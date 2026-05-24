@@ -1,4 +1,4 @@
-# PredictBadminton
+# predict-badminton
 
 LightGBM-based BWF match winner prediction with hybrid Elo ratings, Elo leaderboards, and a future-fixture scoring pipeline.
 
@@ -7,7 +7,7 @@ LightGBM-based BWF match winner prediction with hybrid Elo ratings, Elo leaderbo
 ## Folder structure
 
 ```
-PredictBadminton/
+predict-badminton/
 ├── data/
 │   ├── raw_matches/               # Raw BWF JSON tournament files
 │   └── upcoming_fixtures_template.csv   # Template for future fixture CSV
