@@ -1,0 +1,3 @@
+match_id,match_time,discipline,team1_player_ids,team2_player_ids,round_name,tournament_name,tournament_tier,team1_seed,team2_seed,team1_country,team2_country
+example_001,2026-01-15 10:00:00,MS,12345,67890,R32,Example Open,5,,,CAN,USA
+example_002,2026-01-15 11:00:00,MD,12345|23456,67890|78901,QF,Example Open,5,1,2,CAN,USA

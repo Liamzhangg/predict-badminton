@@ -12,7 +12,7 @@ Usage examples:
   python train.py --no-tune
 
   # Custom paths and trial count
-  python train.py --data-dir data/raw_matches --artifacts-dir outputs/artifacts --n-trials 50
+  python train.py --data-dir data/raw/bwf_matches --artifacts-dir outputs/artifacts --n-trials 50
 
   # Skip rolling backtest (faster)
   python train.py --no-tune --no-backtest
@@ -42,7 +42,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--data-dir",
         type=Path,
-        default=Path("data/raw_matches"),
+        default=Path("data/raw/bwf_matches"),
         help="Directory with raw JSON tournament files",
     )
     p.add_argument(

@@ -9,8 +9,12 @@ LightGBM-based BWF match winner prediction with hybrid Elo ratings, Elo leaderbo
 ```
 predict-badminton/
 ├── data/
-│   ├── raw_matches/               # Raw BWF JSON tournament files
-│   └── upcoming_fixtures_template.csv   # Template for future fixture CSV
+│   ├── README.md                  # Data layout and raw JSON contract
+│   ├── raw/
+│   │   └── bwf_matches/           # Raw BWF JSON tournament files
+│   ├── processed/                 # Future cleaned/model-ready datasets
+│   └── templates/
+│       └── upcoming_fixtures_template.csv
 ├── outputs/
 │   ├── artifacts/
 │   │   ├── lgbm_model.pkl
@@ -64,7 +68,7 @@ python train.py --smoke-test --no-tune
 python train.py --no-backtest
 
 # Custom paths
-python train.py --data-dir data/raw_matches --artifacts-dir outputs/artifacts --n-trials 50
+python train.py --data-dir data/raw/bwf_matches --artifacts-dir outputs/artifacts --n-trials 50
 ```
 
 Training outputs:
@@ -82,7 +86,7 @@ Training outputs:
 Copy the template and fill in your upcoming matches:
 
 ```bash
-cp data/upcoming_fixtures_template.csv data/my_fixtures.csv
+cp data/templates/upcoming_fixtures_template.csv data/my_fixtures.csv
 ```
 
 Required columns:

@@ -20,6 +20,11 @@ build/
 *.pkl
 *.h5
 *.hdf5
+!data/templates/upcoming_fixtures_template.csv
+data/raw/**/*.json
+!data/raw/bwf_matches/.gitkeep
+data/processed/**
+!data/processed/.gitkeep
 models/
 outputs/
 
