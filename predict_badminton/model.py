@@ -17,8 +17,6 @@ Calibration:
 from __future__ import annotations
 
 import logging
-import warnings
-from pathlib import Path
 from typing import Any
 
 import lightgbm as lgb
@@ -30,7 +28,6 @@ from sklearn.metrics import log_loss
 from sklearn.preprocessing import LabelEncoder
 
 from predict_badminton.config import (
-    CAT_FEATURE_COLS,
     CV_FOLD_VAL_YEARS,
     FEATURE_COLS,
     SEED,
@@ -40,14 +37,12 @@ from predict_badminton.evaluate import (
     PlattCalibrator,
     compute_metrics,
     feature_importance_df,
-    metrics_summary,
     reliability_stats,
     shap_importance,
 )
 
 logger = logging.getLogger(__name__)
 optuna.logging.set_verbosity(optuna.logging.WARNING)
-warnings.filterwarnings("ignore", category=UserWarning)
 
 # ---------------------------------------------------------------------------
 # Data helpers

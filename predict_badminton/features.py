@@ -37,11 +37,9 @@ import pandas as pd
 
 from predict_badminton.config import (
     ALPHA_PLAYER_SHARE,
-    CAT_FEATURE_COLS,
     DEFAULT_ELO,
     DISCIPLINES,
     DOUBLES_DISCIPLINES,
-    FEATURE_COLS,
     K_BASE,
     PAIR_LAMBDA,
     ROUND_IMPORTANCE,

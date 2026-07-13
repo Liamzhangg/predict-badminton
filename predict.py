@@ -2,8 +2,8 @@
 """Future match prediction CLI.
 
 Usage:
-  python predict.py --fixtures-csv data/upcoming_fixtures.csv
-  python predict.py --fixtures-csv data/upcoming_fixtures.csv \\
+  uv run python predict.py --fixtures-csv data/upcoming_fixtures.csv
+  uv run python predict.py --fixtures-csv data/upcoming_fixtures.csv \\
       --model-path outputs/artifacts/lgbm_model.pkl \\
       --calibrator-path outputs/artifacts/isotonic_calibrator.pkl \\
       --state-path outputs/artifacts/elo_state.pkl
@@ -17,12 +17,8 @@ import argparse
 import logging
 import pickle
 import sys
-import warnings
 from datetime import datetime
 from pathlib import Path
-
-warnings.filterwarnings("ignore", category=UserWarning)
-warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 import numpy as np
 import pandas as pd

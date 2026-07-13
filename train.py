@@ -3,19 +3,19 @@
 
 Usage examples:
   # Full training run (all files, 30 Optuna trials)
-  python train.py
+  uv run python train.py
 
   # Quick smoke test (100 files, 5 Optuna trials)
-  python train.py --smoke-test --no-tune
+  uv run python train.py --smoke-test --no-tune
 
   # Skip Optuna; use default LightGBM params
-  python train.py --no-tune
+  uv run python train.py --no-tune
 
   # Custom paths and trial count
-  python train.py --data-dir data/raw/bwf_matches --artifacts-dir outputs/artifacts --n-trials 50
+  uv run python train.py --data-dir data/raw/bwf_matches --artifacts-dir outputs/artifacts --n-trials 50
 
   # Skip rolling backtest (faster)
-  python train.py --no-tune --no-backtest
+  uv run python train.py --no-tune --no-backtest
 """
 from __future__ import annotations
 
@@ -26,7 +26,6 @@ import pickle
 import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 logging.basicConfig(

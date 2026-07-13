@@ -6,12 +6,11 @@ that can be fed directly to the saved LightGBM model.
 from __future__ import annotations
 
 import logging
-from collections import defaultdict, deque
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 import pandas as pd
 
 from predict_badminton.config import (
@@ -19,7 +18,7 @@ from predict_badminton.config import (
     FEATURE_COLS,
     ROUND_IMPORTANCE,
 )
-from predict_badminton.features import EloEngine, _k_factor, _elo_expected
+from predict_badminton.features import EloEngine
 
 logger = logging.getLogger(__name__)
 

@@ -3,7 +3,6 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent
 RAW_JSON_DIR = REPO_ROOT / "data" / "raw" / "bwf_matches"
-ARTIFACTS_DIR = REPO_ROOT / "outputs" / "artifacts"
 
 SEED = 42
 
@@ -98,5 +97,3 @@ FEATURE_COLS: list[str] = [
     # Categorical (last so LightGBM categorical_feature indexing is easy)
     "discipline",
 ]
-
-CAT_FEATURE_COLS: list[str] = ["discipline"]
