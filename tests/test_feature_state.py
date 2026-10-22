@@ -86,6 +86,58 @@ class FeatureStateTests(unittest.TestCase):
                     self.assertGreater(len(pd.read_csv(path).columns), 0)
                 self.assertEqual(len(pd.read_csv(output / "elo_leaderboard_MS.csv")), 2 if include_match else 0)
 
+    def test_pair_leaderboards_rank_named_pairs_by_hybrid_elo(self) -> None:
+        builder = FeatureBuilder(player_names={"p1": "Player, One", "p2": "Player Two",
+                                               "p3": "Player Three", "p4": ""})
+        builder.elo.pair_lambda = 10
+        for disc in ("MD", "WD", "XD"):
+            for pid, rating in (("p1", 1700), ("p2", 1900), ("p3", 2000), ("p4", 2100)):
+                builder.elo._disc[pid][disc] = rating
+                builder.elo._global[pid] = rating
+                builder.elo._disc_count[pid][disc] = 20
+            for pair, component, count in ((("p1", "p2"), 400, 5), (("p3", "p4"), 20, 20)):
+                builder.elo._pair[pair][disc] = component
+                builder.elo._pair_count[pair][disc] = count
+
+        before = builder.get_state()
+        with tempfile.TemporaryDirectory() as tmp:
+            builder.export_leaderboards(Path(tmp))
+            for disc in ("MD", "WD", "XD"):
+                table = pd.read_csv(Path(tmp) / f"elo_leaderboard_pairs_{disc}.csv")
+                self.assertEqual(list(table.columns),
+                                 ["pair_name", "pair_key", "elo", "pair_elo_component", "pair_matches"])
+                self.assertEqual(list(table["pair_key"]), ["p3|p4", "p1|p2"])
+                self.assertEqual(list(table["pair_name"]),
+                                 ["Player Three / p4", "Player, One / Player Two"])
+                self.assertEqual(list(table["pair_elo_component"]), [20, 400])
+                self.assertEqual(list(table["pair_matches"]), [20, 5])
+                self.assertAlmostEqual(table.iloc[0]["elo"], 2063.33)
+                self.assertAlmostEqual(table.iloc[1]["elo"], 1933.33)
+        self.assertEqual(builder.get_state(), before)
+
+    def test_pair_leaderboards_require_two_distinct_players_and_shared_history(self) -> None:
+        builder = FeatureBuilder()
+        for pair, count in ((("a", "b"), 1), (("a", "c"), 0),
+                            (("a",), 1), (("a", "a"), 1), (("a", "b", "c"), 1)):
+            builder.elo._pair[pair]["MD"] = 0
+            builder.elo._pair_count[pair]["MD"] = count
+        with tempfile.TemporaryDirectory() as tmp:
+            builder.export_leaderboards(Path(tmp))
+            table = pd.read_csv(Path(tmp) / "elo_leaderboard_pairs_MD.csv")
+        self.assertEqual(list(table["pair_key"]), ["a|b"])
+        self.assertEqual(table.iloc[0]["elo"], 1500)
+        self.assertEqual(table.iloc[0]["pair_matches"], 1)
+
+    def test_pair_leaderboard_ties_are_ordered_by_pair_key(self) -> None:
+        builder = FeatureBuilder()
+        for pair in (("c", "d"), ("a", "b")):
+            builder.elo._pair[pair]["MD"] = 0
+            builder.elo._pair_count[pair]["MD"] = 1
+        with tempfile.TemporaryDirectory() as tmp:
+            builder.export_leaderboards(Path(tmp))
+            table = pd.read_csv(Path(tmp) / "elo_leaderboard_pairs_MD.csv")
+        self.assertEqual(list(table["pair_key"]), ["a|b", "c|d"])
+
     def test_legacy_or_incomplete_state_requires_retraining(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "state.pkl"

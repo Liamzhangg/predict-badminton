@@ -6,7 +6,11 @@ BWF match predictions using LightGBM, player/pair Elo, recent form, head-to-head
 
 **Snapshot: October 21, 2026, 18:10 UTC**, after processing 300,103 played matches from the available 2018-2026 data. These are this model's Elo ratings, **not official BWF rankings or win probabilities**. Coverage is incomplete, junior results are included, and inactive players are not filtered out or penalized for inactivity.
 
-Each event below shows its top five. The linked CSVs contain every rated player in that event. Doubles tables rank **individual players**, not partnerships.
+Each leaderboard below shows its top five, with full CSV downloads. Individual ratings and doubles pair ratings are listed separately.
+
+### Individual Players
+
+These tables rank players individually, including in doubles events.
 
 <details open>
 <summary>Men's Singles (MS)</summary>
@@ -83,6 +87,57 @@ Each event below shows its top five. The linked CSVs contain every rated player 
 
 </details>
 
+### Doubles Pairs
+
+Pair Elo uses the model's full team rating: `average of both players' event Elo + n / (n + 20) * pair component`, where `n` is their played matches together. It is not the pair component alone.
+
+These lists include every recorded two-player partnership with at least one played match, including former partnerships. Both players' ratings are taken at the snapshot cutoff, not frozen at their last match together. Match counts show how much shared history supports each pairing; no minimum-history or active-pair filter is applied.
+
+<details>
+<summary>Men's Doubles (MD) Pairs</summary>
+
+| Rank | Pair | Elo | Matches Together |
+| --- | --- | ---: | ---: |
+| 1 | KIM Won Ho / SEO Seung Jae | 2166.68 | 149 |
+| 2 | SEO Seung Jae / KANG Min Hyuk | 2150.98 | 148 |
+| 3 | Fajar ALFIAN / Muhammad Shohibul FIKRI | 2084.55 | 85 |
+| 4 | SEO Seung Jae / CHOI Sol Gyu | 2056.81 | 101 |
+| 5 | SEO Seung Jae / JIN Yong | 2055.06 | 17 |
+
+[Full MD pair leaderboard: 18,489 pairs](data/leaderboards/elo_leaderboard_pairs_MD.csv)
+
+</details>
+
+<details>
+<summary>Women's Doubles (WD) Pairs</summary>
+
+| Rank | Pair | Elo | Matches Together |
+| --- | --- | ---: | ---: |
+| 1 | TAN Ning / LIU Sheng Shu | 2230.01 | 262 |
+| 2 | JIA Yi Fan / CHEN Qing Chen | 2171.24 | 328 |
+| 3 | BAEK Ha Na / LEE So Hee | 2157.73 | 235 |
+| 4 | Nami MATSUYAMA / Chiharu SHIDA | 2086.83 | 308 |
+| 5 | BAEK Ha Na / KIM Hye Jeong | 2066.38 | 5 |
+
+[Full WD pair leaderboard: 13,599 pairs](data/leaderboards/elo_leaderboard_pairs_WD.csv)
+
+</details>
+
+<details>
+<summary>Mixed Doubles (XD) Pairs</summary>
+
+| Rank | Pair | Elo | Matches Together |
+| --- | --- | ---: | ---: |
+| 1 | HUANG Ya Qiong / ZHENG Si Wei | 2252.88 | 323 |
+| 2 | FENG Yan Zhe / HUANG Dong Ping | 2156.38 | 267 |
+| 3 | WEI Ya Xin / JIANG Zhen Bang | 2154.38 | 269 |
+| 4 | HUANG Dong Ping / WANG Yi Lyu | 2101.88 | 204 |
+| 5 | Yuta WATANABE / Arisa IGARASHI | 2072.60 | 291 |
+
+[Full XD pair leaderboard: 20,319 pairs](data/leaderboards/elo_leaderboard_pairs_XD.csv)
+
+</details>
+
 These are manually published snapshots, not a live feed. See [refresh instructions](data/README.md#public-elo-snapshots).
 
 ## Setup
@@ -142,7 +197,8 @@ Outputs default to `outputs/artifacts/`:
 | `feature_state.pkl`, `feature_list.json` | Complete Elo/form/H2H history and model feature order |
 | `metrics_report.json`, `feature_importance.csv` | Evaluation and feature importance |
 | `elo_leaderboard_MS.csv` through `elo_leaderboard_XD.csv` | Per-event player ratings, names, IDs, counts, and last match time |
-| `elo_leaderboard_GLOBAL.csv`, `elo_leaderboard_pairs_*.csv` | Global player ratings and doubles pair components |
+| `elo_leaderboard_GLOBAL.csv` | Global player ratings |
+| `elo_leaderboard_pairs_MD.csv`, `elo_leaderboard_pairs_WD.csv`, `elo_leaderboard_pairs_XD.csv` | Named doubles pair ratings, player IDs, pair components, and shared match counts |
 
 Elo ratings are model ratings, not official BWF ranking points. Doubles strength combines average player Elo with a history-weighted pair component; a pair component alone is not its full team rating.
 

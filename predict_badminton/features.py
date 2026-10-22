@@ -602,18 +602,22 @@ class FeatureBuilder:
         for disc in DOUBLES_DISCIPLINES:
             rows_p = []
             for pk, disc_map in self.elo._pair.items():
+                if len(pk) != 2 or len(set(pk)) != 2:
+                    continue
                 cnt = self.elo._pair_count[pk].get(disc, 0)
                 if cnt == 0:
                     continue
                 comp = disc_map.get(disc, 0.0)
                 rows_p.append({
+                    "pair_name": " / ".join(self._player_names.get(pid) or pid for pid in pk),
                     "pair_key": "|".join(pk),
+                    "elo": round(self.elo.team_elo(list(pk), disc)[0], 2),
                     "pair_elo_component": round(comp, 2),
                     "pair_matches": cnt,
                 })
             df_pair = (
-                pd.DataFrame(rows_p, columns=["pair_key", "pair_elo_component", "pair_matches"])
-                .sort_values("pair_elo_component", ascending=False)
+                pd.DataFrame(rows_p, columns=["pair_name", "pair_key", "elo", "pair_elo_component", "pair_matches"])
+                .sort_values(["elo", "pair_key"], ascending=[False, True])
                 .reset_index(drop=True)
             )
             out = artifacts_dir / f"elo_leaderboard_pairs_{disc}.csv"

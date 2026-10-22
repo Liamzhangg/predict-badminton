@@ -8,7 +8,7 @@ Raw sources and generated outputs stay local, except for the selected public Elo
 | --- | --- |
 | `raw/bwf_matches/` | Canonical training input: raw BWF tournament JSON |
 | `draws/` | Tracked official draw snapshots used for forecasts, never training input |
-| `leaderboards/` | Tracked per-event player Elo CSV snapshots for public viewing |
+| `leaderboards/` | Tracked per-event player and doubles pair Elo CSV snapshots for public viewing |
 | `templates/` | `upcoming_fixtures_template.csv` for `predict.py` |
 | `source_cache/bwf/` | Downloaded responses, source evidence, collection reports, checksums, and original-file backups |
 | `manifests/` | Local fetch/import statuses, including blocked sources |
@@ -81,16 +81,27 @@ Generated forecasts, result logs, models, and original Elo exports stay under th
 
 ## Public Elo Snapshots
 
-`leaderboards/elo_leaderboard_{MS,WS,MD,WD,XD}.csv` contains the complete per-event player exports from `outputs/runs/2026-10-21-french-open/`, with model history through **2026-10-21 18:10 UTC**. The five files total about 3.9 MB. They are display/download snapshots, never training input.
+All public snapshots use model history through **2026-10-21 18:10 UTC**, from `outputs/runs/2026-10-21-french-open/`. They are display/download snapshots, never training input.
 
-Each CSV is sorted by descending `elo`. `player_id` is the BWF player identifier; `matches_in_discipline` counts included matches in that event. `last_match_time` is the player's most recent included match **across all events**, in UTC. Doubles rows rate individual players, not pairs. Inactive players and junior results remain included; these are model ratings, not official BWF rankings.
+`leaderboards/elo_leaderboard_{MS,WS,MD,WD,XD}.csv` contains the five complete individual-player exports, totaling about 3.9 MB. Each CSV is sorted by descending `elo`. `player_id` is the BWF player identifier; `matches_in_discipline` counts included matches in that event. `last_match_time` is the player's most recent included match **across all events**, in UTC. Doubles rows in these files rate individual players, not pairs.
 
-After training, copy the five exports from the run you intend to publish. For the default artifact location:
+`leaderboards/elo_leaderboard_pairs_{MD,WD,XD}.csv` contains 18,489 MD, 13,599 WD, and 20,319 XD partnerships, totaling about 3.3 MB. These were regenerated from the same saved `feature_state.pkl` using the updated exporter, without retraining or altering the original run. Each row contains:
+
+- `pair_name`: both player names, falling back to IDs when a name is unavailable.
+- `pair_key`: the two BWF player IDs in canonical order, separated by `|`.
+- `elo`: full hybrid team Elo, `average player event Elo + n / (n + pair_lambda) * pair_elo_component`. The saved model uses `pair_lambda = 20`.
+- `pair_elo_component`: the unweighted partnership-specific adjustment, not the full rating.
+- `pair_matches`: their included played matches together in that event (`n`).
+
+Pair files are sorted by descending `elo`, then `pair_key` to break rounded ties. Only two distinct players with at least one recorded played match together are included. Former partnerships remain included, and both individual ratings come from the snapshot cutoff, not the last time that pairing played. Pair ratings can therefore change when either player competes with another partner. Inactive players and junior results remain included in all snapshots; these are model ratings, not official BWF rankings.
+
+Training now exports both individual and full pair ratings. After training, copy the eight selected exports from the run you intend to publish. For the default artifact location:
 
 ```bash
 cp outputs/artifacts/elo_leaderboard_{MS,WS,MD,WD,XD}.csv data/leaderboards/
+cp outputs/artifacts/elo_leaderboard_pairs_{MD,WD,XD}.csv data/leaderboards/
 ```
 
-For a dated run, replace `outputs/artifacts/` with its artifact directory. Update the snapshot date, player counts, and top-five tables in the root README to match the new exports before committing. Read the history cutoff from `production_refit.through` in that run's `metrics_report.json` when using `--refit-all`.
+For a dated run, replace `outputs/artifacts/` with its artifact directory. Older pair exports contain only the pair component; regenerate them with the current exporter or use a new training run before publishing. Update the snapshot date, player/pair counts, and top-five tables in the root README to match the new exports before committing. Read the history cutoff from `production_refit.through` in that run's `metrics_report.json` when using `--refit-all`.
 
 Commit and push the CSVs and documentation together. GitHub renders the README tables and links to the full CSV downloads; no separate website, hosting plan, or domain is required. This is a manual publishing workflow, not an automatic updater.
