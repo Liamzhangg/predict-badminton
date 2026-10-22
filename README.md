@@ -2,6 +2,89 @@
 
 BWF match predictions using LightGBM, player/pair Elo, recent form, head-to-head history, and match context. Includes data collection, training, fixture scoring, and a small Streamlit draw viewer.
 
+## Elo Leaderboards
+
+**Snapshot: October 21, 2026, 18:10 UTC**, after processing 300,103 played matches from the available 2018-2026 data. These are this model's Elo ratings, **not official BWF rankings or win probabilities**. Coverage is incomplete, junior results are included, and inactive players are not filtered out or penalized for inactivity.
+
+Each event below shows its top five. The linked CSVs contain every rated player in that event. Doubles tables rank **individual players**, not partnerships.
+
+<details open>
+<summary>Men's Singles (MS)</summary>
+
+| Rank | Player | Elo | Matches |
+| --- | --- | ---: | ---: |
+| 1 | Alex LANIER | 2353.38 | 353 |
+| 2 | SHI Yu Qi | 2276.70 | 363 |
+| 3 | Anders ANTONSEN | 2260.67 | 401 |
+| 4 | Viktor AXELSEN | 2245.19 | 362 |
+| 5 | Christo POPOV | 2221.52 | 411 |
+
+[Full MS leaderboard: 15,949 players](data/leaderboards/elo_leaderboard_MS.csv)
+
+</details>
+
+<details>
+<summary>Women's Singles (WS)</summary>
+
+| Rank | Player | Elo | Matches |
+| --- | --- | ---: | ---: |
+| 1 | AN Se Young | 2739.22 | 488 |
+| 2 | Akane YAMAGUCHI | 2463.93 | 484 |
+| 3 | WANG Zhi Yi | 2404.21 | 426 |
+| 4 | CHEN Yu Fei | 2365.95 | 463 |
+| 5 | Carolina MARIN | 2287.18 | 272 |
+
+[Full WS leaderboard: 10,129 players](data/leaderboards/elo_leaderboard_WS.csv)
+
+</details>
+
+<details>
+<summary>Men's Doubles (MD)</summary>
+
+| Rank | Player | Elo | Matches |
+| --- | --- | ---: | ---: |
+| 1 | SEO Seung Jae | 2147.05 | 420 |
+| 2 | Muhammad Shohibul FIKRI | 2045.35 | 328 |
+| 3 | KIM Won Ho | 2021.12 | 330 |
+| 4 | Fajar ALFIAN | 1975.86 | 446 |
+| 5 | WANG Chang | 1947.88 | 380 |
+
+[Full MD leaderboard: 17,564 players](data/leaderboards/elo_leaderboard_MD.csv)
+
+</details>
+
+<details>
+<summary>Women's Doubles (WD)</summary>
+
+| Rank | Player | Elo | Matches |
+| --- | --- | ---: | ---: |
+| 1 | BAEK Ha Na | 2132.52 | 376 |
+| 2 | LIU Sheng Shu | 2086.21 | 285 |
+| 3 | JIA Yi Fan | 2025.71 | 451 |
+| 4 | KIM Hye Jeong | 1993.67 | 276 |
+| 5 | ZHANG Shu Xian | 1991.39 | 348 |
+
+[Full WD leaderboard: 11,651 players](data/leaderboards/elo_leaderboard_WD.csv)
+
+</details>
+
+<details>
+<summary>Mixed Doubles (XD)</summary>
+
+| Rank | Player | Elo | Matches |
+| --- | --- | ---: | ---: |
+| 1 | HUANG Dong Ping | 2076.99 | 477 |
+| 2 | HUANG Ya Qiong | 2047.66 | 335 |
+| 3 | WEI Ya Xin | 2001.35 | 303 |
+| 4 | FENG Yan Zhe | 1990.56 | 366 |
+| 5 | ZHENG Si Wei | 1987.23 | 327 |
+
+[Full XD leaderboard: 19,337 players](data/leaderboards/elo_leaderboard_XD.csv)
+
+</details>
+
+These are manually published snapshots, not a live feed. See [refresh instructions](data/README.md#public-elo-snapshots).
+
 ## Setup
 
 Run commands from this repository's root. Python **3.12.13** is pinned in `.python-version`; `uv` manages the local `.venv` and installs dependencies from `uv.lock`.
@@ -79,26 +162,6 @@ The CLI uses `outputs/artifacts/` by default. Override `--model-path`, `--calibr
 
 CSV output goes to `outputs/predictions/` with raw and calibrated win probabilities. Winners use the selected calibrator, isotonic by default. CLI `confidence` is the scaled probability margin, `2 * abs(p - 0.5)`, not the win probability itself.
 
-## French Open Viewer
-
-The viewer currently uses the **October 21, 2026 update**: 80 confirmed R32 outcomes, including two walkovers, with 16 surviving entries per event. It covers R16 on October 22 through the October 25 finals.
-
-Input: `data/draws/french-open-2026-after-r32.json`. Model: `outputs/runs/2026-10-21-french-open/`. If that local bundle is absent, train it from your raw data first:
-
-```bash
-uv run python train.py --no-tune --no-backtest --refit-all \
-  --artifacts-dir outputs/runs/2026-10-21-french-open
-uv run --extra app streamlit run app.py
-```
-
-Open `http://127.0.0.1:8501`; stop the app with `Ctrl+C` in its terminal. A snapshot requires model history earlier than its remaining fixtures; a model trained on later results must not score this old draw.
-
-The app has draw, advancement-table, matchup, and CSV-download views. First-round boxes show confirmed opponents. Later boxes show possible slot winners; the displayed candidates plus "Other players" sum to 100%. Conditional head-to-head odds are separate from the chance that a matchup occurs.
-
-Raw probabilities are the app default. Elo, form, and H2H stay fixed during hypothetical future rounds. Published match times are used when available; estimated session starts are labelled. Injuries, future fatigue, withdrawals, and later results are not automatically incorporated.
-
-The pre-event snapshot and October 20 model remain separate from the R16 update. Saved local forecasts and result logs are under `outputs/forecasts/`. **The app is a saved forecast viewer, not a live feed or a deployed six-hour updater.**
-
 ## Project Map
 
 | Path | Purpose |
@@ -108,7 +171,7 @@ The pre-event snapshot and October 20 model remain separate from the R16 update.
 | `predict_badminton/data_parser.py` | Raw JSON normalization, filtering, and deduplication |
 | `predict_badminton/features.py`, `model.py`, `evaluate.py` | Historical features, model fitting, and evaluation |
 | `predict_badminton/inference.py`, `tournament.py`, `app.py` | Future fixtures, bracket probabilities, and Streamlit UI |
-| `data/` | Local sources, tracked draw snapshots, and fixture template |
+| `data/` | Local sources, public Elo snapshots, tracked draws, and fixture template |
 | `tests/` | Parser, fetch/import, state, time-split, and bracket regression tests |
 
 The model uses 38 features: discipline/global Elo, doubles pair history, recent win rates and rest days, H2H, tournament tier, round, seeds, country overlap, and discipline. Features are recorded before each match updates history. Tournament tiers are inferred heuristically from names; missing coverage and sparse player history limit predictions.
@@ -121,4 +184,4 @@ uv lock --check
 git diff --check
 ```
 
-Git tracks code, tests, configuration, data docs, the fixture template, and public draw snapshots. Raw JSON, caches, generated reports, model artifacts, virtual environments, and secrets stay ignored. Back up local data and trained runs separately; pushing this repository does not back them up.
+Git tracks code, tests, configuration, data docs, the fixture template, public draw snapshots, and the selected Elo CSVs in `data/leaderboards/`. Raw JSON, caches, generated reports, model artifacts, virtual environments, and secrets stay ignored. Back up local data and trained runs separately; pushing this repository does not back them up.

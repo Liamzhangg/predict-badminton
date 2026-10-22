@@ -1,6 +1,6 @@
 # Data
 
-Raw sources and generated outputs stay local. Only this documentation, the fixture template, public draw snapshots, and directory placeholders are tracked by Git.
+Raw sources and generated outputs stay local, except for the selected public Elo snapshots. This documentation, the fixture template, public draw snapshots, Elo snapshots, and directory placeholders are tracked by Git.
 
 ## Layout
 
@@ -8,6 +8,7 @@ Raw sources and generated outputs stay local. Only this documentation, the fixtu
 | --- | --- |
 | `raw/bwf_matches/` | Canonical training input: raw BWF tournament JSON |
 | `draws/` | Tracked official draw snapshots used for forecasts, never training input |
+| `leaderboards/` | Tracked per-event player Elo CSV snapshots for public viewing |
 | `templates/` | `upcoming_fixtures_template.csv` for `predict.py` |
 | `source_cache/bwf/` | Downloaded responses, source evidence, collection reports, checksums, and original-file backups |
 | `manifests/` | Local fetch/import statuses, including blocked sources |
@@ -76,4 +77,20 @@ Snapshots preserve bracket order, player IDs, seeds, source URLs, retrieval time
 
 For individual predictions, copy `templates/upcoming_fixtures_template.csv` and replace its illustrative rows. Required fields are `match_id`, `match_time`, `discipline`, `team1_player_ids`, and `team2_player_ids`; pipe-delimit doubles IDs. Optional fields describe the round, tournament/tier, seeds, and countries. Use UTC times after the model's history cutoff.
 
-Generated forecasts, result logs, models, and Elo CSVs belong under the repository's ignored `outputs/` directory, not in `data/draws/` or Git. See the root [README](../README.md) for training and app commands.
+Generated forecasts, result logs, models, and original Elo exports stay under the repository's ignored `outputs/` directory, not in `data/draws/`. Only the selected public Elo copies described below are committed. See the root [README](../README.md) for training and prediction commands.
+
+## Public Elo Snapshots
+
+`leaderboards/elo_leaderboard_{MS,WS,MD,WD,XD}.csv` contains the complete per-event player exports from `outputs/runs/2026-10-21-french-open/`, with model history through **2026-10-21 18:10 UTC**. The five files total about 3.9 MB. They are display/download snapshots, never training input.
+
+Each CSV is sorted by descending `elo`. `player_id` is the BWF player identifier; `matches_in_discipline` counts included matches in that event. `last_match_time` is the player's most recent included match **across all events**, in UTC. Doubles rows rate individual players, not pairs. Inactive players and junior results remain included; these are model ratings, not official BWF rankings.
+
+After training, copy the five exports from the run you intend to publish. For the default artifact location:
+
+```bash
+cp outputs/artifacts/elo_leaderboard_{MS,WS,MD,WD,XD}.csv data/leaderboards/
+```
+
+For a dated run, replace `outputs/artifacts/` with its artifact directory. Update the snapshot date, player counts, and top-five tables in the root README to match the new exports before committing. Read the history cutoff from `production_refit.through` in that run's `metrics_report.json` when using `--refit-all`.
+
+Commit and push the CSVs and documentation together. GitHub renders the README tables and links to the full CSV downloads; no separate website, hosting plan, or domain is required. This is a manual publishing workflow, not an automatic updater.
