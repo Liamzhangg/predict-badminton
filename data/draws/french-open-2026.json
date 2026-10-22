@@ -1,0 +1,3431 @@
+{
+  "name": "YONEX French Open 2026",
+  "location": "Tremblay-en-France, France",
+  "start_date": "2026-10-20",
+  "end_date": "2026-10-25",
+  "source_url": "https://bwfworldtour.bwfbadminton.com/tournament/5272/yonex-french-open-2026/draws/full-draw/ms",
+  "schedule_source_url": "https://www.yonexifb.com/fr/la-competition/programme",
+  "retrieved_at_utc": "2026-10-20T06:35:17.346217+00:00",
+  "assumptions": "Pre-event snapshot, not live results. History stays fixed at October 18. Unpublished R32 times use October 21 session start; later rounds use official session starts. These are forecast-only estimates, never training timestamps. Future fatigue, injuries and withdrawals are not simulated.",
+  "draws": {
+    "MS": {
+      "entries": [
+        {
+          "id": "64032",
+          "name": "Kunlavut VITIDSARN",
+          "short_name": "K VITIDSARN",
+          "players": [
+            {
+              "id": "64032",
+              "name": "Kunlavut VITIDSARN"
+            }
+          ],
+          "country": "THA",
+          "seed": 1
+        },
+        {
+          "id": "61628",
+          "name": "Toma Junior POPOV",
+          "short_name": "T POPOV",
+          "players": [
+            {
+              "id": "61628",
+              "name": "Toma Junior POPOV"
+            }
+          ],
+          "country": "FRA",
+          "seed": null
+        },
+        {
+          "id": "85095",
+          "name": "Nhat NGUYEN",
+          "short_name": "N NGUYEN",
+          "players": [
+            {
+              "id": "85095",
+              "name": "Nhat NGUYEN"
+            }
+          ],
+          "country": "IRL",
+          "seed": null
+        },
+        {
+          "id": "82606",
+          "name": "Jia Heng TEH",
+          "short_name": "J TEH",
+          "players": [
+            {
+              "id": "82606",
+              "name": "Jia Heng TEH"
+            }
+          ],
+          "country": "SGP",
+          "seed": null
+        },
+        {
+          "id": "94580",
+          "name": "Alex LANIER",
+          "short_name": "A LANIER",
+          "players": [
+            {
+              "id": "94580",
+              "name": "Alex LANIER"
+            }
+          ],
+          "country": "FRA",
+          "seed": 7
+        },
+        {
+          "id": "65634",
+          "name": "Jason GUNAWAN",
+          "short_name": "J GUNAWAN",
+          "players": [
+            {
+              "id": "65634",
+              "name": "Jason GUNAWAN"
+            }
+          ],
+          "country": "HKG",
+          "seed": null
+        },
+        {
+          "id": "59322",
+          "name": "LEE Chia Hao",
+          "short_name": "C LEE",
+          "players": [
+            {
+              "id": "59322",
+              "name": "LEE Chia Hao"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "85845",
+          "name": "Panitchaphon TEERARATSAKUL",
+          "short_name": "P TEERARATSAKUL",
+          "players": [
+            {
+              "id": "85845",
+              "name": "Panitchaphon TEERARATSAKUL"
+            }
+          ],
+          "country": "THA",
+          "seed": null
+        },
+        {
+          "id": "73442",
+          "name": "Jonatan CHRISTIE",
+          "short_name": "J CHRISTIE",
+          "players": [
+            {
+              "id": "73442",
+              "name": "Jonatan CHRISTIE"
+            }
+          ],
+          "country": "INA",
+          "seed": 4
+        },
+        {
+          "id": "60321",
+          "name": "Moh. Zaki UBAIDILLAH",
+          "short_name": "M UBAIDILLAH",
+          "players": [
+            {
+              "id": "60321",
+              "name": "Moh. Zaki UBAIDILLAH"
+            }
+          ],
+          "country": "INA",
+          "seed": null
+        },
+        {
+          "id": "97174",
+          "name": "Koki WATANABE",
+          "short_name": "K WATANABE",
+          "players": [
+            {
+              "id": "97174",
+              "name": "Koki WATANABE"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "84838",
+          "name": "LEONG Jun Hao",
+          "short_name": "LEONG J H",
+          "players": [
+            {
+              "id": "84838",
+              "name": "LEONG Jun Hao"
+            }
+          ],
+          "country": "MAS",
+          "seed": null
+        },
+        {
+          "id": "34810",
+          "name": "CHOU Tien Chen",
+          "short_name": "CHOU T C",
+          "players": [
+            {
+              "id": "34810",
+              "name": "CHOU Tien Chen"
+            }
+          ],
+          "country": "TPE",
+          "seed": 5
+        },
+        {
+          "id": "86672",
+          "name": "Yushi TANAKA",
+          "short_name": "Y TANAKA",
+          "players": [
+            {
+              "id": "86672",
+              "name": "Yushi TANAKA"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "77848",
+          "name": "CHI Yu Jen",
+          "short_name": "CHI Y J",
+          "players": [
+            {
+              "id": "77848",
+              "name": "CHI Yu Jen"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "85394",
+          "name": "Kenta NISHIMOTO",
+          "short_name": "K NISHIMOTO",
+          "players": [
+            {
+              "id": "85394",
+              "name": "Kenta NISHIMOTO"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "93627",
+          "name": "KIDAMBI Srikanth",
+          "short_name": "KIDAMBI S",
+          "players": [
+            {
+              "id": "93627",
+              "name": "KIDAMBI Srikanth"
+            }
+          ],
+          "country": "IND",
+          "seed": null
+        },
+        {
+          "id": "68322",
+          "name": "Ayush SHETTY",
+          "short_name": "A SHETTY",
+          "players": [
+            {
+              "id": "68322",
+              "name": "Ayush SHETTY"
+            }
+          ],
+          "country": "IND",
+          "seed": null
+        },
+        {
+          "id": "68870",
+          "name": "Lakshya SEN",
+          "short_name": "L SEN",
+          "players": [
+            {
+              "id": "68870",
+              "name": "Lakshya SEN"
+            }
+          ],
+          "country": "IND",
+          "seed": null
+        },
+        {
+          "id": "62063",
+          "name": "Kodai NARAOKA",
+          "short_name": "K NARAOKA",
+          "players": [
+            {
+              "id": "62063",
+              "name": "Kodai NARAOKA"
+            }
+          ],
+          "country": "JPN",
+          "seed": 6
+        },
+        {
+          "id": "62855",
+          "name": "Rasmus GEMKE",
+          "short_name": "R GEMKE",
+          "players": [
+            {
+              "id": "62855",
+              "name": "Rasmus GEMKE"
+            }
+          ],
+          "country": "DEN",
+          "seed": null
+        },
+        {
+          "id": "90735",
+          "name": "Yudai OKIMOTO",
+          "short_name": "Y OKIMOTO",
+          "players": [
+            {
+              "id": "90735",
+              "name": "Yudai OKIMOTO"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "59543",
+          "name": "Arnaud MERKLE",
+          "short_name": "A MERKLE",
+          "players": [
+            {
+              "id": "59543",
+              "name": "Arnaud MERKLE"
+            }
+          ],
+          "country": "FRA",
+          "seed": null
+        },
+        {
+          "id": "72885",
+          "name": "Christo POPOV",
+          "short_name": "C POPOV",
+          "players": [
+            {
+              "id": "72885",
+              "name": "Christo POPOV"
+            }
+          ],
+          "country": "FRA",
+          "seed": 3
+        },
+        {
+          "id": "63122",
+          "name": "Brian YANG",
+          "short_name": "B YANG",
+          "players": [
+            {
+              "id": "63122",
+              "name": "Brian YANG"
+            }
+          ],
+          "country": "CAN",
+          "seed": null
+        },
+        {
+          "id": "94780",
+          "name": "LEE Cheuk Yiu",
+          "short_name": "LEE C Y",
+          "players": [
+            {
+              "id": "94780",
+              "name": "LEE Cheuk Yiu"
+            }
+          ],
+          "country": "HKG",
+          "seed": null
+        },
+        {
+          "id": "73591",
+          "name": "HU Zhe An",
+          "short_name": "HU Z A",
+          "players": [
+            {
+              "id": "73591",
+              "name": "HU Zhe An"
+            }
+          ],
+          "country": "CHN",
+          "seed": null
+        },
+        {
+          "id": "94151",
+          "name": "Victor LAI",
+          "short_name": "V LAI",
+          "players": [
+            {
+              "id": "94151",
+              "name": "Victor LAI"
+            }
+          ],
+          "country": "CAN",
+          "seed": 8
+        },
+        {
+          "id": "86114",
+          "name": "LIN Chun-Yi",
+          "short_name": "LIN C Y",
+          "players": [
+            {
+              "id": "86114",
+              "name": "LIN Chun-Yi"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "58089",
+          "name": "Alwi FARHAN",
+          "short_name": "A FARHAN",
+          "players": [
+            {
+              "id": "58089",
+              "name": "Alwi FARHAN"
+            }
+          ],
+          "country": "INA",
+          "seed": null
+        },
+        {
+          "id": "45171",
+          "name": "NG Ka Long Angus",
+          "short_name": "NG K L A",
+          "players": [
+            {
+              "id": "45171",
+              "name": "NG Ka Long Angus"
+            }
+          ],
+          "country": "HKG",
+          "seed": null
+        },
+        {
+          "id": "91554",
+          "name": "Anders ANTONSEN",
+          "short_name": "A ANTONSEN",
+          "players": [
+            {
+              "id": "91554",
+              "name": "Anders ANTONSEN"
+            }
+          ],
+          "country": "DEN",
+          "seed": 2
+        }
+      ],
+      "rounds": [
+        {
+          "name": "R32",
+          "matches": [
+            {
+              "id": "1558565",
+              "time_utc": "2026-10-20 09:40:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558431",
+              "time_utc": "2026-10-20 09:00:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558499",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558486",
+              "time_utc": "2026-10-20 10:40:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558539",
+              "time_utc": "2026-10-20 13:10:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558479",
+              "time_utc": "2026-10-20 10:30:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558545",
+              "time_utc": "2026-10-20 13:50:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558430",
+              "time_utc": "2026-10-20 12:10:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558508",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558518",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558509",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558469",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558444",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558541",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558505",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558542",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "R16",
+          "matches": [
+            {
+              "id": "1558421",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558442",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558445",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558448",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558447",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558452",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558450",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558453",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "QF",
+          "matches": [
+            {
+              "id": "1558438",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558437",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558441",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558440",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "SF",
+          "matches": [
+            {
+              "id": "1558436",
+              "time_utc": "2026-10-24 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558435",
+              "time_utc": "2026-10-24 07:30:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "Final",
+          "matches": [
+            {
+              "id": "1558434",
+              "time_utc": "2026-10-25 10:00:00",
+              "time_estimated": true
+            }
+          ]
+        }
+      ],
+      "tournament_name": "YONEX French Open 2026",
+      "tournament_code": "02C81098-27CE-498C-AABD-8C520607CEAD",
+      "tournament_tier": 3,
+      "source_url": "https://extranet-lv.bwfbadminton.com/api/vue-tournament-draw-data?tmtTab=draw&tmtId=5272&tmtType=1&drawId=1&isPara=false",
+      "source_sha256": "f60f9685f86d8dacc5d556cf9fa6cf0862444615f6f614abce74f42d448c92c8"
+    },
+    "WS": {
+      "entries": [
+        {
+          "id": "87442",
+          "name": "AN Se Young",
+          "short_name": "AN S Y",
+          "players": [
+            {
+              "id": "87442",
+              "name": "AN Se Young"
+            }
+          ],
+          "country": "KOR",
+          "seed": 1
+        },
+        {
+          "id": "70651",
+          "name": "Amalie SCHULZ",
+          "short_name": "A SCHULZ",
+          "players": [
+            {
+              "id": "70651",
+              "name": "Amalie SCHULZ"
+            }
+          ],
+          "country": "DEN",
+          "seed": null
+        },
+        {
+          "id": "99042",
+          "name": "Tanvi SHARMA",
+          "short_name": "T SHARMA",
+          "players": [
+            {
+              "id": "99042",
+              "name": "Tanvi SHARMA"
+            }
+          ],
+          "country": "IND",
+          "seed": null
+        },
+        {
+          "id": "76851",
+          "name": "Isharani BARUAH",
+          "short_name": "I BARUAH",
+          "players": [
+            {
+              "id": "76851",
+              "name": "Isharani BARUAH"
+            }
+          ],
+          "country": "IND",
+          "seed": null
+        },
+        {
+          "id": "92967",
+          "name": "HAN Yue",
+          "short_name": "HAN Y",
+          "players": [
+            {
+              "id": "92967",
+              "name": "HAN Yue"
+            }
+          ],
+          "country": "CHN",
+          "seed": 7
+        },
+        {
+          "id": "85302",
+          "name": "Line CHRISTOPHERSEN",
+          "short_name": "L CHRISTOPHERSEN",
+          "players": [
+            {
+              "id": "85302",
+              "name": "Line CHRISTOPHERSEN"
+            }
+          ],
+          "country": "DEN",
+          "seed": null
+        },
+        {
+          "id": "48528",
+          "name": "Kirsty GILMOUR",
+          "short_name": "K GILMOUR",
+          "players": [
+            {
+              "id": "48528",
+              "name": "Kirsty GILMOUR"
+            }
+          ],
+          "country": "SCO",
+          "seed": null
+        },
+        {
+          "id": "91224",
+          "name": "Mia BLICHFELDT",
+          "short_name": "M BLICHFELDT",
+          "players": [
+            {
+              "id": "91224",
+              "name": "Mia BLICHFELDT"
+            }
+          ],
+          "country": "DEN",
+          "seed": null
+        },
+        {
+          "id": "96312",
+          "name": "Akane YAMAGUCHI",
+          "short_name": "A YAMAGUCHI",
+          "players": [
+            {
+              "id": "96312",
+              "name": "Akane YAMAGUCHI"
+            }
+          ],
+          "country": "JPN",
+          "seed": 3
+        },
+        {
+          "id": "96725",
+          "name": "LIN Hsiang Ti",
+          "short_name": "LIN H T",
+          "players": [
+            {
+              "id": "96725",
+              "name": "LIN Hsiang Ti"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "75628",
+          "name": "Ashmita CHALIHA",
+          "short_name": "A CHALIHA",
+          "players": [
+            {
+              "id": "75628",
+              "name": "Ashmita CHALIHA"
+            }
+          ],
+          "country": "IND",
+          "seed": null
+        },
+        {
+          "id": "92928",
+          "name": "HAN Qian Xi",
+          "short_name": "HAN Q X",
+          "players": [
+            {
+              "id": "92928",
+              "name": "HAN Qian Xi"
+            }
+          ],
+          "country": "CHN",
+          "seed": null
+        },
+        {
+          "id": "84062",
+          "name": "Pornpawee CHOCHUWONG",
+          "short_name": "P CHOCHUWONG",
+          "players": [
+            {
+              "id": "84062",
+              "name": "Pornpawee CHOCHUWONG"
+            }
+          ],
+          "country": "THA",
+          "seed": 8
+        },
+        {
+          "id": "59367",
+          "name": "Karupathevan LETSHANAA",
+          "short_name": "K LETSHANAA",
+          "players": [
+            {
+              "id": "59367",
+              "name": "Karupathevan LETSHANAA"
+            }
+          ],
+          "country": "MAS",
+          "seed": null
+        },
+        {
+          "id": "96713",
+          "name": "Nozomi OKUHARA",
+          "short_name": "N OKUHARA",
+          "players": [
+            {
+              "id": "96713",
+              "name": "Nozomi OKUHARA"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "91896",
+          "name": "Natsuki NIDAIRA",
+          "short_name": "N NIDAIRA",
+          "players": [
+            {
+              "id": "91896",
+              "name": "Natsuki NIDAIRA"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "59687",
+          "name": "Unnati HOODA",
+          "short_name": "U HOODA",
+          "players": [
+            {
+              "id": "59687",
+              "name": "Unnati HOODA"
+            }
+          ],
+          "country": "IND",
+          "seed": null
+        },
+        {
+          "id": "76079",
+          "name": "Riko GUNJI",
+          "short_name": "R GUNJI",
+          "players": [
+            {
+              "id": "76079",
+              "name": "Riko GUNJI"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "91422",
+          "name": "Supanida KATETHONG",
+          "short_name": "S KATETHONG",
+          "players": [
+            {
+              "id": "91422",
+              "name": "Supanida KATETHONG"
+            }
+          ],
+          "country": "THA",
+          "seed": null
+        },
+        {
+          "id": "73173",
+          "name": "PUSARLA V. Sindhu",
+          "short_name": "PUSARLA V S",
+          "players": [
+            {
+              "id": "73173",
+              "name": "PUSARLA V. Sindhu"
+            }
+          ],
+          "country": "IND",
+          "seed": null
+        },
+        {
+          "id": "80862",
+          "name": "CHIU Pin-Chian",
+          "short_name": "CHIU P C",
+          "players": [
+            {
+              "id": "80862",
+              "name": "CHIU Pin-Chian"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "87112",
+          "name": "Kaloyana NALBANTOVA",
+          "short_name": "K NALBANTOVA",
+          "players": [
+            {
+              "id": "87112",
+              "name": "Kaloyana NALBANTOVA"
+            }
+          ],
+          "country": "BUL",
+          "seed": null
+        },
+        {
+          "id": "99069",
+          "name": "SIM Yu Jin",
+          "short_name": "SIM Y J",
+          "players": [
+            {
+              "id": "99069",
+              "name": "SIM Yu Jin"
+            }
+          ],
+          "country": "KOR",
+          "seed": null
+        },
+        {
+          "id": "35642",
+          "name": "Ratchanok INTANON",
+          "short_name": "R INTANON",
+          "players": [
+            {
+              "id": "35642",
+              "name": "Ratchanok INTANON"
+            }
+          ],
+          "country": "THA",
+          "seed": 4
+        },
+        {
+          "id": "63437",
+          "name": "Line Højmark KJAERSFELDT",
+          "short_name": "L KJAERSFELDT",
+          "players": [
+            {
+              "id": "63437",
+              "name": "Line Højmark KJAERSFELDT"
+            }
+          ],
+          "country": "DEN",
+          "seed": null
+        },
+        {
+          "id": "87885",
+          "name": "Neslihan ARIN",
+          "short_name": "N ARIN",
+          "players": [
+            {
+              "id": "87885",
+              "name": "Neslihan ARIN"
+            }
+          ],
+          "country": "TUR",
+          "seed": null
+        },
+        {
+          "id": "90287",
+          "name": "Devika SIHAG",
+          "short_name": "D SIHAG",
+          "players": [
+            {
+              "id": "90287",
+              "name": "Devika SIHAG"
+            }
+          ],
+          "country": "IND",
+          "seed": null
+        },
+        {
+          "id": "76890",
+          "name": "Putri Kusuma WARDANI",
+          "short_name": "P WARDANI",
+          "players": [
+            {
+              "id": "76890",
+              "name": "Putri Kusuma WARDANI"
+            }
+          ],
+          "country": "INA",
+          "seed": 5
+        },
+        {
+          "id": "84523",
+          "name": "Michelle LI",
+          "short_name": "M LI",
+          "players": [
+            {
+              "id": "84523",
+              "name": "Michelle LI"
+            }
+          ],
+          "country": "CAN",
+          "seed": null
+        },
+        {
+          "id": "68479",
+          "name": "Hina AKECHI",
+          "short_name": "H AKECHI",
+          "players": [
+            {
+              "id": "68479",
+              "name": "Hina AKECHI"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "97685",
+          "name": "HUANG Yu-Hsun",
+          "short_name": "HUANG Y H",
+          "players": [
+            {
+              "id": "97685",
+              "name": "HUANG Yu-Hsun"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "61854",
+          "name": "WANG Zhi Yi",
+          "short_name": "WANG Z Y",
+          "players": [
+            {
+              "id": "61854",
+              "name": "WANG Zhi Yi"
+            }
+          ],
+          "country": "CHN",
+          "seed": 2
+        }
+      ],
+      "rounds": [
+        {
+          "name": "R32",
+          "matches": [
+            {
+              "id": "1558527",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558460",
+              "time_utc": "2026-10-20 08:10:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558459",
+              "time_utc": "2026-10-20 08:50:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558535",
+              "time_utc": "2026-10-20 09:40:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558426",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558443",
+              "time_utc": "2026-10-20 13:10:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558457",
+              "time_utc": "2026-10-20 13:00:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558506",
+              "time_utc": "2026-10-20 12:20:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558490",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558569",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558564",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558478",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558537",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558575",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558570",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558446",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "R16",
+          "matches": [
+            {
+              "id": "1558556",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558554",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558558",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558557",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558562",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558559",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558566",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558563",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "QF",
+          "matches": [
+            {
+              "id": "1558425",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558429",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558428",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558552",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "SF",
+          "matches": [
+            {
+              "id": "1558525",
+              "time_utc": "2026-10-24 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558427",
+              "time_utc": "2026-10-24 07:30:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "Final",
+          "matches": [
+            {
+              "id": "1558526",
+              "time_utc": "2026-10-25 10:00:00",
+              "time_estimated": true
+            }
+          ]
+        }
+      ],
+      "tournament_name": "YONEX French Open 2026",
+      "tournament_code": "02C81098-27CE-498C-AABD-8C520607CEAD",
+      "tournament_tier": 3,
+      "source_url": "https://extranet-lv.bwfbadminton.com/api/vue-tournament-draw-data?tmtTab=draw&tmtId=5272&tmtType=1&drawId=2&isPara=false",
+      "source_sha256": "f443c515445ff79da20de94c4e0565d0f6664c5a70a9c104d80ff6dc58840ab6"
+    },
+    "MD": {
+      "entries": [
+        {
+          "id": "61444|66513",
+          "name": "KIM Won Ho / SEO Seung Jae",
+          "short_name": "KIM W H / SEO S J",
+          "players": [
+            {
+              "id": "61444",
+              "name": "KIM Won Ho"
+            },
+            {
+              "id": "66513",
+              "name": "SEO Seung Jae"
+            }
+          ],
+          "country": "KOR",
+          "seed": 1
+        },
+        {
+          "id": "82009|86479",
+          "name": "Hiroki OKAMURA / Kyohei YAMASHITA",
+          "short_name": "H OKAMURA / K YAMASHITA",
+          "players": [
+            {
+              "id": "86479",
+              "name": "Hiroki OKAMURA"
+            },
+            {
+              "id": "82009",
+              "name": "Kyohei YAMASHITA"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "62618|63739",
+          "name": "CHEN ZHI YI / Presley SMITH",
+          "short_name": "CHEN Z Y / P SMITH",
+          "players": [
+            {
+              "id": "62618",
+              "name": "CHEN ZHI YI"
+            },
+            {
+              "id": "63739",
+              "name": "Presley SMITH"
+            }
+          ],
+          "country": "USA",
+          "seed": null
+        },
+        {
+          "id": "57397|88322",
+          "name": "Aaron TAI / YAP Roy King",
+          "short_name": "A TAI / YAP R K",
+          "players": [
+            {
+              "id": "57397",
+              "name": "Aaron TAI"
+            },
+            {
+              "id": "88322",
+              "name": "YAP Roy King"
+            }
+          ],
+          "country": "MAS",
+          "seed": null
+        },
+        {
+          "id": "90768|94814",
+          "name": "GOH Sze Fei / Nur IZZUDDIN",
+          "short_name": "GOH S F / N IZZUDDIN",
+          "players": [
+            {
+              "id": "90768",
+              "name": "GOH Sze Fei"
+            },
+            {
+              "id": "94814",
+              "name": "Nur IZZUDDIN"
+            }
+          ],
+          "country": "MAS",
+          "seed": 6
+        },
+        {
+          "id": "64729|75049",
+          "name": "Christian Faust KJÆR / Rasmus KJÆR",
+          "short_name": "C KJÆR / R KJÆR",
+          "players": [
+            {
+              "id": "75049",
+              "name": "Christian Faust KJÆR"
+            },
+            {
+              "id": "64729",
+              "name": "Rasmus KJÆR"
+            }
+          ],
+          "country": "DEN",
+          "seed": null
+        },
+        {
+          "id": "60507|68134",
+          "name": "Daniel LUNDGAARD / Mads VESTERGAARD",
+          "short_name": "D LUNDGAARD / M VESTERGAARD",
+          "players": [
+            {
+              "id": "68134",
+              "name": "Daniel LUNDGAARD"
+            },
+            {
+              "id": "60507",
+              "name": "Mads VESTERGAARD"
+            }
+          ],
+          "country": "DEN",
+          "seed": null
+        },
+        {
+          "id": "76275|99102",
+          "name": "LEE Jhe-Huei / YANG Po-Hsuan",
+          "short_name": "LEE J H / YANG P H",
+          "players": [
+            {
+              "id": "99102",
+              "name": "LEE Jhe-Huei"
+            },
+            {
+              "id": "76275",
+              "name": "YANG Po-Hsuan"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "88876|91440",
+          "name": "Fajar ALFIAN / Muhammad Shohibul FIKRI",
+          "short_name": "F ALFIAN / M FIKRI",
+          "players": [
+            {
+              "id": "88876",
+              "name": "Fajar ALFIAN"
+            },
+            {
+              "id": "91440",
+              "name": "Muhammad Shohibul FIKRI"
+            }
+          ],
+          "country": "INA",
+          "seed": 3
+        },
+        {
+          "id": "92913|96514",
+          "name": "CHIU Hsiang Chieh / WANG Chi-Lin",
+          "short_name": "H CHIU / WANG C L",
+          "players": [
+            {
+              "id": "92913",
+              "name": "CHIU Hsiang Chieh"
+            },
+            {
+              "id": "96514",
+              "name": "WANG Chi-Lin"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "72973|76388",
+          "name": "Ali Faathir RAYHAN / Devin Artha WAHYUDI",
+          "short_name": "A RAYHAN / D WAHYUDI",
+          "players": [
+            {
+              "id": "72973",
+              "name": "Ali Faathir RAYHAN"
+            },
+            {
+              "id": "76388",
+              "name": "Devin Artha WAHYUDI"
+            }
+          ],
+          "country": "INA",
+          "seed": null
+        },
+        {
+          "id": "62804|77262",
+          "name": "KANG Min Hyuk / LEE JONGMIN",
+          "short_name": "KANG M H / LEE J",
+          "players": [
+            {
+              "id": "77262",
+              "name": "KANG Min Hyuk"
+            },
+            {
+              "id": "62804",
+              "name": "LEE JONGMIN"
+            }
+          ],
+          "country": "KOR",
+          "seed": null
+        },
+        {
+          "id": "70500|72435",
+          "name": "Satwiksairaj RANKIREDDY / Chirag SHETTY",
+          "short_name": "S RANKIREDDY / C SHETTY",
+          "players": [
+            {
+              "id": "72435",
+              "name": "Satwiksairaj RANKIREDDY"
+            },
+            {
+              "id": "70500",
+              "name": "Chirag SHETTY"
+            }
+          ],
+          "country": "IND",
+          "seed": 5
+        },
+        {
+          "id": "61628|72885",
+          "name": "Christo POPOV / Toma Junior POPOV",
+          "short_name": "C POPOV / T POPOV",
+          "players": [
+            {
+              "id": "72885",
+              "name": "Christo POPOV"
+            },
+            {
+              "id": "61628",
+              "name": "Toma Junior POPOV"
+            }
+          ],
+          "country": "FRA",
+          "seed": null
+        },
+        {
+          "id": "57424|70231",
+          "name": "Fang-Chih LEE / Fang-Jen LEE",
+          "short_name": "F LEE / F LEE",
+          "players": [
+            {
+              "id": "57424",
+              "name": "Fang-Chih LEE"
+            },
+            {
+              "id": "70231",
+              "name": "Fang-Jen LEE"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "68633|84786",
+          "name": "Leo Rolly CARNANDO / Daniel MARTHIN",
+          "short_name": "L CARNANDO / D MARTHIN",
+          "players": [
+            {
+              "id": "68633",
+              "name": "Leo Rolly CARNANDO"
+            },
+            {
+              "id": "84786",
+              "name": "Daniel MARTHIN"
+            }
+          ],
+          "country": "INA",
+          "seed": null
+        },
+        {
+          "id": "78409|85129",
+          "name": "MAN Wei Chong / TEE Kai Wun",
+          "short_name": "MAN W C / TEE K W",
+          "players": [
+            {
+              "id": "78409",
+              "name": "MAN Wei Chong"
+            },
+            {
+              "id": "85129",
+              "name": "TEE Kai Wun"
+            }
+          ],
+          "country": "MAS",
+          "seed": null
+        },
+        {
+          "id": "63530|79906",
+          "name": "Kakeru KUMAGAI / Hiroki NISHI",
+          "short_name": "K KUMAGAI / H NISHI",
+          "players": [
+            {
+              "id": "79906",
+              "name": "Kakeru KUMAGAI"
+            },
+            {
+              "id": "63530",
+              "name": "Hiroki NISHI"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "72478|76278",
+          "name": "Ben LANE / Sean VENDY",
+          "short_name": "B LANE / S VENDY",
+          "players": [
+            {
+              "id": "76278",
+              "name": "Ben LANE"
+            },
+            {
+              "id": "72478",
+              "name": "Sean VENDY"
+            }
+          ],
+          "country": "ENG",
+          "seed": null
+        },
+        {
+          "id": "67903|81657",
+          "name": "Takuro HOKI / Yugo KOBAYASHI",
+          "short_name": "T HOKI / Y KOBAYASHI",
+          "players": [
+            {
+              "id": "81657",
+              "name": "Takuro HOKI"
+            },
+            {
+              "id": "67903",
+              "name": "Yugo KOBAYASHI"
+            }
+          ],
+          "country": "JPN",
+          "seed": 8
+        },
+        {
+          "id": "52071|70443",
+          "name": "Nur Mohd Azriyn Ayub AZRIYN / TAN Wee Kiong",
+          "short_name": "N AZRIYN / TAN W K",
+          "players": [
+            {
+              "id": "70443",
+              "name": "Nur Mohd Azriyn Ayub AZRIYN"
+            },
+            {
+              "id": "52071",
+              "name": "TAN Wee Kiong"
+            }
+          ],
+          "country": "MAS",
+          "seed": null
+        },
+        {
+          "id": "65674|84102",
+          "name": "Peeratchai SUKPHUN / Pakkapon TEERARATSAKUL",
+          "short_name": "P SUKPHUN / P TEERARATSAKUL",
+          "players": [
+            {
+              "id": "84102",
+              "name": "Peeratchai SUKPHUN"
+            },
+            {
+              "id": "65674",
+              "name": "Pakkapon TEERARATSAKUL"
+            }
+          ],
+          "country": "THA",
+          "seed": null
+        },
+        {
+          "id": "59673|84812",
+          "name": "HE Ji Ting / REN Xiang Yu",
+          "short_name": "HE J T / REN X Y",
+          "players": [
+            {
+              "id": "59673",
+              "name": "HE Ji Ting"
+            },
+            {
+              "id": "84812",
+              "name": "REN Xiang Yu"
+            }
+          ],
+          "country": "CHN",
+          "seed": null
+        },
+        {
+          "id": "56203|99389",
+          "name": "Aaron CHIA / SOH Wooi Yik",
+          "short_name": "A CHIA / SOH W Y",
+          "players": [
+            {
+              "id": "56203",
+              "name": "Aaron CHIA"
+            },
+            {
+              "id": "99389",
+              "name": "SOH Wooi Yik"
+            }
+          ],
+          "country": "MAS",
+          "seed": 4
+        },
+        {
+          "id": "44414|92980",
+          "name": "Kim ASTRUP / Anders Skaarup RASMUSSEN",
+          "short_name": "K ASTRUP / A RASMUSSEN",
+          "players": [
+            {
+              "id": "92980",
+              "name": "Kim ASTRUP"
+            },
+            {
+              "id": "44414",
+              "name": "Anders Skaarup RASMUSSEN"
+            }
+          ],
+          "country": "DEN",
+          "seed": null
+        },
+        {
+          "id": "71223|93130",
+          "name": "CHEN Bo Yang / LIU Yi",
+          "short_name": "CHEN B Y / LIU Y",
+          "players": [
+            {
+              "id": "93130",
+              "name": "CHEN Bo Yang"
+            },
+            {
+              "id": "71223",
+              "name": "LIU Yi"
+            }
+          ],
+          "country": "CHN",
+          "seed": null
+        },
+        {
+          "id": "55669|99781",
+          "name": "Raymond INDRA / Nikolaus JOAQUIN",
+          "short_name": "R INDRA / N JOAQUIN",
+          "players": [
+            {
+              "id": "99781",
+              "name": "Raymond INDRA"
+            },
+            {
+              "id": "55669",
+              "name": "Nikolaus JOAQUIN"
+            }
+          ],
+          "country": "INA",
+          "seed": null
+        },
+        {
+          "id": "86136|87432",
+          "name": "Sabar Karyaman GUTAMA / Moh Reza Pahlevi ISFAHANI",
+          "short_name": "S GUTAMA / M ISFAHANI",
+          "players": [
+            {
+              "id": "87432",
+              "name": "Sabar Karyaman GUTAMA"
+            },
+            {
+              "id": "86136",
+              "name": "Moh Reza Pahlevi ISFAHANI"
+            }
+          ],
+          "country": "INA",
+          "seed": 7
+        },
+        {
+          "id": "62220|97601",
+          "name": "HU Ke Yuan / LIN Xiang Yi",
+          "short_name": "HU K Y / LIN X Y",
+          "players": [
+            {
+              "id": "97601",
+              "name": "HU Ke Yuan"
+            },
+            {
+              "id": "62220",
+              "name": "LIN Xiang Yi"
+            }
+          ],
+          "country": "CHN",
+          "seed": null
+        },
+        {
+          "id": "79732|99066",
+          "name": "CHIA Weijie / TEO Ee Yi",
+          "short_name": "CHIA W / TEO E Y",
+          "players": [
+            {
+              "id": "79732",
+              "name": "CHIA Weijie"
+            },
+            {
+              "id": "99066",
+              "name": "TEO Ee Yi"
+            }
+          ],
+          "country": "MAS",
+          "seed": null
+        },
+        {
+          "id": "75829|92504",
+          "name": "CHEN Zhi  Ray / LIN Yu Chieh",
+          "short_name": "CHEN Z  R / LIN Y C",
+          "players": [
+            {
+              "id": "75829",
+              "name": "CHEN Zhi  Ray"
+            },
+            {
+              "id": "92504",
+              "name": "LIN Yu Chieh"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "55414|90531",
+          "name": "LIANG Wei Keng / WANG Chang",
+          "short_name": "LIANG W K / WANG C",
+          "players": [
+            {
+              "id": "90531",
+              "name": "LIANG Wei Keng"
+            },
+            {
+              "id": "55414",
+              "name": "WANG Chang"
+            }
+          ],
+          "country": "CHN",
+          "seed": 2
+        }
+      ],
+      "rounds": [
+        {
+          "name": "R32",
+          "matches": [
+            {
+              "id": "1558546",
+              "time_utc": "2026-10-20 11:20:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558503",
+              "time_utc": "2026-10-20 14:00:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558480",
+              "time_utc": "2026-10-20 12:10:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558574",
+              "time_utc": "2026-10-20 13:50:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558560",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558551",
+              "time_utc": "2026-10-20 14:40:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558561",
+              "time_utc": "2026-10-20 14:40:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558477",
+              "time_utc": "2026-10-20 13:00:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558458",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558540",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558544",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558487",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558538",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558533",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558543",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558534",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "R16",
+          "matches": [
+            {
+              "id": "1558516",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558515",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558492",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558519",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558496",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558494",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558481",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558482",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "QF",
+          "matches": [
+            {
+              "id": "1558512",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558511",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558514",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558513",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "SF",
+          "matches": [
+            {
+              "id": "1558422",
+              "time_utc": "2026-10-24 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558424",
+              "time_utc": "2026-10-24 07:30:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "Final",
+          "matches": [
+            {
+              "id": "1558423",
+              "time_utc": "2026-10-25 10:00:00",
+              "time_estimated": true
+            }
+          ]
+        }
+      ],
+      "tournament_name": "YONEX French Open 2026",
+      "tournament_code": "02C81098-27CE-498C-AABD-8C520607CEAD",
+      "tournament_tier": 3,
+      "source_url": "https://extranet-lv.bwfbadminton.com/api/vue-tournament-draw-data?tmtTab=draw&tmtId=5272&tmtType=1&drawId=3&isPara=false",
+      "source_sha256": "d2d4f5928264bfe45e096567ce48e66d2124bb57572e7cde480a027df88a765e"
+    },
+    "WD": {
+      "entries": [
+        {
+          "id": "71023|81609",
+          "name": "Yuki FUKUSHIMA / Mayu MATSUMOTO",
+          "short_name": "Y FUKUSHIMA / M MATSUMOTO",
+          "players": [
+            {
+              "id": "71023",
+              "name": "Yuki FUKUSHIMA"
+            },
+            {
+              "id": "81609",
+              "name": "Mayu MATSUMOTO"
+            }
+          ],
+          "country": "JPN",
+          "seed": 1
+        },
+        {
+          "id": "68304|92989",
+          "name": "Nanako HARA / Riko KIYOSE",
+          "short_name": "N HARA / R KIYOSE",
+          "players": [
+            {
+              "id": "92989",
+              "name": "Nanako HARA"
+            },
+            {
+              "id": "68304",
+              "name": "Riko KIYOSE"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "65349|74561",
+          "name": "HSU Ya Ching / SUNG Yu-Hsuan",
+          "short_name": "HSU Y C / SUNG Y H",
+          "players": [
+            {
+              "id": "74561",
+              "name": "HSU Ya Ching"
+            },
+            {
+              "id": "65349",
+              "name": "SUNG Yu-Hsuan"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "65708|69091",
+          "name": "Lauren LAM / Allison Quynh LEE",
+          "short_name": "L LAM / A LEE",
+          "players": [
+            {
+              "id": "69091",
+              "name": "Lauren LAM"
+            },
+            {
+              "id": "65708",
+              "name": "Allison Quynh LEE"
+            }
+          ],
+          "country": "USA",
+          "seed": null
+        },
+        {
+          "id": "79664|82364",
+          "name": "Febriana Dwipuji KUSUMA / Meilysa Trias PUSPITASARI",
+          "short_name": "F KUSUMA / M PUSPITASARI",
+          "players": [
+            {
+              "id": "79664",
+              "name": "Febriana Dwipuji KUSUMA"
+            },
+            {
+              "id": "82364",
+              "name": "Meilysa Trias PUSPITASARI"
+            }
+          ],
+          "country": "INA",
+          "seed": 7
+        },
+        {
+          "id": "67761|88097",
+          "name": "Amallia Cahaya PRATIWI / Siti Fadia Silva RAMADHANTI",
+          "short_name": "A PRATIWI / S RAMADHANTI",
+          "players": [
+            {
+              "id": "67761",
+              "name": "Amallia Cahaya PRATIWI"
+            },
+            {
+              "id": "88097",
+              "name": "Siti Fadia Silva RAMADHANTI"
+            }
+          ],
+          "country": "INA",
+          "seed": null
+        },
+        {
+          "id": "59966|71612",
+          "name": "Treesa JOLLY / GAYATRI GOPICHAND PULLELA",
+          "short_name": "T JOLLY / G PULLELA",
+          "players": [
+            {
+              "id": "71612",
+              "name": "Treesa JOLLY"
+            },
+            {
+              "id": "59966",
+              "name": "GAYATRI GOPICHAND PULLELA"
+            }
+          ],
+          "country": "IND",
+          "seed": null
+        },
+        {
+          "id": "70860|85808",
+          "name": "LIN Chih-Chun / YANG Chu Yun",
+          "short_name": "LIN C C / YANG C Y",
+          "players": [
+            {
+              "id": "85808",
+              "name": "LIN Chih-Chun"
+            },
+            {
+              "id": "70860",
+              "name": "YANG Chu Yun"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "69009|96973",
+          "name": "HSU Yin-Hui / LIN Jhih Yun",
+          "short_name": "HSU Y H / LIN J Y",
+          "players": [
+            {
+              "id": "96973",
+              "name": "HSU Yin-Hui"
+            },
+            {
+              "id": "69009",
+              "name": "LIN Jhih Yun"
+            }
+          ],
+          "country": "TPE",
+          "seed": 4
+        },
+        {
+          "id": "66794|76295",
+          "name": "Hinata SUZUKI / Nao YAMAKITA",
+          "short_name": "H SUZUKI / N YAMAKITA",
+          "players": [
+            {
+              "id": "76295",
+              "name": "Hinata SUZUKI"
+            },
+            {
+              "id": "66794",
+              "name": "Nao YAMAKITA"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "62035|97313",
+          "name": "LUO Yi / WANG Ting Ge",
+          "short_name": "LUO Y / WANG T G",
+          "players": [
+            {
+              "id": "97313",
+              "name": "LUO Yi"
+            },
+            {
+              "id": "62035",
+              "name": "WANG Ting Ge"
+            }
+          ],
+          "country": "CHN",
+          "seed": null
+        },
+        {
+          "id": "19726|70692",
+          "name": "Sumire NAKADE / Miyu TAKAHASHI",
+          "short_name": "S NAKADE / M TAKAHASHI",
+          "players": [
+            {
+              "id": "19726",
+              "name": "Sumire NAKADE"
+            },
+            {
+              "id": "70692",
+              "name": "Miyu TAKAHASHI"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "55481|94567",
+          "name": "Rachel Allessya ROSE / Febi SETIANINGRUM",
+          "short_name": "R ROSE / F SETIANINGRUM",
+          "players": [
+            {
+              "id": "94567",
+              "name": "Rachel Allessya ROSE"
+            },
+            {
+              "id": "55481",
+              "name": "Febi SETIANINGRUM"
+            }
+          ],
+          "country": "INA",
+          "seed": 5
+        },
+        {
+          "id": "87893|95205",
+          "name": "LUI Lok Lok / TSANG Hiu Yan",
+          "short_name": "LUI L L / TSANG H Y",
+          "players": [
+            {
+              "id": "87893",
+              "name": "LUI Lok Lok"
+            },
+            {
+              "id": "95205",
+              "name": "TSANG Hiu Yan"
+            }
+          ],
+          "country": "HKG",
+          "seed": null
+        },
+        {
+          "id": "68015|75864",
+          "name": "YEUNG Nga Ting / YEUNG Pui Lam",
+          "short_name": "YEUNG N T / YEUNG P L",
+          "players": [
+            {
+              "id": "68015",
+              "name": "YEUNG Nga Ting"
+            },
+            {
+              "id": "75864",
+              "name": "YEUNG Pui Lam"
+            }
+          ],
+          "country": "HKG",
+          "seed": null
+        },
+        {
+          "id": "91715|92277",
+          "name": "Julie MACPHERSON / Ciara TORRANCE",
+          "short_name": "J MACPHERSON / C TORRANCE",
+          "players": [
+            {
+              "id": "91715",
+              "name": "Julie MACPHERSON"
+            },
+            {
+              "id": "92277",
+              "name": "Ciara TORRANCE"
+            }
+          ],
+          "country": "SCO",
+          "seed": null
+        },
+        {
+          "id": "68282|86778",
+          "name": "Ririna HIRAMOTO / Chiharu SHIDA",
+          "short_name": "R HIRAMOTO / C SHIDA",
+          "players": [
+            {
+              "id": "86778",
+              "name": "Ririna HIRAMOTO"
+            },
+            {
+              "id": "68282",
+              "name": "Chiharu SHIDA"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "67676|80547",
+          "name": "Rutaparna PANDA / Swetaparna PANDA",
+          "short_name": "R PANDA / S PANDA",
+          "players": [
+            {
+              "id": "80547",
+              "name": "Rutaparna PANDA"
+            },
+            {
+              "id": "67676",
+              "name": "Swetaparna PANDA"
+            }
+          ],
+          "country": "IND",
+          "seed": null
+        },
+        {
+          "id": "83211|94519",
+          "name": "Sayaka HIROTA / Ayako SAKURAMOTO",
+          "short_name": "S HIROTA / A SAKURAMOTO",
+          "players": [
+            {
+              "id": "94519",
+              "name": "Sayaka HIROTA"
+            },
+            {
+              "id": "83211",
+              "name": "Ayako SAKURAMOTO"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "18889|62277",
+          "name": "BAO Li Jing / CAO Zi Han",
+          "short_name": "BAO L J / CAO Z H",
+          "players": [
+            {
+              "id": "62277",
+              "name": "BAO Li Jing"
+            },
+            {
+              "id": "18889",
+              "name": "CAO Zi Han"
+            }
+          ],
+          "country": "CHN",
+          "seed": 6
+        },
+        {
+          "id": "75270|78687",
+          "name": "CHANG Ching  Hui / YANG Ching Tun",
+          "short_name": "CHANG C  H / YANG C T",
+          "players": [
+            {
+              "id": "75270",
+              "name": "CHANG Ching  Hui"
+            },
+            {
+              "id": "78687",
+              "name": "YANG Ching Tun"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "61882|83074",
+          "name": "Francesca CORBETT / Jennie GAI",
+          "short_name": "F CORBETT / J GAI",
+          "players": [
+            {
+              "id": "61882",
+              "name": "Francesca CORBETT"
+            },
+            {
+              "id": "83074",
+              "name": "Jennie GAI"
+            }
+          ],
+          "country": "USA",
+          "seed": null
+        },
+        {
+          "id": "59014|84159",
+          "name": "Rui HIROKAMI / Sayaka HOBARA",
+          "short_name": "R HIROKAMI / S HOBARA",
+          "players": [
+            {
+              "id": "84159",
+              "name": "Rui HIROKAMI"
+            },
+            {
+              "id": "59014",
+              "name": "Sayaka HOBARA"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "87428|88135",
+          "name": "Rin IWANAGA / Kie NAKANISHI",
+          "short_name": "R IWANAGA / K NAKANISHI",
+          "players": [
+            {
+              "id": "88135",
+              "name": "Rin IWANAGA"
+            },
+            {
+              "id": "87428",
+              "name": "Kie NAKANISHI"
+            }
+          ],
+          "country": "JPN",
+          "seed": 3
+        },
+        {
+          "id": "66115|73838",
+          "name": "KIM Yu Jung / LEE Yu Lim",
+          "short_name": "KIM Y J / LEE Y L",
+          "players": [
+            {
+              "id": "73838",
+              "name": "KIM Yu Jung"
+            },
+            {
+              "id": "66115",
+              "name": "LEE Yu Lim"
+            }
+          ],
+          "country": "KOR",
+          "seed": null
+        },
+        {
+          "id": "94032|96877",
+          "name": "Polina BUHROVA / Yevheniia KANTEMYR",
+          "short_name": "P BUHROVA / Y KANTEMYR",
+          "players": [
+            {
+              "id": "96877",
+              "name": "Polina BUHROVA"
+            },
+            {
+              "id": "94032",
+              "name": "Yevheniia KANTEMYR"
+            }
+          ],
+          "country": "UKR",
+          "seed": null
+        },
+        {
+          "id": "61633|67290",
+          "name": "Kathrine VANG / Mette WERGE",
+          "short_name": "K VANG / M WERGE",
+          "players": [
+            {
+              "id": "61633",
+              "name": "Kathrine VANG"
+            },
+            {
+              "id": "67290",
+              "name": "Mette WERGE"
+            }
+          ],
+          "country": "DEN",
+          "seed": null
+        },
+        {
+          "id": "43840|46169",
+          "name": "Gabriela STOEVA / Stefani STOEVA",
+          "short_name": "G STOEVA / S STOEVA",
+          "players": [
+            {
+              "id": "43840",
+              "name": "Gabriela STOEVA"
+            },
+            {
+              "id": "46169",
+              "name": "Stefani STOEVA"
+            }
+          ],
+          "country": "BUL",
+          "seed": 8
+        },
+        {
+          "id": "84050|99891",
+          "name": "Margot LAMBERT / Camille POGNANTE",
+          "short_name": "M LAMBERT / C POGNANTE",
+          "players": [
+            {
+              "id": "99891",
+              "name": "Margot LAMBERT"
+            },
+            {
+              "id": "84050",
+              "name": "Camille POGNANTE"
+            }
+          ],
+          "country": "FRA",
+          "seed": null
+        },
+        {
+          "id": "60219|80386",
+          "name": "ONG Xin Yee / Carmen TING",
+          "short_name": "ONG X Y / C TING",
+          "players": [
+            {
+              "id": "80386",
+              "name": "ONG Xin Yee"
+            },
+            {
+              "id": "60219",
+              "name": "Carmen TING"
+            }
+          ],
+          "country": "MAS",
+          "seed": null
+        },
+        {
+          "id": "62426|73023",
+          "name": "Bengisu ERCETIN / Nazlıcan INCI",
+          "short_name": "B ERCETIN / N INCI",
+          "players": [
+            {
+              "id": "62426",
+              "name": "Bengisu ERCETIN"
+            },
+            {
+              "id": "73023",
+              "name": "Nazlıcan INCI"
+            }
+          ],
+          "country": "TUR",
+          "seed": null
+        },
+        {
+          "id": "68628|85551",
+          "name": "Pearly TAN / THINAAH Muralitharan",
+          "short_name": "P TAN / THINAAH M",
+          "players": [
+            {
+              "id": "85551",
+              "name": "Pearly TAN"
+            },
+            {
+              "id": "68628",
+              "name": "THINAAH Muralitharan"
+            }
+          ],
+          "country": "MAS",
+          "seed": 2
+        }
+      ],
+      "rounds": [
+        {
+          "name": "R32",
+          "matches": [
+            {
+              "id": "1558454",
+              "time_utc": "2026-10-20 09:50:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558567",
+              "time_utc": "2026-10-20 09:00:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558549",
+              "time_utc": "2026-10-20 11:30:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558507",
+              "time_utc": "2026-10-20 14:00:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558571",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558432",
+              "time_utc": "2026-10-20 12:20:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558550",
+              "time_utc": "2026-10-20 10:40:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558572",
+              "time_utc": "2026-10-20 08:00:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558568",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558510",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558553",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558531",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558439",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558547",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558573",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558449",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "R16",
+          "matches": [
+            {
+              "id": "1558467",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558472",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558471",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558521",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558532",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558522",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558520",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558523",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "QF",
+          "matches": [
+            {
+              "id": "1558463",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558466",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558465",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558470",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "SF",
+          "matches": [
+            {
+              "id": "1558461",
+              "time_utc": "2026-10-24 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558464",
+              "time_utc": "2026-10-24 07:30:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "Final",
+          "matches": [
+            {
+              "id": "1558462",
+              "time_utc": "2026-10-25 10:00:00",
+              "time_estimated": true
+            }
+          ]
+        }
+      ],
+      "tournament_name": "YONEX French Open 2026",
+      "tournament_code": "02C81098-27CE-498C-AABD-8C520607CEAD",
+      "tournament_tier": 3,
+      "source_url": "https://extranet-lv.bwfbadminton.com/api/vue-tournament-draw-data?tmtTab=draw&tmtId=5272&tmtType=1&drawId=4&isPara=false",
+      "source_sha256": "6cad83064052aa2eae6a040466f3e4cf31ec523512684c088f190429c7798c25"
+    },
+    "XD": {
+      "entries": [
+        {
+          "id": "65267|89426",
+          "name": "FENG Yan Zhe / HUANG Dong Ping",
+          "short_name": "FENG Y Z / HUANG D P",
+          "players": [
+            {
+              "id": "65267",
+              "name": "FENG Yan Zhe"
+            },
+            {
+              "id": "89426",
+              "name": "HUANG Dong Ping"
+            }
+          ],
+          "country": "CHN",
+          "seed": 1
+        },
+        {
+          "id": "64819|80293",
+          "name": "KIM Jae Hyeon / JANG Ha Jeong",
+          "short_name": "KIM J H / JANG H J",
+          "players": [
+            {
+              "id": "80293",
+              "name": "KIM Jae Hyeon"
+            },
+            {
+              "id": "64819",
+              "name": "JANG Ha Jeong"
+            }
+          ],
+          "country": "KOR",
+          "seed": null
+        },
+        {
+          "id": "73323|98329",
+          "name": "Julien MAIO / Lea PALERMO",
+          "short_name": "J MAIO / L PALERMO",
+          "players": [
+            {
+              "id": "73323",
+              "name": "Julien MAIO"
+            },
+            {
+              "id": "98329",
+              "name": "Lea PALERMO"
+            }
+          ],
+          "country": "FRA",
+          "seed": null
+        },
+        {
+          "id": "92404|94156",
+          "name": "Ruben GARCIA / Lucia RODRIGUEZ",
+          "short_name": "R GARCIA / L RODRIGUEZ",
+          "players": [
+            {
+              "id": "94156",
+              "name": "Ruben GARCIA"
+            },
+            {
+              "id": "92404",
+              "name": "Lucia RODRIGUEZ"
+            }
+          ],
+          "country": "ESP",
+          "seed": null
+        },
+        {
+          "id": "62713|81108",
+          "name": "YE Hong Wei / Nicole Gonzales CHAN",
+          "short_name": "YE H W / N CHAN",
+          "players": [
+            {
+              "id": "81108",
+              "name": "YE Hong Wei"
+            },
+            {
+              "id": "62713",
+              "name": "Nicole Gonzales CHAN"
+            }
+          ],
+          "country": "TPE",
+          "seed": 7
+        },
+        {
+          "id": "63739|83074",
+          "name": "Presley SMITH / Jennie GAI",
+          "short_name": "P SMITH / J GAI",
+          "players": [
+            {
+              "id": "63739",
+              "name": "Presley SMITH"
+            },
+            {
+              "id": "83074",
+              "name": "Jennie GAI"
+            }
+          ],
+          "country": "USA",
+          "seed": null
+        },
+        {
+          "id": "60838|76281",
+          "name": "Amri SYAHNAWI / Nita Violina MARWAH",
+          "short_name": "A SYAHNAWI / N MARWAH",
+          "players": [
+            {
+              "id": "76281",
+              "name": "Amri SYAHNAWI"
+            },
+            {
+              "id": "60838",
+              "name": "Nita Violina MARWAH"
+            }
+          ],
+          "country": "INA",
+          "seed": null
+        },
+        {
+          "id": "80605|84340",
+          "name": "Jimmy WONG / CHENG Su Yin",
+          "short_name": "J WONG / CHENG S Y",
+          "players": [
+            {
+              "id": "84340",
+              "name": "Jimmy WONG"
+            },
+            {
+              "id": "80605",
+              "name": "CHENG Su Yin"
+            }
+          ],
+          "country": "MAS",
+          "seed": null
+        },
+        {
+          "id": "68544|70762",
+          "name": "Thom GICQUEL / Delphine DELRUE",
+          "short_name": "T GICQUEL / D DELRUE",
+          "players": [
+            {
+              "id": "68544",
+              "name": "Thom GICQUEL"
+            },
+            {
+              "id": "70762",
+              "name": "Delphine DELRUE"
+            }
+          ],
+          "country": "FRA",
+          "seed": 4
+        },
+        {
+          "id": "59331|86756",
+          "name": "Callum HEMMING / Estelle VAN LEEUWEN",
+          "short_name": "C HEMMING / E VAN LEEUWEN",
+          "players": [
+            {
+              "id": "86756",
+              "name": "Callum HEMMING"
+            },
+            {
+              "id": "59331",
+              "name": "Estelle VAN LEEUWEN"
+            }
+          ],
+          "country": "ENG",
+          "seed": null
+        },
+        {
+          "id": "64682|72504",
+          "name": "Tanadon PUNPANICH / Jhenicha SUDJAIPRAPARAT",
+          "short_name": "T PUNPANICH / J SUDJAIPRAPARAT",
+          "players": [
+            {
+              "id": "64682",
+              "name": "Tanadon PUNPANICH"
+            },
+            {
+              "id": "72504",
+              "name": "Jhenicha SUDJAIPRAPARAT"
+            }
+          ],
+          "country": "THA",
+          "seed": null
+        },
+        {
+          "id": "70860|97737",
+          "name": "WU Hsuan-Yi / YANG Chu Yun",
+          "short_name": "WU H Y / YANG C Y",
+          "players": [
+            {
+              "id": "97737",
+              "name": "WU Hsuan-Yi"
+            },
+            {
+              "id": "70860",
+              "name": "YANG Chu Yun"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "58931|88450",
+          "name": "CHENG Xing / ZHANG Chi",
+          "short_name": "CHENG X / ZHANG C",
+          "players": [
+            {
+              "id": "58931",
+              "name": "CHENG Xing"
+            },
+            {
+              "id": "88450",
+              "name": "ZHANG Chi"
+            }
+          ],
+          "country": "CHN",
+          "seed": 8
+        },
+        {
+          "id": "58240|60335",
+          "name": "Yuta WATANABE / Maya TAGUCHI",
+          "short_name": "Y WATANABE / M TAGUCHI",
+          "players": [
+            {
+              "id": "58240",
+              "name": "Yuta WATANABE"
+            },
+            {
+              "id": "60335",
+              "name": "Maya TAGUCHI"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "76717|99841",
+          "name": "WU Guan Xun / LEE Chia Hsin",
+          "short_name": "WU G X / LEE C H",
+          "players": [
+            {
+              "id": "99841",
+              "name": "WU Guan Xun"
+            },
+            {
+              "id": "76717",
+              "name": "LEE Chia Hsin"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "70093|71294",
+          "name": "WONG Tien Ci / LIM Chiew Sien",
+          "short_name": "WONG T C / LIM C S",
+          "players": [
+            {
+              "id": "71294",
+              "name": "WONG Tien Ci"
+            },
+            {
+              "id": "70093",
+              "name": "LIM Chiew Sien"
+            }
+          ],
+          "country": "MAS",
+          "seed": null
+        },
+        {
+          "id": "65674|67158",
+          "name": "Pakkapon TEERARATSAKUL / Sapsiree TAERATTANACHAI",
+          "short_name": "P TEERARATSAKUL / S TAERATTANACHAI",
+          "players": [
+            {
+              "id": "65674",
+              "name": "Pakkapon TEERARATSAKUL"
+            },
+            {
+              "id": "67158",
+              "name": "Sapsiree TAERATTANACHAI"
+            }
+          ],
+          "country": "THA",
+          "seed": null
+        },
+        {
+          "id": "69193|81458",
+          "name": "Dejan FERDINANSYAH / Felisha Alberta Nathaniel PASARIBU",
+          "short_name": "D FERDINANSYAH / F PASARIBU",
+          "players": [
+            {
+              "id": "81458",
+              "name": "Dejan FERDINANSYAH"
+            },
+            {
+              "id": "69193",
+              "name": "Felisha Alberta Nathaniel PASARIBU"
+            }
+          ],
+          "country": "INA",
+          "seed": null
+        },
+        {
+          "id": "67922|91715",
+          "name": "Alexander DUNN / Julie MACPHERSON",
+          "short_name": "A DUNN / J MACPHERSON",
+          "players": [
+            {
+              "id": "67922",
+              "name": "Alexander DUNN"
+            },
+            {
+              "id": "91715",
+              "name": "Julie MACPHERSON"
+            }
+          ],
+          "country": "SCO",
+          "seed": null
+        },
+        {
+          "id": "50469|81844",
+          "name": "GUO Xin Wa / CHEN Fang Hui",
+          "short_name": "GUO X W / CHEN F H",
+          "players": [
+            {
+              "id": "81844",
+              "name": "GUO Xin Wa"
+            },
+            {
+              "id": "50469",
+              "name": "CHEN Fang Hui"
+            }
+          ],
+          "country": "CHN",
+          "seed": 6
+        },
+        {
+          "id": "76275|87176",
+          "name": "YANG Po-Hsuan / HU Ling Fang",
+          "short_name": "YANG P H / HU L F",
+          "players": [
+            {
+              "id": "76275",
+              "name": "YANG Po-Hsuan"
+            },
+            {
+              "id": "87176",
+              "name": "HU Ling Fang"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "57924|61986",
+          "name": "CHAN Yin Chak / NG Tsz Yau",
+          "short_name": "CHAN Y C / NG T Y",
+          "players": [
+            {
+              "id": "57924",
+              "name": "CHAN Yin Chak"
+            },
+            {
+              "id": "61986",
+              "name": "NG Tsz Yau"
+            }
+          ],
+          "country": "HKG",
+          "seed": null
+        },
+        {
+          "id": "55417|88405",
+          "name": "Akira KOGA / Natsu SAITO",
+          "short_name": "A KOGA / N SAITO",
+          "players": [
+            {
+              "id": "88405",
+              "name": "Akira KOGA"
+            },
+            {
+              "id": "55417",
+              "name": "Natsu SAITO"
+            }
+          ],
+          "country": "JPN",
+          "seed": null
+        },
+        {
+          "id": "88779|99521",
+          "name": "Mathias CHRISTIANSEN / Alexandra BØJE",
+          "short_name": "M CHRISTIANSEN / A BØJE",
+          "players": [
+            {
+              "id": "99521",
+              "name": "Mathias CHRISTIANSEN"
+            },
+            {
+              "id": "88779",
+              "name": "Alexandra BØJE"
+            }
+          ],
+          "country": "DEN",
+          "seed": 3
+        },
+        {
+          "id": "47007|72675",
+          "name": "HOO Pang Ron / LAI Pei Jing",
+          "short_name": "HOO P R / LAI P J",
+          "players": [
+            {
+              "id": "72675",
+              "name": "HOO Pang Ron"
+            },
+            {
+              "id": "47007",
+              "name": "LAI Pei Jing"
+            }
+          ],
+          "country": "MAS",
+          "seed": null
+        },
+        {
+          "id": "57943|91533",
+          "name": "GAO Jia Xuan / WU Meng Ying",
+          "short_name": "GAO J X / WU M Y",
+          "players": [
+            {
+              "id": "57943",
+              "name": "GAO Jia Xuan"
+            },
+            {
+              "id": "91533",
+              "name": "WU Meng Ying"
+            }
+          ],
+          "country": "CHN",
+          "seed": null
+        },
+        {
+          "id": "59609|96973",
+          "name": "LIU Kuang Heng / HSU Yin-Hui",
+          "short_name": "LIU K H / HSU Y H",
+          "players": [
+            {
+              "id": "59609",
+              "name": "LIU Kuang Heng"
+            },
+            {
+              "id": "96973",
+              "name": "HSU Yin-Hui"
+            }
+          ],
+          "country": "TPE",
+          "seed": null
+        },
+        {
+          "id": "61731|74980",
+          "name": "Dechapol PUAVARANUKROH / Supissara PAEWSAMPRAN",
+          "short_name": "D PUAVARANUKROH / S PAEWSAMPRAN",
+          "players": [
+            {
+              "id": "61731",
+              "name": "Dechapol PUAVARANUKROH"
+            },
+            {
+              "id": "74980",
+              "name": "Supissara PAEWSAMPRAN"
+            }
+          ],
+          "country": "THA",
+          "seed": 5
+        },
+        {
+          "id": "56352|92593",
+          "name": "GOH Soon Huat / LAI Shevon Jemie",
+          "short_name": "GOH S H / LAI S J",
+          "players": [
+            {
+              "id": "92593",
+              "name": "GOH Soon Huat"
+            },
+            {
+              "id": "56352",
+              "name": "LAI Shevon Jemie"
+            }
+          ],
+          "country": "MAS",
+          "seed": null
+        },
+        {
+          "id": "64909|97648",
+          "name": "Marvin SEIDEL / Thuc Phuong NGUYEN",
+          "short_name": "M SEIDEL / T NGUYEN",
+          "players": [
+            {
+              "id": "64909",
+              "name": "Marvin SEIDEL"
+            },
+            {
+              "id": "97648",
+              "name": "Thuc Phuong NGUYEN"
+            }
+          ],
+          "country": "GER",
+          "seed": null
+        },
+        {
+          "id": "82167|82367",
+          "name": "ZHU Yi Jun / LI Qian",
+          "short_name": "ZHU Y J / LI Q",
+          "players": [
+            {
+              "id": "82167",
+              "name": "ZHU Yi Jun"
+            },
+            {
+              "id": "82367",
+              "name": "LI Qian"
+            }
+          ],
+          "country": "CHN",
+          "seed": null
+        },
+        {
+          "id": "57246|63029",
+          "name": "JIANG Zhen Bang / WEI Ya Xin",
+          "short_name": "JIANG Z B / WEI Y X",
+          "players": [
+            {
+              "id": "63029",
+              "name": "JIANG Zhen Bang"
+            },
+            {
+              "id": "57246",
+              "name": "WEI Ya Xin"
+            }
+          ],
+          "country": "CHN",
+          "seed": 2
+        }
+      ],
+      "rounds": [
+        {
+          "name": "R32",
+          "matches": [
+            {
+              "id": "1558528",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558433",
+              "time_utc": "2026-10-20 10:30:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558529",
+              "time_utc": "2026-10-20 08:00:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558473",
+              "time_utc": "2026-10-20 08:10:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558548",
+              "time_utc": "2026-10-20 11:20:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558504",
+              "time_utc": "2026-10-20 08:50:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558484",
+              "time_utc": "2026-10-20 09:50:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558455",
+              "time_utc": "2026-10-20 11:30:00",
+              "time_estimated": false
+            },
+            {
+              "id": "1558536",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558468",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558524",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558451",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558555",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558498",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558530",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558456",
+              "time_utc": "2026-10-21 08:00:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "R16",
+          "matches": [
+            {
+              "id": "1558488",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558483",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558491",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558485",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558475",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558489",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558476",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558474",
+              "time_utc": "2026-10-22 10:00:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "QF",
+          "matches": [
+            {
+              "id": "1558493",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558501",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558497",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558502",
+              "time_utc": "2026-10-23 07:30:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "SF",
+          "matches": [
+            {
+              "id": "1558517",
+              "time_utc": "2026-10-24 07:30:00",
+              "time_estimated": true
+            },
+            {
+              "id": "1558500",
+              "time_utc": "2026-10-24 07:30:00",
+              "time_estimated": true
+            }
+          ]
+        },
+        {
+          "name": "Final",
+          "matches": [
+            {
+              "id": "1558495",
+              "time_utc": "2026-10-25 10:00:00",
+              "time_estimated": true
+            }
+          ]
+        }
+      ],
+      "tournament_name": "YONEX French Open 2026",
+      "tournament_code": "02C81098-27CE-498C-AABD-8C520607CEAD",
+      "tournament_tier": 3,
+      "source_url": "https://extranet-lv.bwfbadminton.com/api/vue-tournament-draw-data?tmtTab=draw&tmtId=5272&tmtType=1&drawId=5&isPara=false",
+      "source_sha256": "fe5c12735495ac07e957bd288e26d601e9ed0fca11b65b22de9481d2667a5c72"
+    }
+  }
+}

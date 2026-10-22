@@ -77,6 +77,21 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Limit number of JSON files loaded (for debugging)",
     )
+    p.add_argument(
+        "--include-para",
+        action="store_true",
+        help="Include para matches, which are excluded by default",
+    )
+    p.add_argument(
+        "--test-year",
+        type=int,
+        default=None,
+        help="Held-out test start year (default: latest year in loaded data)",
+    )
+    p.add_argument(
+        "--refit-all", action="store_true",
+        help="After holdout evaluation, refit the production model on all known results",
+    )
     return p.parse_args()
 
 
@@ -97,7 +112,11 @@ def main() -> int:
     logger.info("Loading matches from %s …", args.data_dir)
     from predict_badminton.data_parser import load_all_matches
 
-    matches, drop_counts, player_names = load_all_matches(args.data_dir, max_files=args.max_files)
+    matches, drop_counts, player_names = load_all_matches(
+        args.data_dir,
+        max_files=args.max_files,
+        include_para=args.include_para,
+    )
     logger.info("Loaded %d matches | dropped: %s", len(matches), drop_counts)
     if len(matches) < 1000:
         logger.warning("Very few matches (%d) — results may be unreliable", len(matches))
@@ -116,21 +135,27 @@ def main() -> int:
     logger.info("Feature matrix sample saved → %s/features_sample.csv", artifacts_dir)
 
     # ------------------------------------------------------------------
-    # 2b. Export Elo leaderboards and Elo state (Part B)
+    # 2b. Export Elo leaderboards and complete inference state
     # ------------------------------------------------------------------
     logger.info("Exporting Elo leaderboards …")
     feature_builder.export_leaderboards(artifacts_dir)
 
-    logger.info("Saving Elo state …")
-    feature_builder.elo.save(artifacts_dir / "elo_state.pkl")
+    logger.info("Saving full inference feature state …")
+    feature_builder.save(artifacts_dir / "feature_state.pkl")
 
     # ------------------------------------------------------------------
-    # 3. Train/test split: 2025 as final held-out test set
+    # 3. Chronological train/test split
     # ------------------------------------------------------------------
-    df["_year"] = df["match_time"].apply(lambda x: x.year)
-    test_year = 2025
-    train_df = df[df["_year"] < test_year].drop(columns=["_year"])
-    test_df = df[df["_year"] >= test_year].drop(columns=["_year"])
+    from predict_badminton.model import chronological_holdout_split
+
+    try:
+        train_df, test_df, test_year = chronological_holdout_split(
+            df,
+            test_year=args.test_year,
+        )
+    except ValueError as exc:
+        logger.error("Cannot create chronological holdout: %s", exc)
+        return 1
     logger.info(
         "Train: %d rows (pre-%d) | Test: %d rows (%d+)",
         len(train_df), test_year, len(test_df), test_year,
@@ -194,12 +219,6 @@ def main() -> int:
         logger.warning(
             "Test set has only %d rows — calibration/test metrics may be noisy", len(test_df)
         )
-        from predict_badminton.model import _split_folds
-        from predict_badminton.config import CV_FOLD_VAL_YEARS
-        folds = _split_folds(train_df, CV_FOLD_VAL_YEARS)
-        if folds:
-            _, test_df = folds[-1]
-            logger.info("Using last CV fold val set as test (%d rows)", len(test_df))
 
     model, platt_cal, iso_cal, final_report = train_final_model(
         train_df,
@@ -217,7 +236,7 @@ def main() -> int:
         logger.info("Running rolling backtest …")
         from predict_badminton.model import rolling_backtest
 
-        backtest_report = rolling_backtest(df.drop(columns=["_year"], errors="ignore"), params=best_params)
+        backtest_report = rolling_backtest(df, params=best_params)
         bt_path = artifacts_dir / "rolling_backtest_report.json"
         with open(bt_path, "w") as fh:
             json.dump(backtest_report, fh, indent=2, default=str)
@@ -230,6 +249,24 @@ def main() -> int:
             )
     else:
         logger.info("Skipping rolling backtest")
+
+    production_refit = None
+    if args.refit_all:
+        from predict_badminton.config import FEATURE_COLS
+        from predict_badminton.evaluate import feature_importance_df
+        from predict_badminton.model import refit_production_model
+
+        with (artifacts_dir / "holdout_lgbm_model.pkl").open("wb") as fh:
+            pickle.dump(model, fh)
+        logger.info("Refitting production model on all %d known results", len(df))
+        model = refit_production_model(df, final_report["best_iteration"], best_params)
+        final_report["feature_importance"] = feature_importance_df(model, FEATURE_COLS).to_dict("records")
+        production_refit = {
+            "rows": len(df), "through": df["match_time"].max().isoformat(),
+            "best_iteration": final_report["best_iteration"],
+            "evaluation_model": "holdout_lgbm_model.pkl",
+            "note": "Test metrics describe the pre-refit holdout model, not the all-results production model.",
+        }
 
     # ------------------------------------------------------------------
     # 9. Save artifacts
@@ -260,7 +297,9 @@ def main() -> int:
         "data_shape": list(df.shape),
         "train_size": len(train_df),
         "test_size": len(test_df),
+        "test_year": test_year,
         "label_balance": float(df["label"].mean()),
+        "production_refit": production_refit,
     }
     if backtest_report:
         full_report["rolling_backtest_aggregate"] = backtest_report.get("aggregate", {})
@@ -302,7 +341,7 @@ def main() -> int:
               f"acc={agg.get('accuracy', 'N/A'):.4f}  ece={agg.get('ece', 'N/A'):.4f}")
 
     print(f"\nArtifacts saved to: {artifacts_dir.resolve()}")
-    print(f"Elo state:          {(artifacts_dir / 'elo_state.pkl').resolve()}")
+    print(f"Feature state:      {(artifacts_dir / 'feature_state.pkl').resolve()}")
     print(f"Leaderboards:       {artifacts_dir.resolve()}/elo_leaderboard_*.csv")
     return 0
 

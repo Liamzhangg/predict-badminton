@@ -4,7 +4,8 @@ Each JSON file is a list of rounds, each round is a list of match objects.
 We flatten to individual matches, parse timestamps, and extract player IDs.
 
 Drop policy (tracked in counts dict returned by load_all_matches):
-  - winner not in {1, 2}: cancelled / walkover / in-progress
+  - winner not in {1, 2}: cancelled / in-progress
+  - official walkover status: no played match for training or Elo
   - no parseable match time: cannot order chronologically
   - empty player IDs for either team: cannot compute Elo
 """
@@ -12,6 +13,8 @@ from __future__ import annotations
 
 import json
 import logging
+import re
+from collections import Counter
 from collections.abc import Iterator
 from datetime import datetime
 from pathlib import Path
@@ -19,7 +22,23 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
-_DISC_PREFIXES = ("MS", "WS", "MD", "WD", "XD")
+_DISC_PREFIX_RE = re.compile(r"^(MS|WS|MD|WD|XD|BS|GS|BD|GD)(?:$|[ -]|U\d+\b)")
+_JUNIOR_DISCIPLINES = {"BS": "MS", "GS": "WS", "BD": "MD", "GD": "WD"}
+_DISC_NAMES = {
+    "men's singles": "MS", "women's singles": "WS",
+    "men's doubles": "MD", "women's doubles": "WD", "mixed doubles": "XD",
+    "boy's singles": "MS", "girl's singles": "WS",
+    "boy's doubles": "MD", "girl's doubles": "WD",
+}
+
+_PARA_TOURNAMENT_RE = re.compile(
+    r"\b(?:para(?:\s*-\s*|\s+)?badminton|paralympic|para\s+games?)\b",
+    re.IGNORECASE,
+)
+_PARA_CLASS_RE = re.compile(
+    r"\b(?:WH\s*[12]|SL\s*[34]|SU\s*5|SH\s*6)\b",
+    re.IGNORECASE,
+)
 
 _TIME_FORMATS = (
     "%Y-%m-%d %H:%M:%S",
@@ -33,10 +52,12 @@ def normalize_discipline(event_name: str) -> str:
     """Map raw eventName → one of MS / WS / MD / WD / XD / OTHER."""
     if not event_name:
         return "OTHER"
-    en = event_name.strip()
-    for disc in _DISC_PREFIXES:
-        if en == disc or en.startswith(disc + " ") or en.startswith(disc + "-"):
-            return disc
+    en = event_name.strip().replace("\u2019", "'")
+    if discipline := _DISC_NAMES.get(en.casefold()):
+        return discipline
+    if prefix := _DISC_PREFIX_RE.match(en.upper()):
+        disc = prefix.group(1)
+        return _JUNIOR_DISCIPLINES.get(disc, disc)
     return "OTHER"
 
 
@@ -67,6 +88,16 @@ def infer_tournament_tier(name: str) -> int:
     ):
         return 6
     return 5  # default
+
+
+def is_para_match(match: dict[str, Any]) -> bool:
+    """Return whether tournament or event metadata identifies para badminton."""
+    tournament_name = str(match.get("tournamentName") or "")
+    event_name = str(match.get("eventName") or "")
+    return bool(
+        _PARA_TOURNAMENT_RE.search(tournament_name)
+        or _PARA_CLASS_RE.search(event_name)
+    )
 
 
 def _parse_time(raw: str) -> datetime | None:
@@ -111,6 +142,8 @@ def parse_file(
     filepath: Path,
     drop_counts: dict[str, int],
     name_map: dict[str, str] | None = None,
+    *,
+    include_para: bool = False,
 ) -> list[dict[str, Any]]:
     """Parse one JSON file; return list of normalised match dicts.
 
@@ -126,9 +159,16 @@ def parse_file(
         return records
 
     for match in _iter_matches(data):
+        if not include_para and is_para_match(match):
+            drop_counts["para_match"] = drop_counts.get("para_match", 0) + 1
+            continue
+
         winner = match.get("winner")
         if winner not in (1, 2):
             drop_counts["bad_winner"] = drop_counts.get("bad_winner", 0) + 1
+            continue
+        if match.get("scoreStatus") == 1 or str(match.get("scoreStatusValue", "")).casefold() == "walkover":
+            drop_counts["walkover"] = drop_counts.get("walkover", 0) + 1
             continue
 
         # Prefer UTC timestamp; fall back to local matchTime
@@ -169,13 +209,78 @@ def parse_file(
                 "team2_seed": match.get("team2seed"),
                 "winner": int(winner),  # 1 or 2
                 "label": int(winner == 1),  # target: 1 if team1 wins
+                "_has_utc_time": bool(match.get("matchTimeUtc")),
+                "_source_alias": (
+                    match.get("tournamentCode") or t_name, match.get("matchTime"),
+                    match.get("eventName"), match.get("roundName"), tuple(ids1), tuple(ids2),
+                    match.get("matchOrder"), match.get("matchTypeNo"), winner,
+                    json.dumps(match.get("score"), sort_keys=True),
+                ) if match.get("matchTime") else None,
             }
         )
     return records
 
 
+def _match_identity(record: dict[str, Any]) -> tuple[Any, ...]:
+    match_id = record.get("match_id")
+    if match_id is not None and str(match_id).strip():
+        return ("id", str(match_id).strip())
+
+    teams = tuple(
+        sorted(
+            (
+                tuple(sorted(record["team1_ids"])),
+                tuple(sorted(record["team2_ids"])),
+            )
+        )
+    )
+    tournament = record.get("tournament_code") or record.get("tournament_name") or ""
+    return (
+        "signature",
+        str(tournament).strip().casefold(),
+        record["match_time"].isoformat(),
+        record["discipline"],
+        str(record.get("round_name") or "").strip().casefold(),
+        teams,
+    )
+
+
+def _deduplicate_matches(
+    records: list[dict[str, Any]],
+    drop_counts: dict[str, int],
+) -> list[dict[str, Any]]:
+    """Keep the first deterministic occurrence of each match identity."""
+    unique: list[dict[str, Any]] = []
+    seen: set[tuple[Any, ...]] = set()
+    aliases: dict[tuple[Any, ...], int] = {}
+    for record in records:
+        identity = _match_identity(record)
+        if identity in seen:
+            reason = "duplicate_match_id" if identity[0] == "id" else "duplicate_signature"
+            drop_counts[reason] = drop_counts.get(reason, 0) + 1
+            continue
+        seen.add(identity)
+        alias = record.get("_source_alias")
+        if alias in aliases:
+            index = aliases[alias]
+            # Some BWF copies have new IDs and UTC clocks but identical local results.
+            if record["_has_utc_time"] != unique[index]["_has_utc_time"]:
+                drop_counts["duplicate_source_alias"] = drop_counts.get("duplicate_source_alias", 0) + 1
+                if record["_has_utc_time"]:
+                    unique[index] = record
+                continue
+        if alias is not None:
+            aliases[alias] = len(unique)
+        unique.append(record)
+    return unique
+
+
 def load_all_matches(
-    raw_dir: Path, max_files: int | None = None
+    raw_dir: Path,
+    max_files: int | None = None,
+    *,
+    include_para: bool = False,
+    deduplicate: bool = True,
 ) -> tuple[list[dict[str, Any]], dict[str, int], dict[str, str]]:
     """Load all JSON files; return (sorted match list, drop counts, player name map).
 
@@ -190,8 +295,20 @@ def load_all_matches(
     name_map: dict[str, str] = {}
 
     for fp in files:
-        records = parse_file(fp, drop_counts, name_map)
+        records = parse_file(
+            fp,
+            drop_counts,
+            name_map,
+            include_para=include_para,
+        )
         all_records.extend(records)
+
+    if deduplicate:
+        all_records = _deduplicate_matches(all_records, drop_counts)
+
+    for record in all_records:
+        record.pop("_source_alias", None)
+        record.pop("_has_utc_time", None)
 
     # Stable chronological sort (Python sort is stable)
     all_records.sort(key=lambda x: x["match_time"])
@@ -204,3 +321,40 @@ def load_all_matches(
         len(name_map),
     )
     return all_records, drop_counts, name_map
+
+
+def build_data_report(
+    matches: list[dict[str, Any]],
+    drop_counts: dict[str, int],
+    *,
+    files_scanned: int,
+    include_para: bool,
+    deduplicate: bool,
+) -> dict[str, Any]:
+    """Build a JSON-serialisable summary of normalized training records."""
+    years = Counter(match["match_time"].year for match in matches)
+    disciplines = Counter(match["discipline"] for match in matches)
+    tournaments = {
+        match.get("tournament_code") or match.get("tournament_name")
+        for match in matches
+        if match.get("tournament_code") or match.get("tournament_name")
+    }
+    return {
+        "files_scanned": files_scanned,
+        "matches_included": len(matches),
+        "date_min": matches[0]["match_time"].isoformat() if matches else None,
+        "date_max": matches[-1]["match_time"].isoformat() if matches else None,
+        "tournaments": len(tournaments),
+        "matches_by_year": dict(sorted(years.items())),
+        "matches_by_discipline": dict(sorted(disciplines.items())),
+        "label_balance_team1_win": (
+            sum(match["label"] for match in matches) / len(matches)
+            if matches
+            else None
+        ),
+        "excluded": dict(sorted(drop_counts.items())),
+        "policy": {
+            "include_para": include_para,
+            "deduplicate": deduplicate,
+        },
+    }

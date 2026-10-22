@@ -86,7 +86,9 @@ def reliability_stats(
     prob_true, prob_pred = calibration_curve(
         y_true, y_prob, n_bins=n_bins, strategy="uniform"
     )
-    ece = float(np.mean(np.abs(prob_true - prob_pred)))
+    bin_ids = np.searchsorted(np.linspace(0.0, 1.0, n_bins + 1)[1:-1], y_prob)
+    bin_counts = np.bincount(bin_ids, minlength=n_bins)
+    ece = float(np.average(np.abs(prob_true - prob_pred), weights=bin_counts[bin_counts > 0]))
     return {
         "prob_true": prob_true.tolist(),
         "prob_pred": prob_pred.tolist(),
@@ -108,27 +110,6 @@ def feature_importance_df(
         {"feature": feature_names, "importance_gain": importances}
     ).sort_values("importance_gain", ascending=False)
     return df
-
-
-def shap_importance(
-    model: Any, X: pd.DataFrame, max_rows: int = 5000
-) -> pd.DataFrame | None:
-    """Optional SHAP mean |value| per feature. Returns None if shap not installed."""
-    try:
-        import shap  # type: ignore
-
-        X_sample = X.iloc[:max_rows]
-        explainer = shap.TreeExplainer(model)
-        shap_vals = explainer.shap_values(X_sample)
-        if isinstance(shap_vals, list):
-            shap_vals = shap_vals[1]  # class 1 for binary
-        mean_abs = np.abs(shap_vals).mean(axis=0)
-        return pd.DataFrame(
-            {"feature": X.columns.tolist(), "shap_mean_abs": mean_abs}
-        ).sort_values("shap_mean_abs", ascending=False)
-    except ImportError:
-        logger.info("shap not installed – skipping SHAP analysis")
-        return None
 
 
 # ---------------------------------------------------------------------------

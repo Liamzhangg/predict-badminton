@@ -6,7 +6,7 @@ Usage:
   uv run python predict.py --fixtures-csv data/upcoming_fixtures.csv \\
       --model-path outputs/artifacts/lgbm_model.pkl \\
       --calibrator-path outputs/artifacts/isotonic_calibrator.pkl \\
-      --state-path outputs/artifacts/elo_state.pkl
+      --state-path outputs/artifacts/feature_state.pkl
 
 Output:
   outputs/predictions/predictions_<timestamp>.csv
@@ -47,7 +47,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--state-path",
         type=Path,
-        default=Path("outputs/artifacts/elo_state.pkl"),
+        default=Path("outputs/artifacts/feature_state.pkl"),
     )
     p.add_argument(
         "--output-dir",
@@ -77,7 +77,7 @@ def main() -> int:
 
     feat_df, raw_fixtures = build_inference_features(
         fixtures_path=args.fixtures_csv,
-        elo_state_path=args.state_path,
+        state_path=args.state_path,
     )
     logger.info("Feature rows: %d", len(feat_df))
 
@@ -113,9 +113,10 @@ def main() -> int:
     })
 
     # Merge in team IDs if available
-    for col in ("team1_player_ids", "team2_player_ids", "discipline", "round_name", "tournament_name"):
-        if col in raw_fixtures.columns:
-            out_df[col] = raw_fixtures[col].values
+    metadata_cols = [col for col in (
+        "team1_player_ids", "team2_player_ids", "discipline", "round_name", "tournament_name"
+    ) if col in raw_fixtures.columns]
+    out_df = out_df.merge(raw_fixtures[["match_id", *metadata_cols]], on="match_id", validate="one_to_one")
 
     # ---- Save ----------------------------------------------------------
     args.output_dir.mkdir(parents=True, exist_ok=True)

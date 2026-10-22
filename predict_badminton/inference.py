@@ -1,7 +1,7 @@
 """Inference module: generate training-compatible features for future fixtures.
 
-Loads persisted Elo state and produces FEATURE_COLS-aligned rows (no labels)
-that can be fed directly to the saved LightGBM model.
+Loads persisted training feature state and produces FEATURE_COLS-aligned rows
+(no labels) that can be fed directly to the saved LightGBM model.
 """
 from __future__ import annotations
 
@@ -16,9 +16,8 @@ import pandas as pd
 from predict_badminton.config import (
     DISCIPLINES,
     FEATURE_COLS,
-    ROUND_IMPORTANCE,
 )
-from predict_badminton.features import EloEngine
+from predict_badminton.features import FeatureBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -71,11 +70,19 @@ def load_fixtures(path: Path) -> pd.DataFrame:
         raise ValueError("No valid fixture rows after validation")
 
     # Parse match_time
-    df["match_time"] = pd.to_datetime(df["match_time"], errors="coerce")
+    df["match_time"] = pd.to_datetime(df["match_time"], errors="coerce", format="mixed", utc=True).dt.tz_localize(None)
     bad_time = df["match_time"].isna()
     if bad_time.any():
         logger.warning("Dropping %d fixtures with unparseable match_time", bad_time.sum())
         df = df[~bad_time]
+
+    for col in ("team1_player_ids", "team2_player_ids"):
+        valid_ids = df[col].map(lambda value: bool(_parse_player_ids(value))).astype(bool)
+        df = df.loc[valid_ids].copy()
+    if df.empty:
+        raise ValueError("No valid fixture rows after validation")
+    if df["match_id"].duplicated().any():
+        raise ValueError("Fixture match_id values must be unique")
 
     df = df.sort_values("match_time").reset_index(drop=True)
     logger.info("Loaded %d valid fixture rows from %s", len(df), path)
@@ -93,13 +100,16 @@ def _parse_player_ids(raw: str) -> list[str]:
 
 
 class InferenceBuilder:
-    """Generate prediction features from a loaded Elo state + fixtures CSV."""
+    """Generate fixture features from persisted training history."""
 
-    def __init__(self, elo: EloEngine) -> None:
-        self.elo = elo
+    def __init__(self, feature_builder: FeatureBuilder) -> None:
+        self.feature_builder = feature_builder
 
     def build_features(self, fixtures: pd.DataFrame) -> pd.DataFrame:
         """Return a DataFrame with exactly FEATURE_COLS columns (no label)."""
+        cutoff = max(self.feature_builder.elo._last_match.values(), default=datetime.min)
+        if (fixtures["match_time"] <= cutoff).any():
+            raise ValueError("Fixture times must follow the saved history cutoff")
         rows = []
         for _, fix in fixtures.iterrows():
             row = self._build_row(fix)
@@ -114,16 +124,6 @@ class InferenceBuilder:
         # Ensure discipline is categorical (same encoding as training)
         all_discs = DISCIPLINES + ["OTHER"]
         df["discipline"] = pd.Categorical(df["discipline"], categories=all_discs)
-
-        # Fill NaN rest_days with median of known values (safe default)
-        for col in ("rest_days_t1", "rest_days_t2"):
-            med = df[col].median()
-            df[col] = df[col].fillna(0.0 if pd.isna(med) else med)
-
-        # Ensure all feature cols exist (fill missing with 0)
-        for col in FEATURE_COLS:
-            if col not in df.columns:
-                df[col] = 0.0
 
         return df[["match_id", "match_time"] + FEATURE_COLS]
 
@@ -144,19 +144,6 @@ class InferenceBuilder:
         except (ValueError, TypeError):
             t_tier = 5
 
-        # Elo
-        elo1_d, elo1_g = self.elo.team_elo(ids1, disc)
-        elo2_d, elo2_g = self.elo.team_elo(ids2, disc)
-        mc1 = self.elo.team_disc_count(ids1, disc)
-        mc2 = self.elo.team_disc_count(ids2, disc)
-
-        # Pair Elo
-        pc1 = self.elo.pair_component(ids1, disc)
-        pc2 = self.elo.pair_component(ids2, disc)
-        pm1 = float(self.elo.pair_match_count(ids1, disc))
-        pm2 = float(self.elo.pair_match_count(ids2, disc))
-
-        # Seeds
         s1_raw = fix.get("team1_seed", "")
         s2_raw = fix.get("team2_seed", "")
         try:
@@ -168,67 +155,39 @@ class InferenceBuilder:
         except (ValueError, TypeError):
             seed2 = 0
 
-        round_imp = ROUND_IMPORTANCE.get(round_name, 5)
-
         c1 = str(fix.get("team1_country", "")) if pd.notna(fix.get("team1_country", "")) else ""
         c2 = str(fix.get("team2_country", "")) if pd.notna(fix.get("team2_country", "")) else ""
+        tournament_name = (
+            str(fix.get("tournament_name", ""))
+            if pd.notna(fix.get("tournament_name", ""))
+            else ""
+        )
 
-        return {
+        match = {
             "match_id": fix.get("match_id"),
             "match_time": match_time,
-            # Elo
-            "elo_diff_disc": elo1_d - elo2_d,
-            "elo_t1_disc": elo1_d,
-            "elo_t2_disc": elo2_d,
-            "elo_diff_global": elo1_g - elo2_g,
-            "elo_t1_global": elo1_g,
-            "elo_t2_global": elo2_g,
-            "elo_matches_t1_disc": float(mc1),
-            "elo_matches_t2_disc": float(mc2),
-            "elo_reliability": float(min(mc1, mc2)),
-            # Pair Elo
-            "pair_component_t1": pc1,
-            "pair_component_t2": pc2,
-            "pair_component_diff": pc1 - pc2,
-            "pair_matches_t1": pm1,
-            "pair_matches_t2": pm2,
-            "pair_reliability": min(pm1, pm2),
-            # Form — unknown for future matches; fill with neutral defaults
-            "form5_wr_t1": 0.5,
-            "form10_wr_t1": 0.5,
-            "form5_cnt_t1": 0.0,
-            "form10_cnt_t1": 0.0,
-            "rest_days_t1": float("nan"),
-            "form5_wr_t2": 0.5,
-            "form10_wr_t2": 0.5,
-            "form5_cnt_t2": 0.0,
-            "form10_cnt_t2": 0.0,
-            "rest_days_t2": float("nan"),
-            "form5_wr_diff": 0.0,
-            "form10_wr_diff": 0.0,
-            # H2H — not persisted in Elo state; default to neutral
-            "h2h_wins_t1": 0.0,
-            "h2h_wins_t2": 0.0,
-            "h2h_total": 0.0,
-            "h2h_wr_t1": 0.5,
-            # Context
-            "tournament_tier": float(t_tier),
-            "round_importance": float(round_imp),
-            "team1_seeded": float(seed1 > 0),
-            "team2_seeded": float(seed2 > 0),
-            "seed_diff": float(seed1 - seed2),
-            "same_country": float(bool(c1) and c1 == c2),
             "discipline": disc,
+            "team1_ids": ids1,
+            "team2_ids": ids2,
+            "round_name": round_name,
+            "tournament_name": tournament_name,
+            "tournament_code": "",
+            "tournament_tier": t_tier,
+            "team1_seed": seed1,
+            "team2_seed": seed2,
+            "team1_country": c1,
+            "team2_country": c2,
         }
+        return self.feature_builder.preview(match)
 
 
 def build_inference_features(
     fixtures_path: Path,
-    elo_state_path: Path,
+    state_path: Path,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Load fixtures and Elo state; return (features_df, raw_fixtures_df)."""
-    elo = EloEngine.load(elo_state_path)
+    """Load fixtures and training state; return features and raw fixtures."""
+    feature_builder = FeatureBuilder.load(state_path)
     fixtures = load_fixtures(fixtures_path)
-    builder = InferenceBuilder(elo)
+    builder = InferenceBuilder(feature_builder)
     features = builder.build_features(fixtures)
     return features, fixtures

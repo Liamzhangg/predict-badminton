@@ -25,6 +25,7 @@ H2H:
 """
 from __future__ import annotations
 
+import ast
 import logging
 import pickle
 from collections import defaultdict, deque
@@ -68,10 +69,10 @@ _ROUND_K_MULT: dict[str, float] = {
 }
 
 
-def _k_factor(round_name: str, tournament_tier: int) -> float:
+def _k_factor(round_name: str, tournament_tier: int, k_base: float = K_BASE) -> float:
     round_mult = _ROUND_K_MULT.get(round_name, 1.0)
     tier_mult = 1.0 + max(0, 6 - tournament_tier) * 0.05
-    return K_BASE * round_mult * tier_mult
+    return k_base * round_mult * tier_mult
 
 
 def _elo_expected(rating_a: float, rating_b: float) -> float:
@@ -148,84 +149,77 @@ class EloEngine:
             "alpha_player": self.alpha_player,
         }
 
-    def save(self, path: Path) -> None:
-        """Pickle the full engine state."""
-        with open(path, "wb") as fh:
-            pickle.dump(self.get_state(), fh)
-        logger.info("Elo state saved → %s", path)
-
     @classmethod
-    def load(cls, path: Path) -> "EloEngine":
-        """Restore engine from a saved state file."""
-        with open(path, "rb") as fh:
-            state = pickle.load(fh)
+    def from_state(cls, state: dict[str, Any]) -> "EloEngine":
+        """Restore an engine from a state dictionary."""
         eng = cls(
             default_elo=state.get("default_elo", DEFAULT_ELO),
             k_base=state.get("k_base", K_BASE),
             pair_lambda=state.get("pair_lambda", PAIR_LAMBDA),
             alpha_player=state.get("alpha_player", ALPHA_PLAYER_SHARE),
         )
-        for pid, d in state["disc"].items():
-            eng._disc[pid].update(d)
-        for pid, v in state["global"].items():
-            eng._global[pid] = v
-        for pid, d in state["disc_count"].items():
-            eng._disc_count[pid].update(d)
-        # Pair keys were stringified; reconstruct tuples
-        for k_str, d in state["pair"].items():
-            key = tuple(k_str.strip("()").replace("'", "").replace(" ", "").split(","))
-            eng._pair[key].update(d)
-        for k_str, d in state["pair_count"].items():
-            key = tuple(k_str.strip("()").replace("'", "").replace(" ", "").split(","))
-            eng._pair_count[key].update(d)
+        for pid, values in state["disc"].items():
+            eng._disc[pid].update(values)
+        for pid, value in state["global"].items():
+            eng._global[pid] = value
+        for pid, values in state["disc_count"].items():
+            eng._disc_count[pid].update(values)
+
+        for raw_key, values in state["pair"].items():
+            key = (
+                raw_key
+                if isinstance(raw_key, tuple)
+                else tuple(ast.literal_eval(raw_key))
+            )
+            eng._pair[key].update(values)
+        for raw_key, values in state["pair_count"].items():
+            key = (
+                raw_key
+                if isinstance(raw_key, tuple)
+                else tuple(ast.literal_eval(raw_key))
+            )
+            eng._pair_count[key].update(values)
         for pid, dt_str in state.get("last_match", {}).items():
             try:
                 eng._last_match[pid] = datetime.fromisoformat(dt_str)
-            except Exception:
-                pass
-        logger.info("Elo state loaded from %s", path)
+            except (TypeError, ValueError):
+                continue
         return eng
 
     # ------------------------------------------------------------------
     # Accessors
     # ------------------------------------------------------------------
 
-    def player_disc_elo(self, pid: str, disc: str) -> float:
-        return self._disc[pid][disc]
-
-    def player_global_elo(self, pid: str) -> float:
-        return self._global[pid]
-
     def pair_component(self, ids: list[str], disc: str) -> float:
         """Pair component value (0.0 for singles or unseen pairs)."""
         if disc not in DOUBLES_DISCIPLINES or len(ids) < 2:
             return 0.0
-        return self._pair[_pair_key(ids)][disc]
+        return self._pair.get(_pair_key(ids), {}).get(disc, 0.0)
 
     def pair_match_count(self, ids: list[str], disc: str) -> int:
         if disc not in DOUBLES_DISCIPLINES or len(ids) < 2:
             return 0
-        return self._pair_count[_pair_key(ids)][disc]
+        return self._pair_count.get(_pair_key(ids), {}).get(disc, 0)
 
     def team_elo(
         self, player_ids: list[str], discipline: str
     ) -> tuple[float, float]:
         """Returns (disc_elo, global_elo) for a team, incorporating pair component for doubles."""
-        d_avg = float(np.mean([self._disc[pid][discipline] for pid in player_ids]))
-        g_avg = float(np.mean([self._global[pid] for pid in player_ids]))
+        d_avg = float(np.mean([self._disc.get(pid, {}).get(discipline, self.default_elo) for pid in player_ids]))
+        g_avg = float(np.mean([self._global.get(pid, self.default_elo) for pid in player_ids]))
 
         if discipline in DOUBLES_DISCIPLINES and len(player_ids) >= 2:
             pk = _pair_key(player_ids)
-            n = self._pair_count[pk][discipline]
+            n = self._pair_count.get(pk, {}).get(discipline, 0)
             w = _pair_weight(n, self.pair_lambda)
-            comp = self._pair[pk][discipline]
+            comp = self._pair.get(pk, {}).get(discipline, 0.0)
             d_hybrid = d_avg + w * comp
             return d_hybrid, g_avg  # pair component only affects disc Elo
         return d_avg, g_avg
 
     def team_disc_count(self, player_ids: list[str], discipline: str) -> int:
         """Min disc match count across team members (conservative reliability)."""
-        return min(self._disc_count[pid][discipline] for pid in player_ids)
+        return min(self._disc_count.get(pid, {}).get(discipline, 0) for pid in player_ids)
 
     # ------------------------------------------------------------------
     # Update
@@ -245,7 +239,7 @@ class EloEngine:
         elo1_d, elo1_g = self.team_elo(ids1, discipline)
         elo2_d, elo2_g = self.team_elo(ids2, discipline)
 
-        k = _k_factor(round_name, tournament_tier)
+        k = _k_factor(round_name, tournament_tier, self.k_base)
 
         E1_d = _elo_expected(elo1_d, elo2_d)
         E1_g = _elo_expected(elo1_g, elo2_g)
@@ -315,6 +309,45 @@ class FeatureBuilder:
         # {canonical_pair: [wins_first, wins_second, total]}
         self._h2h: dict[tuple, list[int]] = defaultdict(lambda: [0, 0, 0])
 
+    def get_state(self) -> dict[str, Any]:
+        """Return all historical state needed to reproduce training features."""
+        return {
+            "state_type": "feature_builder",
+            "version": 1,
+            "elo": self.elo.get_state(),
+            "player_hist": {
+                pid: list(history) for pid, history in self._player_hist.items()
+            },
+            "h2h": dict(self._h2h),
+            "player_names": dict(self._player_names),
+        }
+
+    def save(self, path: Path) -> None:
+        """Persist Elo, form, and H2H state for future inference."""
+        with open(path, "wb") as fh:
+            pickle.dump(self.get_state(), fh)
+        logger.info("Feature state saved → %s", path)
+
+    @classmethod
+    def load(cls, path: Path) -> "FeatureBuilder":
+        """Restore the complete, versioned inference state."""
+        with open(path, "rb") as fh:
+            state = pickle.load(fh)
+
+        required = {"elo", "player_hist", "h2h", "player_names"}
+        if (not isinstance(state, dict) or state.get("state_type") != "feature_builder"
+                or state.get("version") != 1 or not required.issubset(state)):
+            raise ValueError("Incomplete or unsupported feature state; retrain and use feature_state.pkl")
+
+        builder = cls(player_names=state.get("player_names"))
+        builder.elo = EloEngine.from_state(state["elo"])
+        for pid, history in state.get("player_hist", {}).items():
+            builder._player_hist[pid].extend(history)
+        for key, values in state.get("h2h", {}).items():
+            builder._h2h[key] = list(values)
+        logger.info("Feature state loaded from %s", path)
+        return builder
+
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
@@ -339,7 +372,7 @@ class FeatureBuilder:
         rest_list: list[float] = []
 
         for pid in ids:
-            hist = list(self._player_hist[pid])
+            hist = list(self._player_hist.get(pid, ()))
             recent = hist[-n:]
             if recent:
                 win_rates.append(sum(float(e["won"]) for e in recent) / len(recent))
@@ -359,15 +392,14 @@ class FeatureBuilder:
     # Public API
     # ------------------------------------------------------------------
 
-    def process(self, match: dict[str, Any]) -> dict[str, Any]:
-        """Return feature dict (pre-match state), then update internal state."""
+    def preview(self, match: dict[str, Any]) -> dict[str, Any]:
+        """Return a feature row from current state without updating it."""
         ids1: list[str] = match["team1_ids"]
         ids2: list[str] = match["team2_ids"]
         disc: str = match["discipline"]
         round_name: str = match["round_name"]
         t_tier: int = match["tournament_tier"]
         match_time: datetime = match["match_time"]
-        winner: int = match["winner"]
 
         # ---- Elo (pre-match) -------------------------------------------
         elo1_d, elo1_g = self.elo.team_elo(ids1, disc)
@@ -389,7 +421,7 @@ class FeatureBuilder:
 
         # ---- H2H (pre-match) -------------------------------------------
         h2h_key, t1_first = self._canonical_h2h(ids1, ids2)
-        h2h_state = self._h2h[h2h_key]
+        h2h_state = self._h2h.get(h2h_key, (0, 0, 0))
         if t1_first:
             h2h_w1, h2h_w2 = h2h_state[0], h2h_state[1]
         else:
@@ -411,7 +443,6 @@ class FeatureBuilder:
             "match_time": match_time,
             "tournament_code": match.get("tournament_code"),
             "tournament_name": match.get("tournament_name"),
-            "label": match["label"],
             # -- Elo features --
             "elo_diff_disc": elo1_d - elo2_d,
             "elo_t1_disc": elo1_d,
@@ -459,6 +490,23 @@ class FeatureBuilder:
             ),
             "discipline": disc,  # categorical
         }
+
+        if "label" in match:
+            row["label"] = match["label"]
+        return row
+
+    def process(self, match: dict[str, Any]) -> dict[str, Any]:
+        """Return feature dict (pre-match state), then update internal state."""
+        row = self.preview(match)
+        ids1: list[str] = match["team1_ids"]
+        ids2: list[str] = match["team2_ids"]
+        disc: str = match["discipline"]
+        round_name: str = match["round_name"]
+        t_tier: int = match["tournament_tier"]
+        match_time: datetime = match["match_time"]
+        winner: int = match["winner"]
+        h2h_key, t1_first = self._canonical_h2h(ids1, ids2)
+        h2h_state = self._h2h[h2h_key]
 
         # ---- Update state (AFTER features recorded) --------------------
         self.elo.update(ids1, ids2, disc, round_name, t_tier, winner, match_time)
@@ -520,7 +568,7 @@ class FeatureBuilder:
                     "last_match_time": str(last_dt) if last_dt else "",
                 })
             df_lb = (
-                pd.DataFrame(rows)
+                pd.DataFrame(rows, columns=["player_name", "player_id", "elo", "matches_in_discipline", "last_match_time"])
                 .sort_values("elo", ascending=False)
                 .reset_index(drop=True)
             )
@@ -543,7 +591,7 @@ class FeatureBuilder:
                 "last_match_time": str(last_dt) if last_dt else "",
             })
         df_global = (
-            pd.DataFrame(rows_g)
+            pd.DataFrame(rows_g, columns=["player_name", "player_id", "elo", "total_matches", "last_match_time"])
             .sort_values("elo", ascending=False)
             .reset_index(drop=True)
         )
@@ -564,7 +612,7 @@ class FeatureBuilder:
                     "pair_matches": cnt,
                 })
             df_pair = (
-                pd.DataFrame(rows_p)
+                pd.DataFrame(rows_p, columns=["pair_key", "pair_elo_component", "pair_matches"])
                 .sort_values("pair_elo_component", ascending=False)
                 .reset_index(drop=True)
             )

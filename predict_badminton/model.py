@@ -1,7 +1,7 @@
 """LightGBM training, Optuna hyperparameter search, walk-forward CV, baselines.
 
 Walk-forward CV design:
-  - Each fold validates one calendar year (2021, 2022, 2023, 2024).
+  - Each fold validates one calendar year selected from the available data.
   - Training uses ALL data before the validation year start.
   - Model is retrained from scratch per fold (no leakage via model state).
 
@@ -12,7 +12,7 @@ Optuna tuning:
 
 Calibration:
   - Fit Platt scaling and isotonic regression on OOF predictions.
-  - Evaluated on held-out test set (2025).
+  - Evaluated on the latest held-out data year by default.
 """
 from __future__ import annotations
 
@@ -28,7 +28,6 @@ from sklearn.metrics import log_loss
 from sklearn.preprocessing import LabelEncoder
 
 from predict_badminton.config import (
-    CV_FOLD_VAL_YEARS,
     FEATURE_COLS,
     SEED,
 )
@@ -38,7 +37,6 @@ from predict_badminton.evaluate import (
     compute_metrics,
     feature_importance_df,
     reliability_stats,
-    shap_importance,
 )
 
 logger = logging.getLogger(__name__)
@@ -51,6 +49,48 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 def _get_year(dt) -> int:  # noqa: ANN001
     return dt.year if hasattr(dt, "year") else pd.Timestamp(dt).year
+
+
+def chronological_holdout_split(
+    df: pd.DataFrame,
+    test_year: int | None = None,
+) -> tuple[pd.DataFrame, pd.DataFrame, int]:
+    """Split on a year boundary, defaulting to the latest year in the data."""
+    if df.empty:
+        raise ValueError("Cannot split an empty feature matrix")
+
+    years = df["match_time"].apply(_get_year)
+    resolved_test_year = test_year if test_year is not None else int(years.max())
+    train_df = df[years < resolved_test_year].copy()
+    test_df = df[years >= resolved_test_year].copy()
+    if train_df.empty or test_df.empty:
+        raise ValueError(
+            f"Test year {resolved_test_year} must leave non-empty train and test sets"
+        )
+    return train_df, test_df, resolved_test_year
+
+
+def _default_fold_val_years(
+    df: pd.DataFrame,
+    max_folds: int = 4,
+) -> list[tuple[int, int]]:
+    """Choose the latest validation years that have prior training history."""
+    years = sorted({int(_get_year(value)) for value in df["match_time"]})
+    return [(year, year) for year in years[1:][-max_folds:]]
+
+
+def _chronological_validation_split(
+    df: pd.DataFrame,
+    validation_fraction: float = 0.1,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Reserve a chronological tail for early stopping."""
+    if len(df) < 2:
+        raise ValueError("At least two rows are required for validation splitting")
+    ordered = df.sort_values("match_time").reset_index(drop=True)
+    minimum = 50 if len(ordered) >= 500 else 10
+    n_validation = max(minimum, int(len(ordered) * validation_fraction))
+    n_validation = min(n_validation, max(1, len(ordered) // 3))
+    return ordered.iloc[:-n_validation], ordered.iloc[-n_validation:]
 
 
 def _split_folds(
@@ -124,23 +164,52 @@ def _lgbm_params(overrides: dict[str, Any] | None = None) -> dict[str, Any]:
 def train_lgbm(
     X_train: pd.DataFrame,
     y_train: pd.Series,
-    X_val: pd.DataFrame,
-    y_val: pd.Series,
+    X_val: pd.DataFrame | None = None,
+    y_val: pd.Series | None = None,
     params: dict[str, Any] | None = None,
     early_stopping_rounds: int = 50,
 ) -> lgb.LGBMClassifier:
     p = _lgbm_params(params)
     model = lgb.LGBMClassifier(**p)
-    model.fit(
-        X_train,
-        y_train,
-        eval_set=[(X_val, y_val)],
-        callbacks=[
-            lgb.early_stopping(early_stopping_rounds, verbose=False),
-            lgb.log_evaluation(period=-1),
-        ],
-    )
+    fit_kwargs: dict[str, Any] = {}
+    if X_val is not None and y_val is not None:
+        fit_kwargs = {
+            "eval_set": [(X_val, y_val)],
+            "callbacks": [
+                lgb.early_stopping(early_stopping_rounds, verbose=False),
+                lgb.log_evaluation(period=-1),
+            ],
+        }
+    model.fit(X_train, y_train, **fit_kwargs)
     return model
+
+
+def _train_lgbm_for_evaluation(
+    train_df: pd.DataFrame,
+    params: dict[str, Any] | None = None,
+) -> tuple[lgb.LGBMClassifier, int]:
+    """Select iterations internally, then refit on all available training rows."""
+    fit_df, stop_df = _chronological_validation_split(train_df)
+    X_fit, y_fit = _prep_X_y(fit_df)
+    X_stop, y_stop = _prep_X_y(stop_df)
+    provisional = train_lgbm(X_fit, y_fit, X_stop, y_stop, params)
+
+    best_iteration = int(
+        provisional.best_iteration_
+        or _lgbm_params(params)["n_estimators"]
+    )
+    refit_params = dict(params or {})
+    refit_params["n_estimators"] = best_iteration
+    X_train, y_train = _prep_X_y(train_df)
+    return train_lgbm(X_train, y_train, params=refit_params), best_iteration
+
+
+def refit_production_model(
+    df: pd.DataFrame, best_iteration: int, params: dict[str, Any] | None = None,
+) -> lgb.LGBMClassifier:
+    """Refit all known results after evaluation, keeping the selected tree count."""
+    X, y = _prep_X_y(df)
+    return train_lgbm(X, y, params={**(params or {}), "n_estimators": best_iteration})
 
 
 # ---------------------------------------------------------------------------
@@ -177,7 +246,7 @@ def tune_lgbm(
     n_trials: int = 30,
 ) -> dict[str, Any]:
     """Run Optuna on the last (largest) walk-forward fold. Return best params."""
-    folds = _split_folds(df, CV_FOLD_VAL_YEARS)
+    folds = _split_folds(df, _default_fold_val_years(df))
     if not folds:
         raise ValueError("No valid folds for tuning")
     # Use the last fold (most data → most stable signal)
@@ -212,16 +281,16 @@ def walk_forward_cv(
     params: dict[str, Any] | None = None,
 ) -> tuple[list[dict[str, float]], np.ndarray, np.ndarray]:
     """Run full walk-forward CV. Returns (fold_metrics, oof_preds, oof_labels)."""
-    folds = _split_folds(df, CV_FOLD_VAL_YEARS)
+    fold_years = _default_fold_val_years(df)
+    folds = _split_folds(df, fold_years)
     fold_metrics: list[dict[str, float]] = []
     oof_preds: list[np.ndarray] = []
     oof_labels: list[np.ndarray] = []
 
     for i, (train_df, val_df) in enumerate(folds):
-        X_train, y_train = _prep_X_y(train_df)
         X_val, y_val = _prep_X_y(val_df)
 
-        model = train_lgbm(X_train, y_train, X_val, y_val, params)
+        model, _ = _train_lgbm_for_evaluation(train_df, params)
         preds = model.predict_proba(X_val)[:, 1]
 
         m = compute_metrics(y_val.values, preds)
@@ -232,13 +301,18 @@ def walk_forward_cv(
         logger.info(
             "Fold %d | val_year=%s | n_train=%d n_val=%d | log_loss=%.4f auc=%.4f",
             i + 1,
-            CV_FOLD_VAL_YEARS[i],
+            (
+                int(val_df["match_time"].apply(_get_year).min()),
+                int(val_df["match_time"].apply(_get_year).max()),
+            ),
             len(train_df),
             len(val_df),
             m["log_loss"],
             m["roc_auc"],
         )
 
+    if not oof_preds:
+        return fold_metrics, np.array([]), np.array([])
     oof_all = np.concatenate(oof_preds)
     oof_lbl_all = np.concatenate(oof_labels)
     return fold_metrics, oof_all, oof_lbl_all
@@ -267,7 +341,7 @@ def baseline_elo_lr(
 
 def run_baselines(df: pd.DataFrame) -> dict[str, dict[str, float]]:
     """Evaluate baselines on last fold."""
-    folds = _split_folds(df, CV_FOLD_VAL_YEARS)
+    folds = _split_folds(df, _default_fold_val_years(df))
     if not folds:
         return {}
     train_df, val_df = folds[-1]
@@ -306,14 +380,8 @@ def run_baselines(df: pd.DataFrame) -> dict[str, dict[str, float]]:
             eval_metric="logloss",
             random_state=SEED,
             verbosity=0,
-            early_stopping_rounds=50,
         )
-        xgb_model.fit(
-            X_tr_xgb,
-            y_tr,
-            eval_set=[(X_val_xgb, y_val)],
-            verbose=False,
-        )
+        xgb_model.fit(X_tr_xgb, y_tr)
         preds_xgb = xgb_model.predict_proba(X_val_xgb)[:, 1]
         results["xgboost_challenger"] = compute_metrics(y_val.values, preds_xgb)
         logger.info("XGBoost challenger: %s", results["xgboost_challenger"])
@@ -337,35 +405,24 @@ def train_final_model(
 ) -> tuple[lgb.LGBMClassifier, PlattCalibrator, IsotonicCalibrator, dict[str, Any]]:
     """Train final model.
 
-    Calibrators are fit on OOF predictions from walk-forward CV (if provided).
-    If OOF data is absent, fall back to fitting on train set predictions.
+    Calibrators require OOF predictions from walk-forward CV.
     The test set is used only for final evaluation — never for calibrator fitting.
     """
-    X_train, y_train = _prep_X_y(train_df)
+    if (oof_preds is None or oof_labels is None or len(oof_preds) < 50
+            or len(oof_preds) != len(oof_labels)):
+        raise ValueError("Calibration requires at least 50 matched walk-forward predictions and labels")
     X_test, y_test = _prep_X_y(test_df)
 
-    model = train_lgbm(X_train, y_train, X_test, y_test, best_params)
+    model, best_iteration = _train_lgbm_for_evaluation(train_df, best_params)
     raw_preds_test = model.predict_proba(X_test)[:, 1]
 
     raw_metrics = compute_metrics(y_test.values, raw_preds_test)
     logger.info("Final model raw test metrics: %s", raw_metrics)
 
     # Calibration: fit on OOF predictions (not test set)
-    if oof_preds is not None and oof_labels is not None and len(oof_preds) >= 50:
-        logger.info(
-            "Fitting calibrators on OOF predictions (%d samples)", len(oof_preds)
-        )
-        cal_y = oof_labels
-        cal_p = oof_preds
-    else:
-        logger.warning(
-            "OOF predictions not available; fitting calibrators on training predictions (fallback)"
-        )
-        cal_p = model.predict_proba(X_train)[:, 1]
-        cal_y = y_train.values
-
-    platt = PlattCalibrator().fit(cal_y, cal_p)
-    isotonic = IsotonicCalibrator().fit(cal_y, cal_p)
+    logger.info("Fitting calibrators on OOF predictions (%d samples)", len(oof_preds))
+    platt = PlattCalibrator().fit(oof_labels, oof_preds)
+    isotonic = IsotonicCalibrator().fit(oof_labels, oof_preds)
 
     # Evaluate calibrated model on held-out test (no refitting)
     platt_preds = platt.predict(raw_preds_test)
@@ -378,7 +435,6 @@ def train_final_model(
     logger.info("Isotonic calibrated (test): %s", iso_metrics)
 
     fi_df = feature_importance_df(model, FEATURE_COLS)
-    shap_df = shap_importance(model, X_test)
 
     rel_raw = reliability_stats(y_test.values, raw_preds_test)
     rel_platt = reliability_stats(y_test.values, platt_preds)
@@ -387,14 +443,13 @@ def train_final_model(
         "test_raw": raw_metrics,
         "test_platt": platt_metrics,
         "test_isotonic": iso_metrics,
-        "calibration_source": "oof" if (oof_preds is not None and len(oof_preds) >= 50) else "train_fallback",
+        "calibration_source": "oof",
+        "early_stopping_source": "chronological_training_tail",
+        "best_iteration": best_iteration,
         "feature_importance": fi_df.to_dict("records"),
         "reliability_raw": rel_raw,
         "reliability_platt": rel_platt,
     }
-    if shap_df is not None:
-        report["shap_importance"] = shap_df.to_dict("records")
-
     return model, platt, isotonic, report
 
 
@@ -449,14 +504,12 @@ def rolling_backtest(
             train_start += step_years
             continue
 
-        X_tr, y_tr = _prep_X_y(train)
         X_val, y_val = _prep_X_y(val)
 
-        model = train_lgbm(X_tr, y_tr, X_val, y_val, params)
+        model, _ = _train_lgbm_for_evaluation(train, params)
         preds = model.predict_proba(X_val)[:, 1]
 
         m = compute_metrics(y_val.values, preds)
-        from predict_badminton.evaluate import reliability_stats
         rel = reliability_stats(y_val.values, preds)
         m["ece"] = rel["ece"]
 
@@ -485,7 +538,6 @@ def rolling_backtest(
     agg_preds = np.concatenate(all_preds)
     agg_labels = np.concatenate(all_labels)
     agg_metrics = compute_metrics(agg_labels, agg_preds)
-    from predict_badminton.evaluate import reliability_stats
     agg_metrics["ece"] = reliability_stats(agg_labels, agg_preds)["ece"]
 
     return {

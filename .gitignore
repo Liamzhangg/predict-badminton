@@ -1,7 +1,6 @@
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
 .venv/
 venv/
 env/
@@ -9,6 +8,7 @@ env/
 dist/
 build/
 .eggs/
+.cache/
 
 # Jupyter
 .ipynb_checkpoints/
@@ -21,10 +21,17 @@ build/
 *.h5
 *.hdf5
 !data/templates/upcoming_fixtures_template.csv
+!data/draws/*.json
 data/raw/**/*.json
 !data/raw/bwf_matches/.gitkeep
 data/processed/**
 !data/processed/.gitkeep
+data/source_cache/**
+!data/source_cache/
+!data/source_cache/bwf/
+!data/source_cache/bwf/.gitkeep
+data/manifests/*.csv
+!data/manifests/.gitkeep
 models/
 outputs/
 
@@ -41,3 +48,4 @@ Thumbs.db
 # Environment
 .env
 *.env.local
+.streamlit/secrets.toml

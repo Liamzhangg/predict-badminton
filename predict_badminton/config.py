@@ -41,15 +41,6 @@ ROUND_IMPORTANCE: dict[str, int] = {
     "R5": 17,
 }
 
-# Walk-forward CV fold boundaries (exclusive end year for validation)
-# Each entry: (first_val_year, last_val_year_inclusive)
-CV_FOLD_VAL_YEARS: list[tuple[int, int]] = [
-    (2021, 2021),
-    (2022, 2022),
-    (2023, 2023),
-    (2024, 2024),
-]
-
 # Feature columns used for model training
 FEATURE_COLS: list[str] = [
     # Elo
