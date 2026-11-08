@@ -1,6 +1,6 @@
 """Inference module: generate training-compatible features for future fixtures.
 
-Loads persisted training feature state and produces FEATURE_COLS-aligned rows
+Loads persisted training feature state and produces schema-aligned rows
 (no labels) that can be fed directly to the saved LightGBM model.
 """
 from __future__ import annotations
@@ -13,10 +13,7 @@ from typing import Any
 
 import pandas as pd
 
-from predict_badminton.config import (
-    DISCIPLINES,
-    FEATURE_COLS,
-)
+from predict_badminton.config import DISCIPLINES
 from predict_badminton.features import FeatureBuilder
 
 logger = logging.getLogger(__name__)
@@ -106,7 +103,7 @@ class InferenceBuilder:
         self.feature_builder = feature_builder
 
     def build_features(self, fixtures: pd.DataFrame) -> pd.DataFrame:
-        """Return a DataFrame with exactly FEATURE_COLS columns (no label)."""
+        """Return match metadata and the saved history's feature columns (no label)."""
         cutoff = max(self.feature_builder.elo._last_match.values(), default=datetime.min)
         if (fixtures["match_time"] <= cutoff).any():
             raise ValueError("Fixture times must follow the saved history cutoff")
@@ -125,7 +122,7 @@ class InferenceBuilder:
         all_discs = DISCIPLINES + ["OTHER"]
         df["discipline"] = pd.Categorical(df["discipline"], categories=all_discs)
 
-        return df[["match_id", "match_time"] + FEATURE_COLS]
+        return df[["match_id", "match_time"] + self.feature_builder.feature_columns]
 
     def _build_row(self, fix: pd.Series) -> dict[str, Any] | None:
         ids1 = _parse_player_ids(fix["team1_player_ids"])

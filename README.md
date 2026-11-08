@@ -1,6 +1,6 @@
 # predict-badminton
 
-BWF match predictions using LightGBM, player/pair Elo, recent form, head-to-head history, and match context. Includes data collection, training, fixture scoring, and a small Streamlit draw viewer.
+BWF match predictions using **LightGBM + Elo + Glicko-2**, recent form, head-to-head history, and match context. Includes data collection, training, fixture scoring, and a small Streamlit draw viewer.
 
 ## Elo Leaderboards
 
@@ -175,13 +175,21 @@ Use `uv run python fetch_bwf.py --help` for discovery, fetching individual URLs,
 
 ## Train
 
+See [model results](MODEL_RESULTS.md) for a compact comparison of tested approaches and untested ideas.
+
 ```bash
 # Evaluate, then refit a production model on all available played matches
 uv run python train.py --no-tune --no-backtest --refit-all
 
 # Small pipeline check, not a production model
-uv run python train.py --smoke-test --no-tune
+uv run python train.py --smoke-test --no-tune --artifacts-dir outputs/smoke-test
 ```
+
+The main model combines 38 Elo/context features with nine Glicko-2 features: each side's rating, rating deviation (uncertainty), volatility, and their differences. LightGBM learns how to combine these inputs; this is not a fixed average of Elo and Glicko probabilities.
+
+Glicko-2 uses Monday-to-Sunday UTC periods, starting at rating 1500, deviation 350, and volatility 0.06, with `tau=0.5`. Ratings are separate for each event and exact doubles partnership; a new partnership starts fresh. Observed results are batched after each week, while Elo/form/H2H update after every match. Inactivity increases Glicko uncertainty, not Elo decay or a direct rating penalty. Future previews never add hypothetical results or mutate history.
+
+The November 8 integration reproduced **75.79% accuracy / 0.4853 log loss** on 39,537 played 2026 matches, versus **74.80% / 0.5018** for the Elo-based control. This reused holdout is exploratory, not a guarantee on future tournaments. Raw probabilities remain the default; Platt and isotonic calibration are available for comparison. See [model results](MODEL_RESULTS.md) for all runs.
 
 The latest data year is held out for evaluation. Tree count selection uses an earlier training tail; Platt and isotonic calibration use walk-forward out-of-fold predictions, never training-set predictions or final holdout labels.
 
@@ -194,7 +202,7 @@ Outputs default to `outputs/artifacts/`:
 | Output | Contents |
 | --- | --- |
 | `lgbm_model.pkl`, `*_calibrator.pkl` | Model and probability calibrators |
-| `feature_state.pkl`, `feature_list.json` | Complete Elo/form/H2H history and model feature order |
+| `feature_state.pkl`, `feature_list.json` | Complete Elo/Glicko-2/form/H2H history, pending weekly results, and model feature order |
 | `metrics_report.json`, `feature_importance.csv` | Evaluation and feature importance |
 | `elo_leaderboard_MS.csv` through `elo_leaderboard_XD.csv` | Per-event player ratings, names, IDs, counts, and last match time |
 | `elo_leaderboard_GLOBAL.csv` | Global player ratings |
@@ -214,9 +222,9 @@ Required columns: `match_id`, `match_time`, `discipline`, `team1_player_ids`, `t
 
 Times are UTC; supplied timezone offsets are converted to UTC. Every fixture must be later than the saved history cutoff. Replace the template's illustrative dates and IDs before scoring.
 
-The CLI uses `outputs/artifacts/` by default. Override `--model-path`, `--calibrator-path`, and `--state-path` together when using a dated bundle. Only load trusted local pickle files.
+Training, the prediction CLI, and the app use `outputs/artifacts/` by default. For a dated bundle, override `--model-path` and `--state-path` together. Complete older Elo-only bundles remain supported; mixing an old model with new history is rejected. Only load trusted local pickle files.
 
-CSV output goes to `outputs/predictions/` with raw and calibrated win probabilities. Winners use the selected calibrator, isotonic by default. CLI `confidence` is the scaled probability margin, `2 * abs(p - 0.5)`, not the win probability itself.
+CSV output goes to `outputs/predictions/`. `team1_win_prob` and `predicted_winner` use **raw probabilities by default**. Add `--probabilities platt` or `--probabilities isotonic` to use calibration; its file is loaded from the model's folder unless `--calibrator-path` overrides it. `team1_win_prob_raw` is always included; `team1_win_prob_calibrated` is included only when calibration is requested. CLI `confidence` is the scaled probability margin, `2 * abs(p - 0.5)`, not the win probability itself.
 
 ## Project Map
 
@@ -225,12 +233,12 @@ CSV output goes to `outputs/predictions/` with raw and calibrated win probabilit
 | `train.py`, `predict.py`, `audit_data.py` | Training, fixture scoring, and read-only data audit |
 | `fetch_bwf.py`, `predict_badminton/data_sources/` | Official/public collection and manual import |
 | `predict_badminton/data_parser.py` | Raw JSON normalization, filtering, and deduplication |
-| `predict_badminton/features.py`, `model.py`, `evaluate.py` | Historical features, model fitting, and evaluation |
+| `predict_badminton/features.py`, `glicko.py`, `model.py`, `evaluate.py` | Historical features, weekly ratings, model fitting, and evaluation |
 | `predict_badminton/inference.py`, `tournament.py`, `app.py` | Future fixtures, bracket probabilities, and Streamlit UI |
 | `data/` | Local sources, public Elo snapshots, tracked draws, and fixture template |
 | `tests/` | Parser, fetch/import, state, time-split, and bracket regression tests |
 
-The model uses 38 features: discipline/global Elo, doubles pair history, recent win rates and rest days, H2H, tournament tier, round, seeds, country overlap, and discipline. Features are recorded before each match updates history. Tournament tiers are inferred heuristically from names; missing coverage and sparse player history limit predictions.
+The model uses 47 features: discipline/global Elo, doubles pair history, Glicko-2 ratings/uncertainty/volatility, recent win rates and rest days, H2H, tournament tier, round, seeds, country overlap, and discipline. Features are recorded before each match updates history. Tournament tiers are inferred heuristically from names; missing coverage and sparse player history limit predictions. Rating parameters live in [config.py](predict_badminton/config.py); tree parameters live in [model.py](predict_badminton/model.py). Glicko-2 math comes from pinned `glicko2-py==0.1.0` and is regression-tested against the [published example](https://www.glicko.net/glicko/glicko2.pdf).
 
 ## Verify
 

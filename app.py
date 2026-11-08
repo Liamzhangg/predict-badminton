@@ -11,7 +11,7 @@ from predict_badminton.tournament import forecast, load_bundle
 
 ROOT = Path(__file__).resolve().parent
 DRAW = ROOT / "data/draws/french-open-2026-after-r32.json"
-MODEL = ROOT / "outputs/runs/2026-10-21-french-open"
+MODEL = ROOT / "outputs/artifacts"
 
 st.set_page_config(page_title="French Open 2026", layout="wide")
 
@@ -77,7 +77,7 @@ st.caption(f"20–25 October 2026 · {data['location']} · {data['stage']}")
 event = st.segmented_control("Event", list(data["draws"]), default="MS", key="event") or "MS"
 with st.expander("Model and sources"):
     method = st.selectbox("Probabilities", ["Raw", "Isotonic", "Platt"])
-    st.caption(f"Model: {data['model_date']} · Draw retrieved: {data['retrieved_at_utc']} · History frozen for future rounds")
+    st.caption(f"Model: {metrics.get('model_approach', 'LightGBM + Elo')} · Draw retrieved: {data['retrieved_at_utc']} · No simulated results")
     st.caption("2026 holdout log loss, before production refit: " + " · ".join(
         f"{name} {metrics[key]['log_loss']:.4f}" for name, key in
         (("Raw", "test_raw"), ("Isotonic", "test_isotonic"), ("Platt", "test_platt"))))

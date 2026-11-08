@@ -3,6 +3,7 @@ name = "predict-badminton"
 version = "0.1.0"
 requires-python = ">=3.12.13"
 dependencies = [
+    "glicko2-py==0.1.0",
     "lightgbm>=4.0",
     "numpy>=1.24",
     "optuna>=3.3",

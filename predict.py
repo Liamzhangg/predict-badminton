@@ -5,6 +5,7 @@ Usage:
   uv run python predict.py --fixtures-csv data/upcoming_fixtures.csv
   uv run python predict.py --fixtures-csv data/upcoming_fixtures.csv \\
       --model-path outputs/artifacts/lgbm_model.pkl \\
+      --probabilities isotonic \\
       --calibrator-path outputs/artifacts/isotonic_calibrator.pkl \\
       --state-path outputs/artifacts/feature_state.pkl
 
@@ -40,9 +41,13 @@ def parse_args() -> argparse.Namespace:
         default=Path("outputs/artifacts/lgbm_model.pkl"),
     )
     p.add_argument(
+        "--probabilities", choices=("raw", "platt", "isotonic"), default="raw",
+        help="Probability method; raw is the main model's default",
+    )
+    p.add_argument(
         "--calibrator-path",
         type=Path,
-        default=Path("outputs/artifacts/isotonic_calibrator.pkl"),
+        help="Optional calibrator override when --probabilities is platt or isotonic",
     )
     p.add_argument(
         "--state-path",
@@ -54,7 +59,12 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=Path("outputs/predictions"),
     )
-    return p.parse_args()
+    args = p.parse_args()
+    if args.probabilities == "raw" and args.calibrator_path is not None:
+        p.error("--calibrator-path requires --probabilities platt or isotonic")
+    if args.probabilities != "raw" and args.calibrator_path is None:
+        args.calibrator_path = args.model_path.parent / f"{args.probabilities}_calibrator.pkl"
+    return args
 
 
 def main() -> int:
@@ -67,7 +77,7 @@ def main() -> int:
         ("calibrator-path", args.calibrator_path),
         ("state-path", args.state_path),
     ]:
-        if not path.exists():
+        if path is not None and not path.exists():
             logger.error("File not found: %s  (%s)", path, attr)
             return 1
 
@@ -86,31 +96,39 @@ def main() -> int:
     with open(args.model_path, "rb") as fh:
         model = pickle.load(fh)
 
-    logger.info("Loading calibrator from %s …", args.calibrator_path)
-    with open(args.calibrator_path, "rb") as fh:
-        calibrator = pickle.load(fh)
-
     # ---- Score ---------------------------------------------------------
-    from predict_badminton.config import FEATURE_COLS, DISCIPLINES
+    from predict_badminton.config import DISCIPLINES
 
-    X = feat_df[FEATURE_COLS].copy()
+    columns = list(feat_df.columns[2:])
+    if columns != list(model.feature_name_):
+        logger.error("Model features differ from the saved history; use a matching bundle or retrain")
+        return 1
+    X = feat_df[columns].copy()
 
     # Ensure discipline is categorical (match training encoding)
     all_discs = DISCIPLINES + ["OTHER"]
     X["discipline"] = pd.Categorical(X["discipline"], categories=all_discs)
 
     raw_probs = model.predict_proba(X)[:, 1]
-    cal_probs = calibrator.predict(raw_probs)
+    probs = raw_probs
+    if args.calibrator_path is not None:
+        logger.info("Loading calibrator from %s …", args.calibrator_path)
+        with open(args.calibrator_path, "rb") as fh:
+            calibrator = pickle.load(fh)
+        probs = calibrator.predict(raw_probs)
 
     # ---- Assemble output -----------------------------------------------
     out_df = pd.DataFrame({
         "match_id": feat_df["match_id"].values,
         "match_time": feat_df["match_time"].values,
         "team1_win_prob_raw": np.round(raw_probs, 4),
-        "team1_win_prob_calibrated": np.round(cal_probs, 4),
-        "predicted_winner": np.where(cal_probs >= 0.5, "team1", "team2"),
-        "confidence": np.round(np.abs(cal_probs - 0.5) * 2, 4),
+        "team1_win_prob": np.round(probs, 4),
+        "probability_method": args.probabilities,
+        "predicted_winner": np.where(probs >= 0.5, "team1", "team2"),
+        "confidence": np.round(np.abs(probs - 0.5) * 2, 4),
     })
+    if args.calibrator_path is not None:
+        out_df["team1_win_prob_calibrated"] = np.round(probs, 4)
 
     # Merge in team IDs if available
     metadata_cols = [col for col in (
@@ -127,7 +145,7 @@ def main() -> int:
 
     # Print summary
     print(f"\n=== PREDICTIONS ({len(out_df)} matches) ===")
-    print(out_df[["match_id", "predicted_winner", "team1_win_prob_calibrated", "confidence"]].to_string(index=False))
+    print(out_df[["match_id", "predicted_winner", "team1_win_prob", "confidence"]].to_string(index=False))
     print(f"\nOutput: {out_path.resolve()}")
     return 0
 

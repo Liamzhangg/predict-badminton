@@ -10,6 +10,12 @@ SEED = 42
 DEFAULT_ELO: float = 1500.0
 K_BASE: float = 32.0
 
+# Glicko-2: Monday-to-Sunday UTC periods, separate exact teams per discipline.
+GLICKO_PERIOD_DAYS: int = 7
+GLICKO_TAU: float = 0.5
+GLICKO_INITIAL_RD: float = 350.0
+GLICKO_INITIAL_VOLATILITY: float = 0.06
+
 DISCIPLINES = ["MS", "WS", "MD", "WD", "XD"]
 DOUBLES_DISCIPLINES: frozenset[str] = frozenset({"MD", "WD", "XD"})
 
@@ -41,8 +47,8 @@ ROUND_IMPORTANCE: dict[str, int] = {
     "R5": 17,
 }
 
-# Feature columns used for model training
-FEATURE_COLS: list[str] = [
+# Original Elo/context schema, retained for complete legacy bundles.
+LEGACY_FEATURE_COLS: list[str] = [
     # Elo
     "elo_diff_disc",
     "elo_t1_disc",
@@ -85,6 +91,13 @@ FEATURE_COLS: list[str] = [
     "team2_seeded",
     "seed_diff",
     "same_country",
-    # Categorical (last so LightGBM categorical_feature indexing is easy)
+    # Categorical
     "discipline",
 ]
+
+GLICKO_FEATURE_COLS: list[str] = [
+    f"glicko_{quantity}_{side}"
+    for quantity in ("rating", "rd", "volatility")
+    for side in ("t1", "t2", "diff")
+]
+FEATURE_COLS: list[str] = LEGACY_FEATURE_COLS + GLICKO_FEATURE_COLS

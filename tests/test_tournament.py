@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import json
 import pickle
+import tempfile
 import unittest
 from datetime import datetime
 from pathlib import Path
@@ -10,10 +11,14 @@ from pathlib import Path
 import numpy as np
 
 from predict_badminton.features import FeatureBuilder
-from predict_badminton.tournament import forecast, propagate, validate_draw
+from predict_badminton.config import FEATURE_COLS, LEGACY_FEATURE_COLS
+from predict_badminton.tournament import forecast, load_bundle, propagate, validate_draw
 
 
 class FixedModel:
+    def __init__(self, columns=FEATURE_COLS):
+        self.feature_name_ = list(columns)
+
     def predict_proba(self, frame):
         return np.tile([0.5, 0.5], (len(frame), 1))
 
@@ -31,6 +36,29 @@ def draw():
 
 
 class TournamentTests(unittest.TestCase):
+    def test_bundle_schema_must_match_model_and_history_including_legacy(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp)
+            for columns in (FEATURE_COLS, LEGACY_FEATURE_COLS):
+                history = FeatureBuilder()
+                if columns == LEGACY_FEATURE_COLS:
+                    history.glicko = None
+                history.save(path / "feature_state.pkl")
+                (path / "feature_list.json").write_text(json.dumps(columns))
+                for name, value in (("lgbm_model.pkl", FixedModel(columns)),
+                                    ("platt_calibrator.pkl", FixedCalibrator()),
+                                    ("isotonic_calibrator.pkl", FixedCalibrator())):
+                    (path / name).write_bytes(pickle.dumps(value))
+                result = forecast(draw(), "MS", load_bundle(path))
+                self.assertEqual(result["table"]["Title"].tolist(), [25] * 4)
+                wrong = LEGACY_FEATURE_COLS if columns == FEATURE_COLS else FEATURE_COLS
+                (path / "lgbm_model.pkl").write_bytes(pickle.dumps(FixedModel(wrong)))
+                with self.assertRaisesRegex(ValueError, "saved model"):
+                    load_bundle(path)
+                (path / "feature_list.json").write_text(json.dumps(wrong))
+                with self.assertRaisesRegex(ValueError, "saved history"):
+                    load_bundle(path)
+
     def test_balanced_draw_conserves_probability(self):
         advancement, matches = propagate(32, [0.5] * 496)
         np.testing.assert_allclose(advancement[:, -1], 1 / 32)

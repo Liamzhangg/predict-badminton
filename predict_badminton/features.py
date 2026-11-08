@@ -1,4 +1,4 @@
-"""Feature engineering: Elo ratings, rolling form, H2H, and match context.
+"""Feature engineering: Elo/Glicko-2 ratings, rolling form, H2H, and context.
 
 Processing is strictly sequential (matches already sorted by time).
 State is updated AFTER features are recorded → no look-ahead leakage.
@@ -42,9 +42,12 @@ from predict_badminton.config import (
     DISCIPLINES,
     DOUBLES_DISCIPLINES,
     K_BASE,
+    FEATURE_COLS,
+    LEGACY_FEATURE_COLS,
     PAIR_LAMBDA,
     ROUND_IMPORTANCE,
 )
+from predict_badminton.glicko import GlickoEngine
 
 logger = logging.getLogger(__name__)
 
@@ -301,6 +304,7 @@ class FeatureBuilder:
         player_names: dict[str, str] | None = None,
     ) -> None:
         self.elo = EloEngine(k_base=k_base)
+        self.glicko: GlickoEngine | None = GlickoEngine()
         self._player_names: dict[str, str] = player_names or {}
         # {player_id: deque of {"time": datetime, "won": bool}}
         self._player_hist: dict[str, deque] = defaultdict(
@@ -313,8 +317,9 @@ class FeatureBuilder:
         """Return all historical state needed to reproduce training features."""
         return {
             "state_type": "feature_builder",
-            "version": 1,
+            "version": 2 if self.glicko is not None else 1,
             "elo": self.elo.get_state(),
+            **({"glicko": self.glicko.get_state()} if self.glicko is not None else {}),
             "player_hist": {
                 pid: list(history) for pid, history in self._player_hist.items()
             },
@@ -323,7 +328,7 @@ class FeatureBuilder:
         }
 
     def save(self, path: Path) -> None:
-        """Persist Elo, form, and H2H state for future inference."""
+        """Persist Elo, Glicko-2, form, and H2H state for future inference."""
         with open(path, "wb") as fh:
             pickle.dump(self.get_state(), fh)
         logger.info("Feature state saved → %s", path)
@@ -336,17 +341,24 @@ class FeatureBuilder:
 
         required = {"elo", "player_hist", "h2h", "player_names"}
         if (not isinstance(state, dict) or state.get("state_type") != "feature_builder"
-                or state.get("version") != 1 or not required.issubset(state)):
+                or state.get("version") not in {1, 2} or not required.issubset(state)
+                or (state.get("version") == 2 and "glicko" not in state)):
             raise ValueError("Incomplete or unsupported feature state; retrain and use feature_state.pkl")
 
         builder = cls(player_names=state.get("player_names"))
         builder.elo = EloEngine.from_state(state["elo"])
+        builder.glicko = GlickoEngine.from_state(state["glicko"]) if state["version"] == 2 else None
         for pid, history in state.get("player_hist", {}).items():
             builder._player_hist[pid].extend(history)
         for key, values in state.get("h2h", {}).items():
             builder._h2h[key] = list(values)
         logger.info("Feature state loaded from %s", path)
         return builder
+
+    @property
+    def feature_columns(self) -> list[str]:
+        """Keep complete version-1 Elo-only bundles usable without inventing history."""
+        return FEATURE_COLS if self.glicko is not None else LEGACY_FEATURE_COLS
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -491,6 +503,8 @@ class FeatureBuilder:
             "discipline": disc,  # categorical
         }
 
+        if self.glicko is not None:
+            row.update(self.glicko.features(match))
         if "label" in match:
             row["label"] = match["label"]
         return row
@@ -498,6 +512,8 @@ class FeatureBuilder:
     def process(self, match: dict[str, Any]) -> dict[str, Any]:
         """Return feature dict (pre-match state), then update internal state."""
         row = self.preview(match)
+        if self.glicko is not None:
+            self.glicko.observe(match)
         ids1: list[str] = match["team1_ids"]
         ids2: list[str] = match["team2_ids"]
         disc: str = match["discipline"]

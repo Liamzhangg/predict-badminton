@@ -288,6 +288,8 @@ def main() -> int:
     fi_df.to_csv(artifacts_dir / "feature_importance.csv", index=False)
 
     full_report = {
+        "model_approach": "LightGBM + Elo + Glicko-2",
+        "glicko_parameters": feature_builder.glicko.parameters,
         "cv_fold_metrics": fold_metrics,
         "cv_summary": cv_summary,
         "baselines": baseline_results,

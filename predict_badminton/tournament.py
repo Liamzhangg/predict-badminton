@@ -10,19 +10,23 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from predict_badminton.config import DISCIPLINES, FEATURE_COLS
+from predict_badminton.config import DISCIPLINES
 from predict_badminton.features import FeatureBuilder
 
 
 def load_bundle(directory: Path) -> tuple:
     """Load only a trusted local model bundle, never an uploaded pickle."""
-    if json.loads((directory / "feature_list.json").read_text()) != FEATURE_COLS:
-        raise ValueError("Model feature list differs from the current code; retrain first")
+    history = FeatureBuilder.load(directory / "feature_state.pkl")
+    columns = json.loads((directory / "feature_list.json").read_text())
+    if columns != history.feature_columns:
+        raise ValueError("Model feature list differs from its saved history; retrain first")
     objects = []
     for name in ("lgbm_model.pkl", "platt_calibrator.pkl", "isotonic_calibrator.pkl"):
         with (directory / name).open("rb") as handle:
             objects.append(pickle.load(handle))
-    return (*objects, FeatureBuilder.load(directory / "feature_state.pkl"))
+    if list(objects[0].feature_name_) != columns:
+        raise ValueError("Model feature list differs from its saved model; retrain first")
+    return (*objects, history)
 
 
 def validate_draw(draw: dict, discipline: str) -> None:
@@ -105,7 +109,7 @@ def forecast(draw: dict, discipline: str, bundle: tuple, method: str = "Raw") ->
                         "team1_seed": a.get("seed"), "team2_seed": b.get("seed"),
                         "team1_country": a.get("country", ""), "team2_country": b.get("country", ""),
                     }))
-    frame = pd.DataFrame(rows)[FEATURE_COLS]
+    frame = pd.DataFrame(rows)[history.feature_columns]
     frame["discipline"] = pd.Categorical(frame["discipline"], categories=DISCIPLINES + ["OTHER"])
     probabilities = model.predict_proba(frame)[:, 1]
     if method != "Raw":
