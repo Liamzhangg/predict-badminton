@@ -1,13 +1,52 @@
 from __future__ import annotations
 
 import unittest
+import pickle
+import tempfile
+from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
-from predict import parse_args
+from predict import main, parse_args
+from predict_badminton.features import FeatureBuilder
+from tests.test_feature_state import _match
+from tests.test_tournament import FixedCalibrator, FixedModel
 
 
 class PredictionArgsTests(unittest.TestCase):
+    def test_cli_accepts_matching_policies_and_rejects_mixed_bundles(self):
+        history = FeatureBuilder()
+        history.process({**_match("known", datetime(2024, 1, 1), 1), "score_margin": 0.3})
+        model = FixedModel()
+        model.feature_policy_ = history.model_policy
+        calibrator = FixedCalibrator()
+        calibrator.feature_policy_ = history.model_policy
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            history.save(root / "state.pkl")
+            (root / "model.pkl").write_bytes(pickle.dumps(model))
+            (root / "calibrator.pkl").write_bytes(pickle.dumps(calibrator))
+            (root / "fixtures.csv").write_text("match_id,match_time,discipline,team1_player_ids,team2_player_ids\n"
+                                                "next,2030-01-01 10:00:00,MS,p1,p2\n")
+            argv = ["predict.py", "--fixtures-csv", str(root / "fixtures.csv"),
+                    "--model-path", str(root / "model.pkl"), "--state-path", str(root / "state.pkl"),
+                    "--output-dir", str(root / "predictions")]
+            with patch("sys.argv", argv):
+                self.assertEqual(main(), 0)
+            model.feature_policy_ = FeatureBuilder(score_margin_weight=0).model_policy
+            (root / "model.pkl").write_bytes(pickle.dumps(model))
+            with patch("sys.argv", argv):
+                self.assertEqual(main(), 1)
+            model.feature_policy_ = history.model_policy
+            (root / "model.pkl").write_bytes(pickle.dumps(model))
+            calibrated = argv + ["--probabilities", "platt", "--calibrator-path", str(root / "calibrator.pkl")]
+            with patch("sys.argv", calibrated):
+                self.assertEqual(main(), 0)
+            calibrator.feature_policy_ = FeatureBuilder(score_margin_weight=0).model_policy
+            (root / "calibrator.pkl").write_bytes(pickle.dumps(calibrator))
+            with patch("sys.argv", calibrated):
+                self.assertEqual(main(), 1)
+
     def test_default_probabilities_are_raw(self):
         with patch("sys.argv", ["predict.py", "--fixtures-csv", "fixtures.csv"]):
             args = parse_args()

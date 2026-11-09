@@ -44,7 +44,8 @@ The parser prefers `matchTimeUtc`, then falls back to `matchTime`. Missing indiv
 
 - Para records and unplayed walkovers are excluded. Walkovers remain in raw results to determine bracket advancement; played retirements remain included.
 - Duplicate IDs or deterministic metadata signatures are deduplicated in memory. Source aliases prefer the UTC copy only when local result and match-slot metadata agree.
-- Junior labels such as `BS`, `GS`, `BD`, and `GD` map to their standard singles/doubles disciplines. This is not a senior-only dataset. Unrecognized formats retain `OTHER`; team relay and triples are not relabelled as ordinary singles/doubles.
+- Junior labels such as `BS`, `GS`, `BD`, and `GD` map to their standard singles/doubles disciplines. This is not a senior-only dataset. The parser retains `OTHER` for auditing, but training and new predictions accept only standard indoor MS, WS, MD, WD, and XD. AirBadminton (including doubles-labelled records), relay/triples, wrong-sized teams, repeated teammates, and overlapping opponents are excluded from model history. Raw files are preserved.
+- Complete normal 21-point best-of-three scores provide a winner-oriented point margin for score-sensitive Elo. Missing, retired, conflicting, incomplete, or nonstandard scores use the original Elo update. Conflicting duplicate scores are treated as unavailable. Features are captured before each result updates history.
 - All included records are sorted chronologically. Training never rewrites raw files.
 
 `uv run python audit_data.py` writes `processed/data_audit.json` with coverage and exclusion counts. `--include-para` opts into para records; `--no-deduplicate` retains source duplicates for inspection.
@@ -71,9 +72,11 @@ Collection runs preserve `report.json`, `summary.md`, `changes.csv`, source resp
 
 ## Draws And Fixtures
 
-`draws/french-open-2026.json` is the preserved pre-event draw. `draws/french-open-2026-after-r32.json` is the October 21 update with 16 confirmed survivors per event. The 80 completed R32 outcomes are stored locally in `raw/bwf_matches/yonex-french-open-2026.json`; 78 were played and two were walkovers.
+`draws/french-open-2026.json` is the preserved pre-event draw. `draws/french-open-2026-after-r32.json` is the October 21 update with 16 confirmed survivors per event. The local `raw/bwf_matches/yonex-french-open-2026.json` has since been refreshed through the finals, with 152 played matches; the tracked draw snapshots remain historical.
 
 Snapshots preserve bracket order, player IDs, seeds, source URLs, retrieval time, source checksums, and ordered round slots. `time_estimated` distinguishes published individual times from forecast-only session estimates. Those estimates never enter raw training data. The viewer supports complete power-of-two knockout draws and rejects missing entrants instead of inventing byes.
+
+The viewer's model-history selector uses `outputs/runs/2026-11-08-elo-glicko2/` for the preserved October draw when available. Its history ends October 21. The new current bundle ends November 8 and cannot honestly predict those past fixtures; selecting it for that draw is rejected. A future draw after the current cutoff can use the current model.
 
 For individual predictions, copy `templates/upcoming_fixtures_template.csv` and replace its illustrative rows. Required fields are `match_id`, `match_time`, `discipline`, `team1_player_ids`, and `team2_player_ids`; pipe-delimit doubles IDs. Optional fields describe the round, tournament/tier, seeds, and countries. Use UTC times after the model's history cutoff.
 
@@ -81,11 +84,11 @@ Generated forecasts, result logs, models, and original Elo exports stay under th
 
 ## Public Elo Snapshots
 
-All public snapshots use model history through **2026-10-21 18:10 UTC**, from `outputs/runs/2026-10-21-french-open/`. They are display/download snapshots, never training input.
+All public snapshots use score-sensitive Elo model history through **2026-11-08 15:05 UTC**, from `outputs/runs/2026-11-09-score-sensitive-elo/`: 302,984 standard indoor matches. The player-based TrueSkill migration uses the same data and Elo formula, so these ratings and public CSVs remain unchanged. They are display/download snapshots, never training input.
 
-`leaderboards/elo_leaderboard_{MS,WS,MD,WD,XD}.csv` contains the five complete individual-player exports, totaling about 3.9 MB. Each CSV is sorted by descending `elo`. `player_id` is the BWF player identifier; `matches_in_discipline` counts included matches in that event. `last_match_time` is the player's most recent included match **across all events**, in UTC. Doubles rows in these files rate individual players, not pairs.
+`leaderboards/elo_leaderboard_{MS,WS,MD,WD,XD}.csv` contains the five complete individual-player exports, totaling about 4.0 MB. Each CSV is sorted by descending `elo`. `player_id` is the BWF player identifier; `matches_in_discipline` counts included matches in that event. `last_match_time` is the player's most recent included match **across all events**, in UTC. Doubles rows in these files rate individual players, not pairs.
 
-`leaderboards/elo_leaderboard_pairs_{MD,WD,XD}.csv` contains 18,489 MD, 13,599 WD, and 20,319 XD partnerships, totaling about 3.3 MB. These were regenerated from the same saved `feature_state.pkl` using the updated exporter, without retraining or altering the original run. Each row contains:
+`leaderboards/elo_leaderboard_pairs_{MD,WD,XD}.csv` contains 18,619 MD, 13,653 WD, and 20,539 XD partnerships, totaling about 3.3 MB. These were generated during the same complete training replay as the individual exports. Each row contains:
 
 - `pair_name`: both player names, falling back to IDs when a name is unavailable.
 - `pair_key`: the two BWF player IDs in canonical order, separated by `|`.
@@ -102,6 +105,6 @@ cp outputs/artifacts/elo_leaderboard_{MS,WS,MD,WD,XD}.csv data/leaderboards/
 cp outputs/artifacts/elo_leaderboard_pairs_{MD,WD,XD}.csv data/leaderboards/
 ```
 
-For a dated run, replace `outputs/artifacts/` with its artifact directory. Older pair exports contain only the pair component; regenerate them with the current exporter or use a new training run before publishing. Update the snapshot date, player/pair counts, and top-five tables in the root README to match the new exports before committing. Read the history cutoff from `production_refit.through` in that run's `metrics_report.json` when using `--refit-all`.
+For a dated run, replace `outputs/artifacts/` with its artifact directory. Older pair exports contain only the pair component; regenerate them with the current exporter or use a new training run before publishing. Update the snapshot date, leader names/ratings in the root README, and counts here to match the new exports before committing. Read the history cutoff from `production_refit.through` in that run's `metrics_report.json` when using `--refit-all`.
 
 Commit and push the CSVs and documentation together. GitHub renders the README tables and links to the full CSV downloads; no separate website, hosting plan, or domain is required. This is a manual publishing workflow, not an automatic updater.

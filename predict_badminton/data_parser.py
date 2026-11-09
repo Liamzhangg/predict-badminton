@@ -20,6 +20,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from predict_badminton.match_rules import point_margin
+
 logger = logging.getLogger(__name__)
 
 _DISC_PREFIX_RE = re.compile(r"^(MS|WS|MD|WD|XD|BS|GS|BD|GD)(?:$|[ -]|U\d+\b)")
@@ -209,6 +211,7 @@ def parse_file(
                 "team2_seed": match.get("team2seed"),
                 "winner": int(winner),  # 1 or 2
                 "label": int(winner == 1),  # target: 1 if team1 wins
+                "score_margin": point_margin(match),
                 "_has_utc_time": bool(match.get("matchTimeUtc")),
                 "_source_alias": (
                     match.get("tournamentCode") or t_name, match.get("matchTime"),
@@ -251,23 +254,32 @@ def _deduplicate_matches(
 ) -> list[dict[str, Any]]:
     """Keep the first deterministic occurrence of each match identity."""
     unique: list[dict[str, Any]] = []
-    seen: set[tuple[Any, ...]] = set()
+    seen: dict[tuple[Any, ...], dict[str, Any]] = {}
     aliases: dict[tuple[Any, ...], int] = {}
     for record in records:
         identity = _match_identity(record)
         if identity in seen:
+            previous = seen[identity]
+            if (previous["winner"], previous["score_margin"]) != (record["winner"], record["score_margin"]):
+                previous["score_margin"] = None
             reason = "duplicate_match_id" if identity[0] == "id" else "duplicate_signature"
             drop_counts[reason] = drop_counts.get(reason, 0) + 1
             continue
-        seen.add(identity)
+        seen[identity] = record
         alias = record.get("_source_alias")
         if alias in aliases:
             index = aliases[alias]
             # Some BWF copies have new IDs and UTC clocks but identical local results.
             if record["_has_utc_time"] != unique[index]["_has_utc_time"]:
                 drop_counts["duplicate_source_alias"] = drop_counts.get("duplicate_source_alias", 0) + 1
+                previous = unique[index]
+                if previous["score_margin"] != record["score_margin"]:
+                    previous["score_margin"] = record["score_margin"] = None
                 if record["_has_utc_time"]:
                     unique[index] = record
+                    seen[_match_identity(previous)] = record
+                else:
+                    seen[identity] = previous
                 continue
         if alias is not None:
             aliases[alias] = len(unique)

@@ -821,6 +821,7 @@ dependencies = [
     { name = "optuna" },
     { name = "pandas" },
     { name = "scikit-learn" },
+    { name = "trueskill" },
 ]
 
 [package.optional-dependencies]
@@ -844,6 +845,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.0" },
     { name = "scikit-learn", specifier = ">=1.3" },
     { name = "streamlit", marker = "extra == 'app'", specifier = ">=1.50,<2" },
+    { name = "trueskill", specifier = "==0.4.5" },
     { name = "xgboost", marker = "extra == 'benchmark'", specifier = ">=2.0" },
 ]
 provides-extras = ["fetch", "app", "benchmark"]
@@ -1356,6 +1358,15 @@ sdist = { url = "https://files.pythonhosted.org/packages/09/a9/6ba95a270c6f1fbcd
 wheels = [
     { url = "https://files.pythonhosted.org/packages/16/e1/3079a9ff9b8e11b846c6ac5c8b5bfb7ff225eee721825310c91b3b50304f/tqdm-4.67.3-py3-none-any.whl", hash = "sha256:ee1e4c0e59148062281c49d80b25b67771a127c85fc9676d3be5f243206826bf", size = 78374, upload-time = "2026-02-03T17:35:50.982Z" },
 ]
+
+[[package]]
+name = "trueskill"
+version = "0.4.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d0/b1/572f309178eacdccd9f9f5f3e3e14fb3543a89c6259d62b36660350af2b9/trueskill-0.4.5.tar.gz", hash = "sha256:9d62b48d2428369d712bd9becff9f9a2caa325e1a2ab5f9392d34bff757867bb", size = 21315, upload-time = "2018-09-07T12:27:32.078Z" }
 
 [[package]]
 name = "typing-extensions"

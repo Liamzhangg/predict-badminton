@@ -35,6 +35,27 @@ def _raw_match(
 
 
 class DataParserTests(unittest.TestCase):
+    def test_scores_are_normalized_without_removing_retirements(self) -> None:
+        normal = {**_raw_match("normal"), "scoreStatusValue": "Normal",
+                  "score": [{"home": 21, "away": 19}, {"home": 21, "away": 19}]}
+        retired = {**normal, "id": "retired", "scoreStatusValue": "Retired"}
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "matches.json").write_text(json.dumps([[normal, retired]]))
+            matches, _, _ = load_all_matches(Path(tmp))
+        self.assertEqual(matches[0]["score_margin"], 0.05)
+        self.assertIsNone(matches[1]["score_margin"])
+
+    def test_conflicting_duplicate_margins_use_original_elo_fallback(self) -> None:
+        close = {**_raw_match("same"), "score": [{"home": 21, "away": 19}, {"home": 21, "away": 19}]}
+        clear = {**close, "score": [{"home": 21, "away": 10}, {"home": 21, "away": 10}]}
+        with tempfile.TemporaryDirectory() as tmp:
+            for records in ([close, clear], [clear, close]):
+                (Path(tmp) / "matches.json").write_text(json.dumps([records]))
+                matches, drops, _ = load_all_matches(Path(tmp))
+                self.assertEqual(len(matches), 1)
+                self.assertIsNone(matches[0]["score_margin"])
+                self.assertEqual(drops["duplicate_match_id"], 1)
+
     def test_walkovers_do_not_update_training_history_but_retirements_remain(self) -> None:
         records = [{**_raw_match("code"), "scoreStatus": 1},
                    {**_raw_match("text"), "scoreStatusValue": "Walkover"},

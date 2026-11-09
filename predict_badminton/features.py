@@ -1,4 +1,4 @@
-"""Feature engineering: Elo/Glicko-2 ratings, rolling form, H2H, and context.
+"""Feature engineering: Elo/TrueSkill ratings, rolling form, H2H, and context.
 
 Processing is strictly sequential (matches already sorted by time).
 State is updated AFTER features are recorded → no look-ahead leakage.
@@ -11,6 +11,7 @@ Elo design:
       w_pair(n) = n / (n + PAIR_LAMBDA)   [Bayesian weight-in]
   - For singles: pair component = 0, standard player Elo only
   - K-factor scaled by round importance and tournament tier
+  - Complete normal match scores scale K by a bounded point-margin multiplier
   - Delta split: ALPHA_PLAYER_SHARE → players, (1 - ALPHA_PLAYER_SHARE) → pair
 
 Form features (last N matches, before current match):
@@ -27,6 +28,7 @@ from __future__ import annotations
 
 import ast
 import logging
+import math
 import pickle
 from collections import defaultdict, deque
 from datetime import datetime
@@ -43,11 +45,16 @@ from predict_badminton.config import (
     DOUBLES_DISCIPLINES,
     K_BASE,
     FEATURE_COLS,
+    GLICKO_MODEL_FEATURE_COLS,
     LEGACY_FEATURE_COLS,
     PAIR_LAMBDA,
     ROUND_IMPORTANCE,
+    SCORE_MARGIN_REFERENCE,
+    SCORE_MARGIN_WEIGHT,
 )
 from predict_badminton.glicko import GlickoEngine
+from predict_badminton.match_rules import score_multiplier, standard_match_exclusion
+from predict_badminton.trueskill import TrueSkillEngine
 
 logger = logging.getLogger(__name__)
 
@@ -106,11 +113,18 @@ class EloEngine:
         k_base: float = K_BASE,
         pair_lambda: float = PAIR_LAMBDA,
         alpha_player: float = ALPHA_PLAYER_SHARE,
+        score_margin_weight: float = SCORE_MARGIN_WEIGHT,
+        score_margin_reference: float = SCORE_MARGIN_REFERENCE,
     ) -> None:
+        if (not math.isfinite(score_margin_weight) or not 0 <= score_margin_weight <= 1
+                or not math.isfinite(score_margin_reference) or not 0 < score_margin_reference <= 1):
+            raise ValueError("Invalid score-margin Elo parameters")
         self.default_elo = default_elo
         self.k_base = k_base
         self.pair_lambda = pair_lambda
         self.alpha_player = alpha_player
+        self.score_margin_weight = score_margin_weight
+        self.score_margin_reference = score_margin_reference
 
         # {player_id: {discipline: elo}}
         self._disc: dict[str, dict[str, float]] = defaultdict(
@@ -150,6 +164,8 @@ class EloEngine:
             "k_base": self.k_base,
             "pair_lambda": self.pair_lambda,
             "alpha_player": self.alpha_player,
+            "score_margin_weight": self.score_margin_weight,
+            "score_margin_reference": self.score_margin_reference,
         }
 
     @classmethod
@@ -160,6 +176,8 @@ class EloEngine:
             k_base=state.get("k_base", K_BASE),
             pair_lambda=state.get("pair_lambda", PAIR_LAMBDA),
             alpha_player=state.get("alpha_player", ALPHA_PLAYER_SHARE),
+            score_margin_weight=state.get("score_margin_weight", 0.0),
+            score_margin_reference=state.get("score_margin_reference", SCORE_MARGIN_REFERENCE),
         )
         for pid, values in state["disc"].items():
             eng._disc[pid].update(values)
@@ -237,12 +255,14 @@ class EloEngine:
         tournament_tier: int,
         winner: int,
         match_time: datetime | None = None,
+        score_margin: float | None = None,
     ) -> None:
         """Update Elo after a match. winner ∈ {1, 2}."""
         elo1_d, elo1_g = self.team_elo(ids1, discipline)
         elo2_d, elo2_g = self.team_elo(ids2, discipline)
 
-        k = _k_factor(round_name, tournament_tier, self.k_base)
+        multiplier = score_multiplier(score_margin, self.score_margin_weight, self.score_margin_reference)
+        k = _k_factor(round_name, tournament_tier, self.k_base * multiplier)
 
         E1_d = _elo_expected(elo1_d, elo2_d)
         E1_g = _elo_expected(elo1_g, elo2_g)
@@ -302,9 +322,15 @@ class FeatureBuilder:
         self,
         k_base: float = K_BASE,
         player_names: dict[str, str] | None = None,
+        *,
+        score_margin_weight: float = SCORE_MARGIN_WEIGHT,
+        score_margin_reference: float = SCORE_MARGIN_REFERENCE,
     ) -> None:
-        self.elo = EloEngine(k_base=k_base)
-        self.glicko: GlickoEngine | None = GlickoEngine()
+        self.elo = EloEngine(k_base=k_base, score_margin_weight=score_margin_weight,
+                             score_margin_reference=score_margin_reference)
+        self._state_version = 4
+        self.glicko: GlickoEngine | None = None
+        self.trueskill: TrueSkillEngine | None = TrueSkillEngine()
         self._player_names: dict[str, str] = player_names or {}
         # {player_id: deque of {"time": datetime, "won": bool}}
         self._player_hist: dict[str, deque] = defaultdict(
@@ -315,11 +341,17 @@ class FeatureBuilder:
 
     def get_state(self) -> dict[str, Any]:
         """Return all historical state needed to reproduce training features."""
+        elo = self.elo.get_state()
+        if self._state_version < 3:
+            elo.pop("score_margin_weight")
+            elo.pop("score_margin_reference")
         return {
             "state_type": "feature_builder",
-            "version": 2 if self.glicko is not None else 1,
-            "elo": self.elo.get_state(),
-            **({"glicko": self.glicko.get_state()} if self.glicko is not None else {}),
+            "version": self._state_version,
+            "elo": elo,
+            **({"trueskill": self.trueskill.get_state()} if self._state_version == 4
+               else ({"glicko": self.glicko.get_state() if self.glicko is not None else None}
+                     if self._state_version == 3 or self.glicko is not None else {})),
             "player_hist": {
                 pid: list(history) for pid, history in self._player_hist.items()
             },
@@ -328,7 +360,7 @@ class FeatureBuilder:
         }
 
     def save(self, path: Path) -> None:
-        """Persist Elo, Glicko-2, form, and H2H state for future inference."""
+        """Persist complete rating, form, and H2H state for future inference."""
         with open(path, "wb") as fh:
             pickle.dump(self.get_state(), fh)
         logger.info("Feature state saved → %s", path)
@@ -341,13 +373,23 @@ class FeatureBuilder:
 
         required = {"elo", "player_hist", "h2h", "player_names"}
         if (not isinstance(state, dict) or state.get("state_type") != "feature_builder"
-                or state.get("version") not in {1, 2} or not required.issubset(state)
-                or (state.get("version") == 2 and "glicko" not in state)):
+                or state.get("version") not in {1, 2, 3, 4} or not required.issubset(state)
+                or not isinstance(state.get("elo"), dict)
+                or (state.get("version") in {2, 3} and "glicko" not in state)
+                or (state.get("version") == 2 and not isinstance(state.get("glicko"), dict))
+                or (state.get("version") in {1, 2} and state["elo"].get("score_margin_weight", 0) != 0)
+                or (state.get("version") in {3, 4}
+                    and not {"score_margin_weight", "score_margin_reference"}.issubset(state["elo"]))
+                or (state.get("version") != 4 and "trueskill" in state)
+                or (state.get("version") == 4
+                    and (not isinstance(state.get("trueskill"), dict) or "glicko" in state))):
             raise ValueError("Incomplete or unsupported feature state; retrain and use feature_state.pkl")
 
         builder = cls(player_names=state.get("player_names"))
+        builder._state_version = state["version"]
         builder.elo = EloEngine.from_state(state["elo"])
-        builder.glicko = GlickoEngine.from_state(state["glicko"]) if state["version"] == 2 else None
+        builder.glicko = GlickoEngine.from_state(state["glicko"]) if state.get("glicko") is not None else None
+        builder.trueskill = TrueSkillEngine.from_state(state["trueskill"]) if state["version"] == 4 else None
         for pid, history in state.get("player_hist", {}).items():
             builder._player_hist[pid].extend(history)
         for key, values in state.get("h2h", {}).items():
@@ -357,8 +399,33 @@ class FeatureBuilder:
 
     @property
     def feature_columns(self) -> list[str]:
-        """Keep complete version-1 Elo-only bundles usable without inventing history."""
-        return FEATURE_COLS if self.glicko is not None else LEGACY_FEATURE_COLS
+        """Keep complete older bundles usable without inventing rating history."""
+        if self.trueskill is not None:
+            return FEATURE_COLS
+        return GLICKO_MODEL_FEATURE_COLS if self.glicko is not None else LEGACY_FEATURE_COLS
+
+    @property
+    def model_policy(self) -> dict[str, Any]:
+        return {
+            "version": 2 if self._state_version == 4 else 1,
+            "disciplines": list(DISCIPLINES) if self._state_version >= 3 else DISCIPLINES + ["OTHER"],
+            "elo": {name: getattr(self.elo, name) for name in (
+                "default_elo", "k_base", "pair_lambda", "alpha_player",
+                "score_margin_weight", "score_margin_reference")},
+            "glicko": dict(self.glicko.parameters) if self.glicko is not None else None,
+            **({"trueskill": {"parameters": dict(self.trueskill.parameters), "entity": "player",
+                               "library": "trueskill==0.4.5", "draw_probability": 0.0,
+                               "backend": None, "calendar_inactivity": False}}
+               if self.trueskill is not None else {}),
+        }
+
+    def validate_model(self, model: Any) -> None:
+        if list(model.feature_name_) != self.feature_columns:
+            raise ValueError("Model features differ from saved history; use a matching bundle")
+        policy = getattr(model, "feature_policy_", None)
+        if ((policy is None and self._state_version >= 3)
+                or (policy is not None and policy != self.model_policy)):
+            raise ValueError("Model rating policy differs from saved history; use a matching bundle or retrain")
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -406,6 +473,8 @@ class FeatureBuilder:
 
     def preview(self, match: dict[str, Any]) -> dict[str, Any]:
         """Return a feature row from current state without updating it."""
+        if self._state_version >= 3 and (reason := standard_match_exclusion(match)):
+            raise ValueError(f"This model supports standard MS/WS/MD/WD/XD matches only: {reason}")
         ids1: list[str] = match["team1_ids"]
         ids2: list[str] = match["team2_ids"]
         disc: str = match["discipline"]
@@ -505,6 +574,8 @@ class FeatureBuilder:
 
         if self.glicko is not None:
             row.update(self.glicko.features(match))
+        if self.trueskill is not None:
+            row.update(self.trueskill.features(match))
         if "label" in match:
             row["label"] = match["label"]
         return row
@@ -514,6 +585,8 @@ class FeatureBuilder:
         row = self.preview(match)
         if self.glicko is not None:
             self.glicko.observe(match)
+        if self.trueskill is not None:
+            self.trueskill.observe(match)
         ids1: list[str] = match["team1_ids"]
         ids2: list[str] = match["team2_ids"]
         disc: str = match["discipline"]
@@ -525,7 +598,7 @@ class FeatureBuilder:
         h2h_state = self._h2h[h2h_key]
 
         # ---- Update state (AFTER features recorded) --------------------
-        self.elo.update(ids1, ids2, disc, round_name, t_tier, winner, match_time)
+        self.elo.update(ids1, ids2, disc, round_name, t_tier, winner, match_time, match.get("score_margin"))
 
         for pid in ids1:
             self._player_hist[pid].append({"time": match_time, "won": winner == 1})

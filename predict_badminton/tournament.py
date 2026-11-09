@@ -26,6 +26,10 @@ def load_bundle(directory: Path) -> tuple:
             objects.append(pickle.load(handle))
     if list(objects[0].feature_name_) != columns:
         raise ValueError("Model feature list differs from its saved model; retrain first")
+    history.validate_model(objects[0])
+    if any(getattr(calibrator, "feature_policy_", None) != getattr(objects[0], "feature_policy_", None)
+           for calibrator in objects[1:]):
+        raise ValueError("Calibrator rating policy differs from its saved model; use a matching bundle")
     return (*objects, history)
 
 

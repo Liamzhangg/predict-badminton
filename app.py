@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import html
 import json
+from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
@@ -70,12 +71,25 @@ if not DRAW.exists() or not (MODEL / "feature_state.pkl").exists():
 snapshot = DRAW.read_text(encoding="utf-8")
 data = json.loads(snapshot)
 metrics = json.loads((MODEL / "metrics_report.json").read_text(encoding="utf-8"))
-version = tuple((MODEL / name).stat().st_mtime_ns for name in
-                ("lgbm_model.pkl", "platt_calibrator.pkl", "isotonic_calibrator.pkl", "feature_state.pkl"))
+model_options = {"Current model": MODEL}
+archive = ROOT / "outputs/runs/2026-11-08-elo-glicko2"
+default_model = 0
+if (archive / "feature_state.pkl").exists():
+    model_options["October 21 history"] = archive
+    cutoff = (metrics.get("production_refit") or {}).get("through")
+    first_match = min(datetime.fromisoformat(match["time_utc"]) for draw in data["draws"].values()
+                      for rnd in draw["rounds"] for match in rnd["matches"])
+    if cutoff and datetime.fromisoformat(cutoff) >= first_match:
+        default_model = 1
 st.title(data["name"])
 st.caption(f"20–25 October 2026 · {data['location']} · {data['stage']}")
 event = st.segmented_control("Event", list(data["draws"]), default="MS", key="event") or "MS"
 with st.expander("Model and sources"):
+    selected_model = st.selectbox("Model history", list(model_options), index=default_model)
+    MODEL = model_options[selected_model]
+    metrics = json.loads((MODEL / "metrics_report.json").read_text(encoding="utf-8"))
+    version = (str(MODEL),) + tuple((MODEL / name).stat().st_mtime_ns for name in
+                ("lgbm_model.pkl", "platt_calibrator.pkl", "isotonic_calibrator.pkl", "feature_state.pkl"))
     method = st.selectbox("Probabilities", ["Raw", "Isotonic", "Platt"])
     st.caption(f"Model: {metrics.get('model_approach', 'LightGBM + Elo')} · Draw retrieved: {data['retrieved_at_utc']} · No simulated results")
     st.caption("2026 holdout log loss, before production refit: " + " · ".join(

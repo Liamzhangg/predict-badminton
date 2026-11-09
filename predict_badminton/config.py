@@ -9,12 +9,20 @@ SEED = 42
 # Elo system
 DEFAULT_ELO: float = 1500.0
 K_BASE: float = 32.0
+SCORE_MARGIN_WEIGHT: float = 0.5
+SCORE_MARGIN_REFERENCE: float = 0.20
 
 # Glicko-2: Monday-to-Sunday UTC periods, separate exact teams per discipline.
 GLICKO_PERIOD_DAYS: int = 7
 GLICKO_TAU: float = 0.5
 GLICKO_INITIAL_RD: float = 350.0
 GLICKO_INITIAL_VOLATILITY: float = 0.06
+
+# Player-based TrueSkill: tested per-match dynamics, no calendar inactivity rule.
+TRUESKILL_MU: float = 25.0
+TRUESKILL_SIGMA: float = 25 / 3
+TRUESKILL_BETA: float = 25 / 6
+TRUESKILL_TAU: float = 25 / 300
 
 DISCIPLINES = ["MS", "WS", "MD", "WD", "XD"]
 DOUBLES_DISCIPLINES: frozenset[str] = frozenset({"MD", "WD", "XD"})
@@ -100,4 +108,10 @@ GLICKO_FEATURE_COLS: list[str] = [
     for quantity in ("rating", "rd", "volatility")
     for side in ("t1", "t2", "diff")
 ]
-FEATURE_COLS: list[str] = LEGACY_FEATURE_COLS + GLICKO_FEATURE_COLS
+GLICKO_MODEL_FEATURE_COLS: list[str] = LEGACY_FEATURE_COLS + GLICKO_FEATURE_COLS
+TRUESKILL_FEATURE_COLS: list[str] = [
+    f"trueskill_{quantity}_{side}"
+    for quantity in ("mu", "sigma")
+    for side in ("t1", "t2", "diff")
+]
+FEATURE_COLS: list[str] = LEGACY_FEATURE_COLS + TRUESKILL_FEATURE_COLS

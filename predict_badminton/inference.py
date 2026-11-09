@@ -181,9 +181,13 @@ class InferenceBuilder:
 def build_inference_features(
     fixtures_path: Path,
     state_path: Path,
+    *,
+    model: Any | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Load fixtures and training state; return features and raw fixtures."""
     feature_builder = FeatureBuilder.load(state_path)
+    if model is not None:
+        feature_builder.validate_model(model)
     fixtures = load_fixtures(fixtures_path)
     builder = InferenceBuilder(feature_builder)
     features = builder.build_features(fixtures)

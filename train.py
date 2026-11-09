@@ -117,7 +117,19 @@ def main() -> int:
         max_files=args.max_files,
         include_para=args.include_para,
     )
+    from predict_badminton.match_rules import standard_match_exclusion
+
+    supported = []
+    for match in matches:
+        if reason := standard_match_exclusion(match):
+            drop_counts[reason] = drop_counts.get(reason, 0) + 1
+        else:
+            supported.append(match)
+    matches = supported
     logger.info("Loaded %d matches | dropped: %s", len(matches), drop_counts)
+    if not matches:
+        logger.error("No standard indoor MS/WS/MD/WD/XD matches remain after filtering")
+        return 1
     if len(matches) < 1000:
         logger.warning("Very few matches (%d) — results may be unreliable", len(matches))
 
@@ -227,6 +239,8 @@ def main() -> int:
         oof_preds=oof_preds,
         oof_labels=oof_labels,
     )
+    for fitted in (model, platt_cal, iso_cal):
+        fitted.feature_policy_ = feature_builder.model_policy
 
     # ------------------------------------------------------------------
     # 8. Rolling backtest (Part E)
@@ -260,6 +274,7 @@ def main() -> int:
             pickle.dump(model, fh)
         logger.info("Refitting production model on all %d known results", len(df))
         model = refit_production_model(df, final_report["best_iteration"], best_params)
+        model.feature_policy_ = feature_builder.model_policy
         final_report["feature_importance"] = feature_importance_df(model, FEATURE_COLS).to_dict("records")
         production_refit = {
             "rows": len(df), "through": df["match_time"].max().isoformat(),
@@ -288,8 +303,13 @@ def main() -> int:
     fi_df.to_csv(artifacts_dir / "feature_importance.csv", index=False)
 
     full_report = {
-        "model_approach": "LightGBM + Elo + Glicko-2",
-        "glicko_parameters": feature_builder.glicko.parameters,
+        "model_approach": "LightGBM + score-sensitive Elo + player-based TrueSkill",
+        "feature_policy": feature_builder.model_policy,
+        "score_margin_coverage": {
+            "eligible": sum(match["score_margin"] is not None for match in matches),
+            "matches": len(matches),
+        },
+        "trueskill_parameters": feature_builder.model_policy["trueskill"],
         "cv_fold_metrics": fold_metrics,
         "cv_summary": cv_summary,
         "baselines": baseline_results,

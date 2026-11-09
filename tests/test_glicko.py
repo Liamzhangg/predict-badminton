@@ -9,10 +9,18 @@ from pathlib import Path
 
 from glicko2.math import phi_to_rd, rating_to_mu, rd_to_phi, update_rating
 
-from predict_badminton.config import FEATURE_COLS, GLICKO_FEATURE_COLS, LEGACY_FEATURE_COLS
+from predict_badminton.config import GLICKO_MODEL_FEATURE_COLS, GLICKO_FEATURE_COLS, LEGACY_FEATURE_COLS
 from predict_badminton.features import FeatureBuilder
 from predict_badminton.glicko import GlickoEngine
 from tests.test_feature_state import _match
+
+
+def _glicko_builder():
+    builder = FeatureBuilder()
+    builder._state_version = 3
+    builder.glicko = GlickoEngine()
+    builder.trueskill = None
+    return builder
 
 
 class GlickoTests(unittest.TestCase):
@@ -107,7 +115,7 @@ class GlickoTests(unittest.TestCase):
         self.assertEqual(pickle.dumps(engine.get_state()), before)
 
     def test_partial_week_survives_save_load_and_continued_processing(self):
-        builder = FeatureBuilder()
+        builder = _glicko_builder()
         builder.process(_match("m1", datetime(2024, 1, 1), 1))
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "feature_state.pkl"
@@ -118,17 +126,19 @@ class GlickoTests(unittest.TestCase):
             match = _match(f"m{day}", datetime(2024, 1, day), 2)
             self.assertEqual(restored.process(match), builder.process(match))
             self.assertEqual(restored.get_state(), builder.get_state())
-        self.assertEqual(builder.get_state()["version"], 2)
-        self.assertEqual(builder.feature_columns, FEATURE_COLS)
-        self.assertEqual(len(FEATURE_COLS), 47)
+        self.assertEqual(builder.get_state()["version"], 3)
+        self.assertEqual(builder.feature_columns, GLICKO_MODEL_FEATURE_COLS)
+        self.assertEqual(len(GLICKO_MODEL_FEATURE_COLS), 47)
         self.assertTrue(all(math.isfinite(value) for value in builder.glicko.features(match).values()))
 
     def test_complete_legacy_state_retains_original_features(self):
-        builder = FeatureBuilder()
+        builder = _glicko_builder()
         builder.process(_match("m1", datetime(2024, 1, 1), 1))
         state = builder.get_state()
         state.pop("glicko")
         state["version"] = 1
+        state["elo"].pop("score_margin_weight")
+        state["elo"].pop("score_margin_reference")
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "legacy.pkl"
             path.write_bytes(pickle.dumps(state))

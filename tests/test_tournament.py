@@ -11,7 +11,8 @@ from pathlib import Path
 import numpy as np
 
 from predict_badminton.features import FeatureBuilder
-from predict_badminton.config import FEATURE_COLS, LEGACY_FEATURE_COLS
+from predict_badminton.config import FEATURE_COLS, GLICKO_MODEL_FEATURE_COLS, LEGACY_FEATURE_COLS
+from predict_badminton.glicko import GlickoEngine
 from predict_badminton.tournament import forecast, load_bundle, propagate, validate_draw
 
 
@@ -36,22 +37,59 @@ def draw():
 
 
 class TournamentTests(unittest.TestCase):
+    def test_bundle_rejects_mixed_rating_and_calibrator_policies(self):
+        history = FeatureBuilder()
+        model = FixedModel()
+        model.feature_policy_ = history.model_policy
+        calibrator = FixedCalibrator()
+        calibrator.feature_policy_ = history.model_policy
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp)
+            history.save(path / "feature_state.pkl")
+            (path / "feature_list.json").write_text(json.dumps(FEATURE_COLS))
+            for name, value in (("lgbm_model.pkl", model), ("platt_calibrator.pkl", calibrator),
+                                ("isotonic_calibrator.pkl", calibrator)):
+                (path / name).write_bytes(pickle.dumps(value))
+            load_bundle(path)
+            model.feature_policy_ = FeatureBuilder(score_margin_weight=0).model_policy
+            (path / "lgbm_model.pkl").write_bytes(pickle.dumps(model))
+            with self.assertRaisesRegex(ValueError, "rating policy"):
+                load_bundle(path)
+            model.feature_policy_ = history.model_policy
+            (path / "lgbm_model.pkl").write_bytes(pickle.dumps(model))
+            calibrator.feature_policy_ = FeatureBuilder(score_margin_weight=0).model_policy
+            (path / "platt_calibrator.pkl").write_bytes(pickle.dumps(calibrator))
+            with self.assertRaisesRegex(ValueError, "Calibrator"):
+                load_bundle(path)
+
     def test_bundle_schema_must_match_model_and_history_including_legacy(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp)
-            for columns in (FEATURE_COLS, LEGACY_FEATURE_COLS):
+            for columns in (FEATURE_COLS, GLICKO_MODEL_FEATURE_COLS, LEGACY_FEATURE_COLS):
                 history = FeatureBuilder()
+                if columns == GLICKO_MODEL_FEATURE_COLS:
+                    history.trueskill = None
+                    history.glicko = GlickoEngine()
+                    history._state_version = 3
                 if columns == LEGACY_FEATURE_COLS:
                     history.glicko = None
+                    history.trueskill = None
+                    history.elo.score_margin_weight = 0
+                    history._state_version = 1
                 history.save(path / "feature_state.pkl")
                 (path / "feature_list.json").write_text(json.dumps(columns))
-                for name, value in (("lgbm_model.pkl", FixedModel(columns)),
+                model = FixedModel(columns)
+                if columns != LEGACY_FEATURE_COLS:
+                    model.feature_policy_ = history.model_policy
+                for name, value in (("lgbm_model.pkl", model),
                                     ("platt_calibrator.pkl", FixedCalibrator()),
                                     ("isotonic_calibrator.pkl", FixedCalibrator())):
+                    if columns != LEGACY_FEATURE_COLS:
+                        value.feature_policy_ = history.model_policy
                     (path / name).write_bytes(pickle.dumps(value))
                 result = forecast(draw(), "MS", load_bundle(path))
                 self.assertEqual(result["table"]["Title"].tolist(), [25] * 4)
-                wrong = LEGACY_FEATURE_COLS if columns == FEATURE_COLS else FEATURE_COLS
+                wrong = FEATURE_COLS if columns == LEGACY_FEATURE_COLS else LEGACY_FEATURE_COLS
                 (path / "lgbm_model.pkl").write_bytes(pickle.dumps(FixedModel(wrong)))
                 with self.assertRaisesRegex(ValueError, "saved model"):
                     load_bundle(path)

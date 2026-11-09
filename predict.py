@@ -81,20 +81,23 @@ def main() -> int:
             logger.error("File not found: %s  (%s)", path, attr)
             return 1
 
+    with open(args.model_path, "rb") as fh:
+        model = pickle.load(fh)
+
     # ---- Build inference features -------------------------------------
     logger.info("Building features from fixtures …")
     from predict_badminton.inference import build_inference_features
 
-    feat_df, raw_fixtures = build_inference_features(
-        fixtures_path=args.fixtures_csv,
-        state_path=args.state_path,
-    )
+    try:
+        feat_df, raw_fixtures = build_inference_features(
+            fixtures_path=args.fixtures_csv,
+            state_path=args.state_path,
+            model=model,
+        )
+    except ValueError as exc:
+        logger.error("%s", exc)
+        return 1
     logger.info("Feature rows: %d", len(feat_df))
-
-    # ---- Load model and calibrator ------------------------------------
-    logger.info("Loading model from %s …", args.model_path)
-    with open(args.model_path, "rb") as fh:
-        model = pickle.load(fh)
 
     # ---- Score ---------------------------------------------------------
     from predict_badminton.config import DISCIPLINES
@@ -115,6 +118,9 @@ def main() -> int:
         logger.info("Loading calibrator from %s …", args.calibrator_path)
         with open(args.calibrator_path, "rb") as fh:
             calibrator = pickle.load(fh)
+        if getattr(calibrator, "feature_policy_", None) != getattr(model, "feature_policy_", None):
+            logger.error("Calibrator rating policy differs from its model; use a matching bundle")
+            return 1
         probs = calibrator.predict(raw_probs)
 
     # ---- Assemble output -----------------------------------------------
