@@ -17,6 +17,7 @@ from predict_badminton.tournament import forecast, load_bundle, propagate, valid
 
 
 class FixedModel:
+    trained_through_ = datetime.min
     def __init__(self, columns=FEATURE_COLS):
         self.feature_name_ = list(columns)
 
@@ -25,7 +26,9 @@ class FixedModel:
 
 
 class FixedCalibrator:
+    trained_through_ = datetime.min
     def predict(self, probabilities):
+        self.seen = probabilities.copy()
         return np.full(len(probabilities), 0.75)
 
 
@@ -156,7 +159,9 @@ class TournamentTests(unittest.TestCase):
         bundle = (FixedModel(), FixedCalibrator(), FixedCalibrator(), FeatureBuilder())
         for method in ["Platt", "Isotonic"]:
             result = forecast(draw(), "MS", bundle, method)
-            self.assertEqual(result["matchups"][0]["win"], 0.75)
+            self.assertEqual(result["matchups"][0]["win"], 0.5)
+            calibrator = bundle[1 if method == "Platt" else 2]
+            self.assertEqual(len(calibrator.seen), 12)
         with self.assertRaises(ValueError):
             forecast(draw(), "MS", bundle, "unknown")
 

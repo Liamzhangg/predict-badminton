@@ -101,7 +101,8 @@ class TrueSkillTests(unittest.TestCase):
     def test_schema_and_policy_reject_mismatched_trueskill_history(self):
         builder = FeatureBuilder()
         self.assertEqual(len(FEATURE_COLS), 44)
-        model = SimpleNamespace(feature_name_=FEATURE_COLS, feature_policy_=builder.model_policy)
+        model = SimpleNamespace(feature_name_=FEATURE_COLS, feature_policy_=builder.model_policy,
+                                trained_through_=builder.history_cutoff)
         builder.validate_model(model)
         other = FeatureBuilder()
         other.trueskill = TrueSkillEngine(tau=0.2)

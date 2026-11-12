@@ -7,6 +7,7 @@ transport. Sources that still return challenges are recorded in the manifest.
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import sys
 from datetime import date, datetime
@@ -25,6 +26,7 @@ from predict_badminton.data_sources.bwf import (
     upsert_manifest_rows,
     validate_raw_dir,
 )
+from predict_badminton.data_sources.observations import OBSERVATIONS_PATH, observation_status
 
 logging.basicConfig(
     level=logging.INFO,
@@ -78,6 +80,9 @@ def build_parser() -> argparse.ArgumentParser:
     gaps.add_argument("--transport", choices=("standard", "chrome"), default="chrome")
     gaps.add_argument("--delay-seconds", type=float, default=1.0)
 
+    observations = subparsers.add_parser("observations", help="show completed-result receipt and invalidation counts")
+    observations.add_argument("--db", type=Path, default=OBSERVATIONS_PATH)
+
     return parser
 
 
@@ -120,6 +125,8 @@ def cmd_fetch(args: argparse.Namespace) -> int:
         status_info = f" (HTTP {result.status_code})" if result.status_code else ""
         message = f" | {result.message}" if result.message else ""
         print(f"{result.status}{status_info}: {result.url}{cache_info}{message}")
+        if result.completed_results_observed:
+            print(f"  Observed {result.completed_results_observed} completed results; {result.result_versions_added} new versions")
     print(f"Cache: {SOURCE_CACHE_DIR}")
     print(f"Manifest: {MANIFEST_PATH}")
     return 1 if any(result.status != "cached" for result in results) else 0
@@ -169,6 +176,9 @@ def main() -> int:
             return cmd_import_file(args)
         if args.command == "validate":
             return cmd_validate(args)
+        if args.command == "observations":
+            print(json.dumps(observation_status(args.db), indent=2))
+            return 0
         if args.command == "list-blocked":
             return cmd_list_blocked(args)
         if args.command in {"backfill", "recover-gaps"}:

@@ -16,7 +16,11 @@ from predict_badminton.model import (
     refit_production_model,
     run_baselines,
     train_final_model,
+    walk_forward_cv,
 )
+from predict_badminton.evaluate import compute_metrics
+from predict_badminton.probabilities import average_directions, predict_directions
+from tests.test_probabilities import BiasedModel, OffsetCalibrator
 
 
 def _feature_frame(rows: int = 60) -> pd.DataFrame:
@@ -32,6 +36,41 @@ def _feature_frame(rows: int = 60) -> pd.DataFrame:
 
 
 class ModelSplittingTests(unittest.TestCase):
+    def test_cv_scores_averages_but_returns_directional_oof_for_calibration(self):
+        data = _feature_frame()
+        model = BiasedModel()
+        directions = predict_directions(model, data[FEATURE_COLS])
+        with patch("predict_badminton.model._split_folds", return_value=[(data, data)]), \
+                patch("predict_badminton.model._train_lgbm_for_evaluation", return_value=(model, 7)):
+            metrics, oof, labels = walk_forward_cv(data)
+        np.testing.assert_array_equal(oof, directions[:, 0])
+        np.testing.assert_array_equal(labels, data["label"])
+        self.assertEqual(metrics[0], compute_metrics(labels, average_directions(directions)))
+
+    def test_final_evaluation_calibrates_directions_using_only_oof_inputs(self):
+        data = _feature_frame()
+        model = BiasedModel()
+        class Calibrator(OffsetCalibrator):
+            def fit(self, labels, probabilities):
+                self.fit_labels = labels.copy()
+                self.fit_probabilities = probabilities.copy()
+                return self
+        platt, isotonic = Calibrator(), Calibrator()
+        oof, labels = np.linspace(0.1, 0.9, 60), np.tile([0, 1], 30)
+        with patch("predict_badminton.model._train_lgbm_for_evaluation", return_value=(model, 7)), \
+                patch("predict_badminton.model.PlattCalibrator", return_value=platt), \
+                patch("predict_badminton.model.IsotonicCalibrator", return_value=isotonic), \
+                patch("predict_badminton.model.feature_importance_df", return_value=pd.DataFrame()):
+            test = data.assign(match_time=data["match_time"]+pd.DateOffset(years=1))
+            _, _, _, report = train_final_model(data, test, oof_preds=oof, oof_labels=labels)
+        for calibrator in (platt, isotonic):
+            np.testing.assert_array_equal(calibrator.fit_labels, labels)
+            np.testing.assert_array_equal(calibrator.fit_probabilities, oof)
+        directions = predict_directions(model, data[FEATURE_COLS])
+        self.assertEqual(report["test_platt"], compute_metrics(data["label"], average_directions(directions, platt)))
+        self.assertEqual(report["prediction_policy"], "two_order_average_v1")
+        self.assertEqual(report["calibration_order"], "per_direction_before_averaging")
+
     def test_baselines_work_without_optional_xgboost(self) -> None:
         df = _feature_frame()
         expected = {"log_loss": 0.5}

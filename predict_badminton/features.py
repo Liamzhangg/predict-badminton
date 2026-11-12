@@ -1,7 +1,7 @@
 """Feature engineering: Elo/TrueSkill ratings, rolling form, H2H, and context.
 
-Processing is strictly sequential (matches already sorted by time).
-State is updated AFTER features are recorded → no look-ahead leakage.
+Historical predictions use only results released before their cutoff.
+Untracked history uses conservative day-level assumptions; opt-in observed versions use receipt times.
 
 Elo design:
   - Per-player, per-discipline Elo (disc-specific)
@@ -27,11 +27,13 @@ H2H:
 from __future__ import annotations
 
 import ast
+import heapq
 import logging
 import math
 import pickle
 from collections import defaultdict, deque
 from datetime import datetime
+from itertools import groupby
 from pathlib import Path
 from typing import Any
 
@@ -55,6 +57,8 @@ from predict_badminton.config import (
 from predict_badminton.glicko import GlickoEngine
 from predict_badminton.match_rules import score_multiplier, standard_match_exclusion
 from predict_badminton.trueskill import TrueSkillEngine
+from predict_badminton.temporal import AVAILABILITY_POLICY, OBSERVED_AVAILABILITY_POLICIES
+from predict_badminton.tournament_catalog import CATEGORY_POLICY, TournamentCatalog
 
 logger = logging.getLogger(__name__)
 
@@ -281,14 +285,14 @@ class EloEngine:
             self._global[pid] += alpha * k1 * (actual1 - E1_g)
             self._disc_count[pid][discipline] += 1
             if match_time:
-                self._last_match[pid] = match_time
+                self._last_match[pid] = max(match_time, self._last_match.get(pid, match_time))
 
         for pid in ids2:
             self._disc[pid][discipline] += alpha * k2 * (actual2 - (1.0 - E1_d))
             self._global[pid] += alpha * k2 * (actual2 - (1.0 - E1_g))
             self._disc_count[pid][discipline] += 1
             if match_time:
-                self._last_match[pid] = match_time
+                self._last_match[pid] = max(match_time, self._last_match.get(pid, match_time))
 
         # Pair component update (doubles only, remaining share)
         if discipline in DOUBLES_DISCIPLINES:
@@ -314,7 +318,7 @@ class EloEngine:
 
 
 class FeatureBuilder:
-    """Builds leakage-safe feature rows; must process matches in time order."""
+    """Historical replay releases completed results before each prediction cutoff."""
 
     _HISTORY_MAXLEN = 50
 
@@ -325,10 +329,17 @@ class FeatureBuilder:
         *,
         score_margin_weight: float = SCORE_MARGIN_WEIGHT,
         score_margin_reference: float = SCORE_MARGIN_REFERENCE,
+        result_availability_policy: str = AVAILABILITY_POLICY,
+        category_catalog: TournamentCatalog | None = None,
     ) -> None:
+        if result_availability_policy not in (AVAILABILITY_POLICY, *OBSERVED_AVAILABILITY_POLICIES):
+            raise ValueError("Unsupported result-availability policy")
+        self._result_availability_policy = result_availability_policy
         self.elo = EloEngine(k_base=k_base, score_margin_weight=score_margin_weight,
                              score_margin_reference=score_margin_reference)
-        self._state_version = 4
+        self.category_catalog = category_catalog
+        self._state_version = 6 if category_catalog is not None else 5
+        self._history_cutoff: datetime | None = None
         self.glicko: GlickoEngine | None = None
         self.trueskill: TrueSkillEngine | None = TrueSkillEngine()
         self._player_names: dict[str, str] = player_names or {}
@@ -349,7 +360,7 @@ class FeatureBuilder:
             "state_type": "feature_builder",
             "version": self._state_version,
             "elo": elo,
-            **({"trueskill": self.trueskill.get_state()} if self._state_version == 4
+            **({"trueskill": self.trueskill.get_state()} if self._state_version >= 4
                else ({"glicko": self.glicko.get_state() if self.glicko is not None else None}
                      if self._state_version == 3 or self.glicko is not None else {})),
             "player_hist": {
@@ -357,6 +368,10 @@ class FeatureBuilder:
             },
             "h2h": dict(self._h2h),
             "player_names": dict(self._player_names),
+            **({"tournament_catalog": self.category_catalog.get_state()} if self.category_catalog is not None else {}),
+            **({"history_cutoff": self._history_cutoff} if self._state_version >= 5 else {}),
+            **({"result_availability_policy": self._result_availability_policy}
+               if self._state_version >= 5 and self._result_availability_policy != AVAILABILITY_POLICY else {}),
         }
 
     def save(self, path: Path) -> None:
@@ -373,29 +388,41 @@ class FeatureBuilder:
 
         required = {"elo", "player_hist", "h2h", "player_names"}
         if (not isinstance(state, dict) or state.get("state_type") != "feature_builder"
-                or state.get("version") not in {1, 2, 3, 4} or not required.issubset(state)
+                or state.get("version") not in {1, 2, 3, 4, 5, 6} or not required.issubset(state)
                 or not isinstance(state.get("elo"), dict)
                 or (state.get("version") in {2, 3} and "glicko" not in state)
                 or (state.get("version") == 2 and not isinstance(state.get("glicko"), dict))
                 or (state.get("version") in {1, 2} and state["elo"].get("score_margin_weight", 0) != 0)
-                or (state.get("version") in {3, 4}
+                or (state.get("version") in {3, 4, 5, 6}
                     and not {"score_margin_weight", "score_margin_reference"}.issubset(state["elo"]))
-                or (state.get("version") != 4 and "trueskill" in state)
-                or (state.get("version") == 4
-                    and (not isinstance(state.get("trueskill"), dict) or "glicko" in state))):
+                or (state.get("version") < 4 and "trueskill" in state)
+                or (state.get("version") >= 4
+                    and (not isinstance(state.get("trueskill"), dict) or "glicko" in state))
+                or (state.get("version") >= 5 and ("history_cutoff" not in state
+                    or state["history_cutoff"] is not None and not isinstance(state["history_cutoff"], datetime)))
+                or (state.get("version") == 6 and not isinstance(state.get("tournament_catalog"), dict))
+                or (state.get("version") < 6 and "tournament_catalog" in state)):
             raise ValueError("Incomplete or unsupported feature state; retrain and use feature_state.pkl")
 
-        builder = cls(player_names=state.get("player_names"))
+        builder = cls(player_names=state.get("player_names"),
+                      result_availability_policy=state.get("result_availability_policy", AVAILABILITY_POLICY),
+                      category_catalog=TournamentCatalog.from_state(state["tournament_catalog"]) if state["version"] == 6 else None)
         builder._state_version = state["version"]
         builder.elo = EloEngine.from_state(state["elo"])
         builder.glicko = GlickoEngine.from_state(state["glicko"]) if state.get("glicko") is not None else None
-        builder.trueskill = TrueSkillEngine.from_state(state["trueskill"]) if state["version"] == 4 else None
+        builder.trueskill = TrueSkillEngine.from_state(state["trueskill"]) if state["version"] >= 4 else None
+        builder._history_cutoff = state.get("history_cutoff")
         for pid, history in state.get("player_hist", {}).items():
             builder._player_hist[pid].extend(history)
         for key, values in state.get("h2h", {}).items():
             builder._h2h[key] = list(values)
         logger.info("Feature state loaded from %s", path)
         return builder
+
+    @property
+    def history_cutoff(self) -> datetime:
+        return max(self._history_cutoff or datetime.min,
+                   max(self.elo._last_match.values(), default=datetime.min))
 
     @property
     def feature_columns(self) -> list[str]:
@@ -407,7 +434,7 @@ class FeatureBuilder:
     @property
     def model_policy(self) -> dict[str, Any]:
         return {
-            "version": 2 if self._state_version == 4 else 1,
+            "version": 4 if self._state_version >= 6 else 3 if self._state_version >= 5 else 2 if self._state_version == 4 else 1,
             "disciplines": list(DISCIPLINES) if self._state_version >= 3 else DISCIPLINES + ["OTHER"],
             "elo": {name: getattr(self.elo, name) for name in (
                 "default_elo", "k_base", "pair_lambda", "alpha_player",
@@ -417,6 +444,9 @@ class FeatureBuilder:
                                "library": "trueskill==0.4.5", "draw_probability": 0.0,
                                "backend": None, "calendar_inactivity": False}}
                if self.trueskill is not None else {}),
+            **({"result_availability": self._result_availability_policy} if self._state_version >= 5 else {}),
+            **({"tournament_categories": {"policy": CATEGORY_POLICY, "catalog_sha256": self.category_catalog.sha256}}
+               if self.category_catalog is not None else {}),
         }
 
     def validate_model(self, model: Any) -> None:
@@ -426,6 +456,13 @@ class FeatureBuilder:
         if ((policy is None and self._state_version >= 3)
                 or (policy is not None and policy != self.model_policy)):
             raise ValueError("Model rating policy differs from saved history; use a matching bundle or retrain")
+        self.validate_training_cutoff(model)
+
+    def validate_training_cutoff(self, artifact: Any) -> None:
+        if self._state_version >= 5:
+            trained = getattr(artifact, "trained_through_", None)
+            if not isinstance(trained, datetime) or trained > self.history_cutoff:
+                raise ValueError("Model training cutoff exceeds or is missing from saved history; use a matching bundle")
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -479,8 +516,10 @@ class FeatureBuilder:
         ids2: list[str] = match["team2_ids"]
         disc: str = match["discipline"]
         round_name: str = match["round_name"]
-        t_tier: int = match["tournament_tier"]
+        t_tier: int = self._tournament_tier(match)
         match_time: datetime = match["match_time"]
+        if self._state_version >= 5 and self._history_cutoff is not None and match_time <= self.history_cutoff:
+            raise ValueError("Prediction time must follow the saved result-availability cutoff")
 
         # ---- Elo (pre-match) -------------------------------------------
         elo1_d, elo1_g = self.elo.team_elo(ids1, disc)
@@ -581,17 +620,22 @@ class FeatureBuilder:
         return row
 
     def process(self, match: dict[str, Any]) -> dict[str, Any]:
-        """Return feature dict (pre-match state), then update internal state."""
+        """Process one already-completed event; use build_dataframe for raw history."""
         row = self.preview(match)
+        self._observe_result(match, match.get("available_at", match["match_time"]))
+        return row
+
+    def _observe_result(self, match: dict[str, Any], observed_at: datetime) -> None:
+        observed = {**match, "match_time": observed_at} if self._state_version >= 5 else match
         if self.glicko is not None:
-            self.glicko.observe(match)
+            self.glicko.observe(observed)
         if self.trueskill is not None:
-            self.trueskill.observe(match)
+            self.trueskill.observe(observed)
         ids1: list[str] = match["team1_ids"]
         ids2: list[str] = match["team2_ids"]
         disc: str = match["discipline"]
         round_name: str = match["round_name"]
-        t_tier: int = match["tournament_tier"]
+        t_tier: int = self._tournament_tier(match)
         match_time: datetime = match["match_time"]
         winner: int = match["winner"]
         h2h_key, t1_first = self._canonical_h2h(ids1, ids2)
@@ -600,10 +644,16 @@ class FeatureBuilder:
         # ---- Update state (AFTER features recorded) --------------------
         self.elo.update(ids1, ids2, disc, round_name, t_tier, winner, match_time, match.get("score_margin"))
 
-        for pid in ids1:
-            self._player_hist[pid].append({"time": match_time, "won": winner == 1})
-        for pid in ids2:
-            self._player_hist[pid].append({"time": match_time, "won": winner == 2})
+        for ids, won in ((ids1, winner == 1), (ids2, winner == 2)):
+            for pid in ids:
+                history = self._player_hist[pid]
+                entry = {"time": match_time, "won": won}
+                if self._result_availability_policy in OBSERVED_AVAILABILITY_POLICIES and match.get("availability_source") == "observed_completed_result":
+                    recent = sorted([*history, entry], key=lambda item: item["time"])[-self._HISTORY_MAXLEN:]
+                    history.clear()
+                    history.extend(recent)
+                else:
+                    history.append(entry)
 
         h2h_state[2] += 1
         if t1_first:
@@ -611,13 +661,52 @@ class FeatureBuilder:
         else:
             h2h_state[1 if winner == 1 else 0] += 1
 
-        return row
+        if self._state_version >= 5:
+            self._history_cutoff = observed_at
+
+    def _tournament_tier(self, match: dict[str, Any]) -> int:
+        if self.category_catalog is not None:
+            tier = self.category_catalog.tier(match.get("tournament_code"), match.get("tournament_id"))
+            if tier is not None:
+                return tier
+        return match["tournament_tier"]
 
     def build_dataframe(
-        self, matches: list[dict[str, Any]]
+        self, matches: list[dict[str, Any]], *, as_of: datetime | None = None,
     ) -> pd.DataFrame:
-        """Process all matches (must be sorted by time) → feature DataFrame."""
-        rows = [self.process(m) for m in matches]
+        """Generate causal features, then retain only outcomes eligible by as_of."""
+        if self._state_version < 5:
+            rows = [self.process(m) for m in matches]
+        else:
+            if self._result_availability_policy not in OBSERVED_AVAILABILITY_POLICIES and any(
+                    m.get("availability_source") == "observed_completed_result" for m in matches):
+                raise ValueError("Observed results require the observed-result availability policy")
+            if any(not isinstance(m.get(key), datetime) for m in matches for key in ("prediction_time", "available_at")):
+                raise ValueError("Historical replay requires prediction_time and available_at; reload raw data")
+            if any(m["available_at"] <= m["prediction_time"] for m in matches):
+                raise ValueError("Result availability must follow prediction_time")
+            if as_of is not None and any(m["available_at"] >= as_of for m in matches):
+                raise ValueError("Training labels are not yet eligible at as_of")
+            ordered = sorted(matches, key=lambda m: (m["prediction_time"], str(m.get("match_id")), m.get("fixture_id", "")))
+            pending, rows = [], []
+            for stamp, group in groupby(ordered, key=lambda m: m["prediction_time"]):
+                while pending and pending[0][0] < stamp:
+                    release, _, match = heapq.heappop(pending)
+                    self._observe_result(match, release)
+                for match in group:
+                    row = self.preview({**match, "match_time": stamp})
+                    row.update(match_time=match["match_time"], prediction_time=stamp,
+                               available_at=match["available_at"], availability_source=match.get("availability_source"),
+                               fixture_id=match.get("fixture_id"))
+                    rows.append(row)
+                    heapq.heappush(pending, (match["available_at"],
+                                            (match["match_time"], str(match.get("match_id")),
+                                             match.get("fixture_id", ""), len(rows)), match))
+            while pending:
+                release, _, match = heapq.heappop(pending)
+                self._observe_result(match, release)
+            if as_of is not None:
+                self._history_cutoff = max(self.history_cutoff, as_of)
         df = pd.DataFrame(rows)
 
         all_discs = DISCIPLINES + ["OTHER"]
@@ -718,11 +807,15 @@ def build_feature_matrix(
     matches: list[dict[str, Any]],
     k_base: float = K_BASE,
     player_names: dict[str, str] | None = None,
+    *, as_of: datetime | None = None,
+    result_availability_policy: str = AVAILABILITY_POLICY,
+    category_catalog: TournamentCatalog | None = None,
 ) -> tuple[pd.DataFrame, "FeatureBuilder"]:
     """Convenience wrapper: build feature DataFrame from sorted match list.
 
     Returns (df, builder) so callers can access Elo state for leaderboards/inference.
     """
-    builder = FeatureBuilder(k_base=k_base, player_names=player_names)
-    df = builder.build_dataframe(matches)
+    builder = FeatureBuilder(k_base=k_base, player_names=player_names,
+                             result_availability_policy=result_availability_policy, category_catalog=category_catalog)
+    df = builder.build_dataframe(matches, as_of=as_of)
     return df, builder

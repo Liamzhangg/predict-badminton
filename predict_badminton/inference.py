@@ -104,7 +104,7 @@ class InferenceBuilder:
 
     def build_features(self, fixtures: pd.DataFrame) -> pd.DataFrame:
         """Return match metadata and the saved history's feature columns (no label)."""
-        cutoff = max(self.feature_builder.elo._last_match.values(), default=datetime.min)
+        cutoff = self.feature_builder.history_cutoff
         if (fixtures["match_time"] <= cutoff).any():
             raise ValueError("Fixture times must follow the saved history cutoff")
         rows = []
@@ -138,7 +138,7 @@ class InferenceBuilder:
         t_tier_raw = fix.get("tournament_tier", "5")
         try:
             t_tier = int(float(str(t_tier_raw))) if pd.notna(t_tier_raw) else 5
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, OverflowError):
             t_tier = 5
 
         s1_raw = fix.get("team1_seed", "")
@@ -159,6 +159,18 @@ class InferenceBuilder:
             if pd.notna(fix.get("tournament_name", ""))
             else ""
         )
+        tournament_code = str(fix.get("tournament_code") or "") if pd.notna(fix.get("tournament_code")) else ""
+        tournament_id = str(fix.get("tournament_id") or "") if pd.notna(fix.get("tournament_id")) else ""
+        catalog = self.feature_builder.category_catalog
+        if catalog is not None and catalog.tier(tournament_code, tournament_id) is None:
+            try:
+                supplied_tier = float(t_tier_raw)
+                if not supplied_tier.is_integer() or not 1 <= supplied_tier <= 6:
+                    raise ValueError
+            except (ValueError, TypeError):
+                raise ValueError("Uncatalogued fixtures require an explicit tournament_tier from 1 to 6") from None
+            if "tournament_tier" not in fix:
+                raise ValueError("Supply a catalogued tournament_code/ID or an explicit tournament_tier")
 
         match = {
             "match_id": fix.get("match_id"),
@@ -168,7 +180,8 @@ class InferenceBuilder:
             "team2_ids": ids2,
             "round_name": round_name,
             "tournament_name": tournament_name,
-            "tournament_code": "",
+            "tournament_code": tournament_code,
+            "tournament_id": tournament_id,
             "tournament_tier": t_tier,
             "team1_seed": seed1,
             "team2_seed": seed2,
@@ -191,4 +204,6 @@ def build_inference_features(
     fixtures = load_fixtures(fixtures_path)
     builder = InferenceBuilder(feature_builder)
     features = builder.build_features(fixtures)
+    features.attrs["history_as_of"] = feature_builder.history_cutoff.isoformat()
+    features.attrs["result_availability_policy"] = feature_builder.model_policy.get("result_availability", "legacy_start_order")
     return features, fixtures

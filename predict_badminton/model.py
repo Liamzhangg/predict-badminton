@@ -6,9 +6,9 @@ Walk-forward CV design:
   - Model is retrained from scratch per fold (no leakage via model state).
 
 Optuna tuning:
-  - Uses only the LAST fold (largest training set, most representative) for speed.
+  - Each tuning call uses its last available earlier-year fold.
   - 30 trials, fixed seed.
-  - Best params then used for full-fold CV and final model.
+  - CV/backtests tune within each fold's training rows; final tuning excludes holdout.
 
 Calibration:
   - Fit Platt scaling and isotonic regression on OOF predictions.
@@ -38,6 +38,12 @@ from predict_badminton.evaluate import (
     feature_importance_df,
     reliability_stats,
 )
+from predict_badminton.probabilities import (
+    PREDICTION_POLICY,
+    average_directions,
+    predict_directions,
+    predict_probabilities,
+)
 
 logger = logging.getLogger(__name__)
 optuna.logging.set_verbosity(optuna.logging.WARNING)
@@ -51,6 +57,21 @@ def _get_year(dt) -> int:  # noqa: ANN001
     return dt.year if hasattr(dt, "year") else pd.Timestamp(dt).year
 
 
+def _prediction_times(df: pd.DataFrame) -> pd.Series:
+    return df["prediction_time"] if "prediction_time" in df else df["match_time"]
+
+
+def _known_before(df: pd.DataFrame, cutoff: pd.Timestamp) -> pd.Series:
+    return df["available_at"] < cutoff if "available_at" in df else _prediction_times(df) < cutoff
+
+
+def _check_disjoint(train: pd.DataFrame, validation: pd.DataFrame) -> None:
+    for column in ("match_id", "fixture_id"):
+        if column in train and column in validation:
+            if set(train[column].dropna()).intersection(validation[column].dropna()):
+                raise ValueError(f"Duplicate {column} crosses an evaluation boundary")
+
+
 def chronological_holdout_split(
     df: pd.DataFrame,
     test_year: int | None = None,
@@ -59,14 +80,15 @@ def chronological_holdout_split(
     if df.empty:
         raise ValueError("Cannot split an empty feature matrix")
 
-    years = df["match_time"].apply(_get_year)
+    years = _prediction_times(df).apply(_get_year)
     resolved_test_year = test_year if test_year is not None else int(years.max())
-    train_df = df[years < resolved_test_year].copy()
+    train_df = df[(years < resolved_test_year) & _known_before(df, pd.Timestamp(resolved_test_year, 1, 1))].copy()
     test_df = df[years >= resolved_test_year].copy()
     if train_df.empty or test_df.empty:
         raise ValueError(
             f"Test year {resolved_test_year} must leave non-empty train and test sets"
         )
+    _check_disjoint(train_df, test_df)
     return train_df, test_df, resolved_test_year
 
 
@@ -75,7 +97,7 @@ def _default_fold_val_years(
     max_folds: int = 4,
 ) -> list[tuple[int, int]]:
     """Choose the latest validation years that have prior training history."""
-    years = sorted({int(_get_year(value)) for value in df["match_time"]})
+    years = sorted({int(_get_year(value)) for value in _prediction_times(df)})
     return [(year, year) for year in years[1:][-max_folds:]]
 
 
@@ -86,11 +108,18 @@ def _chronological_validation_split(
     """Reserve a chronological tail for early stopping."""
     if len(df) < 2:
         raise ValueError("At least two rows are required for validation splitting")
-    ordered = df.sort_values("match_time").reset_index(drop=True)
+    ordered = df.loc[_prediction_times(df).sort_values(kind="stable").index].reset_index(drop=True)
     minimum = 50 if len(ordered) >= 500 else 10
     n_validation = max(minimum, int(len(ordered) * validation_fraction))
     n_validation = min(n_validation, max(1, len(ordered) // 3))
-    return ordered.iloc[:-n_validation], ordered.iloc[-n_validation:]
+    times = _prediction_times(ordered)
+    boundary = times.iloc[-n_validation]
+    fit = ordered[(times < boundary) & _known_before(ordered, boundary)]
+    stop = ordered[times >= boundary]
+    if fit.empty or stop.empty:
+        raise ValueError("Early stopping requires distinct, availability-isolated timestamps")
+    _check_disjoint(fit, stop)
+    return fit, stop
 
 
 def _split_folds(
@@ -99,10 +128,10 @@ def _split_folds(
 ) -> list[tuple[pd.DataFrame, pd.DataFrame]]:
     """Create walk-forward folds. Each fold: (train_df, val_df)."""
     df = df.copy()
-    df["_year"] = df["match_time"].apply(_get_year)
+    df["_year"] = _prediction_times(df).apply(_get_year)
     folds: list[tuple[pd.DataFrame, pd.DataFrame]] = []
     for val_start, val_end in fold_val_years:
-        train = df[df["_year"] < val_start].drop(columns=["_year"])
+        train = df[(df["_year"] < val_start) & _known_before(df, pd.Timestamp(val_start, 1, 1))].drop(columns=["_year"])
         val = df[(df["_year"] >= val_start) & (df["_year"] <= val_end)].drop(
             columns=["_year"]
         )
@@ -115,6 +144,7 @@ def _split_folds(
                 len(val),
             )
             continue
+        _check_disjoint(train, val)
         folds.append((train, val))
     return folds
 
@@ -209,7 +239,9 @@ def refit_production_model(
 ) -> lgb.LGBMClassifier:
     """Refit all known results after evaluation, keeping the selected tree count."""
     X, y = _prep_X_y(df)
-    return train_lgbm(X, y, params={**(params or {}), "n_estimators": best_iteration})
+    model = train_lgbm(X, y, params={**(params or {}), "n_estimators": best_iteration})
+    model.trained_through_ = (df["available_at"] if "available_at" in df else _prediction_times(df)).max().to_pydatetime()
+    return model
 
 
 # ---------------------------------------------------------------------------
@@ -237,7 +269,7 @@ def _optuna_objective(
         "min_split_gain": trial.suggest_float("min_split_gain", 0.0, 0.5),
     }
     model = train_lgbm(X_train, y_train, X_val, y_val, params)
-    preds = model.predict_proba(X_val)[:, 1]
+    preds = predict_probabilities(model, X_val)
     return float(log_loss(y_val, preds))
 
 
@@ -279,8 +311,13 @@ def tune_lgbm(
 def walk_forward_cv(
     df: pd.DataFrame,
     params: dict[str, Any] | None = None,
+    *, n_trials: int | None = None,
 ) -> tuple[list[dict[str, float]], np.ndarray, np.ndarray]:
-    """Run full walk-forward CV. Returns (fold_metrics, oof_preds, oof_labels)."""
+    """Return averaged fold metrics and single-direction OOF scores for calibration.
+
+    Calibrators learn the base classifier's directional scale. Serving applies
+    calibration to each direction before averaging, preserving symmetry.
+    """
     fold_years = _default_fold_val_years(df)
     folds = _split_folds(df, fold_years)
     fold_metrics: list[dict[str, float]] = []
@@ -290,12 +327,15 @@ def walk_forward_cv(
     for i, (train_df, val_df) in enumerate(folds):
         X_val, y_val = _prep_X_y(val_df)
 
-        model, _ = _train_lgbm_for_evaluation(train_df, params)
-        preds = model.predict_proba(X_val)[:, 1]
+        fold_params = (tune_lgbm(train_df, n_trials=n_trials)
+                       if n_trials is not None and _split_folds(train_df, _default_fold_val_years(train_df)) else params)
+        model, _ = _train_lgbm_for_evaluation(train_df, fold_params)
+        directions = predict_directions(model, X_val)
+        preds = average_directions(directions)
 
         m = compute_metrics(y_val.values, preds)
         fold_metrics.append(m)
-        oof_preds.append(preds)
+        oof_preds.append(directions[:, 0])
         oof_labels.append(y_val.values)
 
         logger.info(
@@ -411,10 +451,16 @@ def train_final_model(
     if (oof_preds is None or oof_labels is None or len(oof_preds) < 50
             or len(oof_preds) != len(oof_labels)):
         raise ValueError("Calibration requires at least 50 matched walk-forward predictions and labels")
+    cutoff = _prediction_times(test_df).min()
+    if _prediction_times(train_df).max() >= cutoff or not _known_before(train_df, cutoff).all():
+        raise ValueError("Final evaluation requires availability-isolated training and test data")
+    _check_disjoint(train_df, test_df)
     X_test, y_test = _prep_X_y(test_df)
 
     model, best_iteration = _train_lgbm_for_evaluation(train_df, best_params)
-    raw_preds_test = model.predict_proba(X_test)[:, 1]
+    model.trained_through_ = (train_df["available_at"] if "available_at" in train_df else _prediction_times(train_df)).max().to_pydatetime()
+    directions = predict_directions(model, X_test)
+    raw_preds_test = average_directions(directions)
 
     raw_metrics = compute_metrics(y_test.values, raw_preds_test)
     logger.info("Final model raw test metrics: %s", raw_metrics)
@@ -423,10 +469,12 @@ def train_final_model(
     logger.info("Fitting calibrators on OOF predictions (%d samples)", len(oof_preds))
     platt = PlattCalibrator().fit(oof_labels, oof_preds)
     isotonic = IsotonicCalibrator().fit(oof_labels, oof_preds)
+    for calibrator in (platt, isotonic):
+        calibrator.trained_through_ = model.trained_through_
 
     # Evaluate calibrated model on held-out test (no refitting)
-    platt_preds = platt.predict(raw_preds_test)
-    iso_preds = isotonic.predict(raw_preds_test)
+    platt_preds = average_directions(directions, platt)
+    iso_preds = average_directions(directions, isotonic)
 
     platt_metrics = compute_metrics(y_test.values, platt_preds)
     iso_metrics = compute_metrics(y_test.values, iso_preds)
@@ -443,8 +491,10 @@ def train_final_model(
         "test_raw": raw_metrics,
         "test_platt": platt_metrics,
         "test_isotonic": iso_metrics,
+        "prediction_policy": PREDICTION_POLICY,
+        "calibration_order": "per_direction_before_averaging",
         "calibration_source": "oof",
-        "early_stopping_source": "chronological_training_tail",
+        "early_stopping_source": "availability_purged_training_tail",
         "best_iteration": best_iteration,
         "feature_importance": fi_df.to_dict("records"),
         "reliability_raw": rel_raw,
@@ -463,6 +513,7 @@ def rolling_backtest(
     window_years: int = 2,
     step_years: int = 1,
     params: dict[str, Any] | None = None,
+    *, n_trials: int | None = None,
 ) -> dict[str, Any]:
     """Rolling walk-forward backtest for future-prediction realism.
 
@@ -472,7 +523,7 @@ def rolling_backtest(
     Returns a report dict suitable for JSON serialisation.
     """
     df = df.copy()
-    df["_year"] = df["match_time"].apply(_get_year)
+    df["_year"] = _prediction_times(df).apply(_get_year)
     min_year = int(df["_year"].min())
     max_year = int(df["_year"].max())
 
@@ -489,7 +540,8 @@ def rolling_backtest(
         if val_end > max_year:
             break
 
-        train = df[(df["_year"] >= train_start) & (df["_year"] <= train_end)].drop(
+        train = df[(df["_year"] >= train_start) & (df["_year"] <= train_end)
+                   & _known_before(df, pd.Timestamp(val_start, 1, 1))].drop(
             columns=["_year"]
         )
         val = df[(df["_year"] >= val_start) & (df["_year"] <= val_end)].drop(
@@ -506,8 +558,11 @@ def rolling_backtest(
 
         X_val, y_val = _prep_X_y(val)
 
-        model, _ = _train_lgbm_for_evaluation(train, params)
-        preds = model.predict_proba(X_val)[:, 1]
+        _check_disjoint(train, val)
+        fold_params = (tune_lgbm(train, n_trials=n_trials)
+                       if n_trials is not None and _split_folds(train, _default_fold_val_years(train)) else params)
+        model, _ = _train_lgbm_for_evaluation(train, fold_params)
+        preds = predict_probabilities(model, X_val)
 
         m = compute_metrics(y_val.values, preds)
         rel = reliability_stats(y_val.values, preds)

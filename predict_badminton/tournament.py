@@ -12,6 +12,7 @@ import pandas as pd
 
 from predict_badminton.config import DISCIPLINES
 from predict_badminton.features import FeatureBuilder
+from predict_badminton.probabilities import PREDICTION_POLICY, predict_probabilities
 
 
 def load_bundle(directory: Path) -> tuple:
@@ -30,6 +31,8 @@ def load_bundle(directory: Path) -> tuple:
     if any(getattr(calibrator, "feature_policy_", None) != getattr(objects[0], "feature_policy_", None)
            for calibrator in objects[1:]):
         raise ValueError("Calibrator rating policy differs from its saved model; use a matching bundle")
+    for calibrator in objects[1:]:
+        history.validate_training_cutoff(calibrator)
     return (*objects, history)
 
 
@@ -90,7 +93,7 @@ def forecast(draw: dict, discipline: str, bundle: tuple, method: str = "Raw") ->
     model, platt, isotonic, history = bundle
     if method not in {"Raw", "Platt", "Isotonic"}:
         raise ValueError("Unknown probability method")
-    cutoff = max(history.elo._last_match.values(), default=datetime.min)
+    cutoff = history.history_cutoff
     entries, rounds = draw["entries"], draw["rounds"]
     rows = []
     for level, rnd in enumerate(rounds):
@@ -115,9 +118,8 @@ def forecast(draw: dict, discipline: str, bundle: tuple, method: str = "Raw") ->
                     }))
     frame = pd.DataFrame(rows)[history.feature_columns]
     frame["discipline"] = pd.Categorical(frame["discipline"], categories=DISCIPLINES + ["OTHER"])
-    probabilities = model.predict_proba(frame)[:, 1]
-    if method != "Raw":
-        probabilities = (platt if method == "Platt" else isotonic).predict(probabilities)
+    calibrator = None if method == "Raw" else platt if method == "Platt" else isotonic
+    probabilities = predict_probabilities(model, frame, calibrator)
     advance, matchups = propagate(len(entries), probabilities)
     labels = [rnd["name"] for rnd in rounds[1:]] + ["Title"]
     records = []
@@ -128,4 +130,5 @@ def forecast(draw: dict, discipline: str, bundle: tuple, method: str = "Raw") ->
                         "History": history.elo.team_disc_count(ids, discipline),
                         **{label: float(advance[index, level + 1] * 100) for level, label in enumerate(labels)}})
     return {"advance": advance, "matchups": matchups, "table": pd.DataFrame(records),
-            "cutoff": cutoff.isoformat(), "method": method}
+            "cutoff": cutoff.isoformat(), "method": method, "prediction_policy": PREDICTION_POLICY,
+            "result_availability_policy": history.model_policy.get("result_availability", "legacy_start_order")}

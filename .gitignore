@@ -23,6 +23,8 @@ build/
 !data/templates/upcoming_fixtures_template.csv
 !data/draws/*.json
 !data/leaderboards/elo_leaderboard_*.csv
+!data/odds/**/*.csv
+!data/catalogs/*.csv
 data/raw/**/*.json
 !data/raw/bwf_matches/.gitkeep
 data/processed/**
@@ -32,6 +34,7 @@ data/source_cache/**
 !data/source_cache/bwf/
 !data/source_cache/bwf/.gitkeep
 data/manifests/*.csv
+data/manifests/*.sqlite3*
 !data/manifests/.gitkeep
 models/
 outputs/
