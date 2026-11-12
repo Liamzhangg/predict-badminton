@@ -2,6 +2,12 @@
 
 BWF match-win probabilities using **LightGBM + score-sensitive Elo + player-based TrueSkill**. Covers men's/women's singles, men's/women's doubles, and mixed doubles.
 
+| Accuracy | Log Loss | Brier Score |
+| ---: | ---: | ---: |
+| **76.22%** | **0.4802** | **0.1593** |
+
+Retrospective 2026 holdout: **43,580 matches** across all five disciplines. Lower log loss and Brier score are better. [Evaluation details](#evaluation).
+
 ## Elo Leaderboards
 
 **Rebuilt November 11, 2026; results through November 8, 15:05 UTC.** Linked names open the full CSV for that event, not just the leader shown here.
@@ -43,20 +49,6 @@ Holdout: 43,580 played 2026 matches, seed 42. Training uses 258,737 earlier matc
 | **Current conservative result-availability pipeline** | **76.22%** | **0.480229** | **0.159314** |
 
 Accuracy counts correct winner picks; log loss and Brier score assess probabilities. These are holdout-classifier metrics **before** the production refit. The timing fix also withholds more information, so the difference does not isolate leakage's effect. The 2026 benchmark has been reused for model selection; it is not an untouched final test.
-
-## Setup
-
-Run commands from the repository root. Python **3.12.13** is pinned in `.python-version`; `uv` manages `.venv` using `pyproject.toml` and `uv.lock`.
-
-```bash
-export UV_CACHE_DIR="$PWD/.cache/uv"
-uv sync --extra app --extra fetch
-uv run python -c "import lightgbm; print('lightgbm ok')"
-```
-
-On macOS, LightGBM needs the system OpenMP runtime: `brew install libomp` if the import reports a missing `libomp.dylib`. No separate `pip install` or environment activation is needed.
-
-Extras: `app` adds Streamlit, `fetch` adds the Chrome-compatible HTTP transport, and `benchmark` adds the optional XGBoost comparison. `uv sync --all-extras` includes all three.
 
 ## Collect Data
 
