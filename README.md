@@ -58,17 +58,12 @@ These are **model ratings, not official BWF rankings or win probabilities**. Jun
 
 ## Model
 
-The active model uses **302,332 played matches from 2018-2026**, through November 8, 2026, with 44 features and 500 LightGBM trees:
+Built from **302,332 matches spanning 2018-2026**, the model estimates win probabilities for all five badminton disciplines.
 
-- **Score-sensitive Elo:** individual strength and doubles partnership history. Complete normal scores scale updates from 0.5x to 1.5x; missing, retired, or invalid scores retain the normal update.
-- **Player-based TrueSkill:** skill and uncertainty per discipline, carried between doubles partners.
-- **Recent history:** win rates, match counts, rest days, and head-to-head results.
-- **Context:** discipline, tournament tier, round, seeds, and country overlap.
+**LightGBM** combines **score-sensitive Elo** and **player-based TrueSkill** with:
 
-LightGBM learns how to combine these inputs. Training excludes para, AirBadminton, unplayed walkovers, and invalid team formats; standard junior events remain included. There is no automatic Elo decay or extra calendar-based TrueSkill uncertainty: that experiment was not adopted.
+- **Player strength:** individual ratings, doubles partnerships, and past match scores.
+- **Match history:** recent form, head-to-head results, and rest days.
+- **Tournament context:** event type, tournament level, round, and seeding.
 
-**History is availability-aware.** The saved active model uses `conservative_day_history_v1`. Future training defaults to `observed_results_with_conservative_history_v2`: exact observed results use receipt times, while untracked older history keeps conservative day boundaries. Only results eligible strictly before each prediction cutoff enter history. See [timing rules](data/README.md#training-rules).
-
-New training also uses the saved [official tournament catalog](data/catalogs/bwf_tournaments.csv) for World Tour tiers, joined by edition ID/code rather than tournament name. Other categories retain the old heuristic. The catalog is frozen into each new run; existing model bundles keep their original tier behavior. See [category mapping](data/README.md#official-categories).
-
-**Predictions average both opponent orders:** `P(A wins) = (model(A,B) + 1 - model(B,A)) / 2`. Reversing the opponents produces complementary probabilities through the shared [prediction function](predict_badminton/probabilities.py). Optional calibration acts on each direction before averaging.
+Historical evaluation follows chronological order, with result-availability checks designed to reduce data leakage.
