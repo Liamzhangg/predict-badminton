@@ -11,8 +11,8 @@ Usage examples:
   # Skip Optuna; use default LightGBM params
   uv run python train.py --no-tune
 
-  # Custom paths and trial count
-  uv run python train.py --data-dir data/raw/bwf_matches --artifacts-dir outputs/artifacts --n-trials 50
+  # Custom run and trial count
+  uv run python train.py --artifacts-dir outputs/runs/my-run --n-trials 50
 
   # Skip rolling backtest (faster)
   uv run python train.py --no-tune --no-backtest
@@ -23,7 +23,9 @@ import argparse
 import json
 import logging
 import pickle
+import sqlite3
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -37,6 +39,9 @@ logger = logging.getLogger("train")
 
 
 def parse_args() -> argparse.Namespace:
+    from predict_badminton.data_sources.observations import OBSERVATIONS_PATH
+    from predict_badminton.tournament_catalog import CATALOG_PATH
+
     p = argparse.ArgumentParser(description="Train badminton winner prediction model")
     p.add_argument(
         "--data-dir",
@@ -47,8 +52,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--artifacts-dir",
         type=Path,
-        default=Path("outputs/artifacts"),
-        help="Directory to save model artifacts",
+        help="Directory to save model artifacts (default: a new timestamped outputs/runs/ directory)",
     )
     p.add_argument(
         "--n-trials",
@@ -92,6 +96,17 @@ def parse_args() -> argparse.Namespace:
         "--refit-all", action="store_true",
         help="After holdout evaluation, refit the production model on all known results",
     )
+    p.add_argument("--as-of", help="UTC snapshot cutoff; default: current UTC time")
+    timing = p.add_mutually_exclusive_group()
+    timing.add_argument("--observations-db", type=Path, default=OBSERVATIONS_PATH,
+                        help="Result receipts database (default: data/manifests/bwf_result_observations.sqlite3)")
+    timing.add_argument("--conservative-history", action="store_const", const=None, dest="observations_db",
+                        help="Ignore result receipts and use conservative historical timing only")
+    categories = p.add_mutually_exclusive_group()
+    categories.add_argument("--category-catalog", type=Path, default=CATALOG_PATH,
+                            help="Official edition categories (default: data/catalogs/bwf_tournaments.csv)")
+    categories.add_argument("--legacy-tournament-tiers", action="store_const", const=None, dest="category_catalog",
+                            help="Reproduce name-based tournament tiers instead of applying official World Tour categories")
     return p.parse_args()
 
 
@@ -103,8 +118,46 @@ def main() -> int:
         args.n_trials = min(args.n_trials, 5)
         logger.info("SMOKE TEST MODE: max_files=%d, n_trials=%d", args.max_files, args.n_trials)
 
-    artifacts_dir: Path = args.artifacts_dir
+    from predict_badminton.data_sources.observations import OBSERVATIONS_PATH, observations_before
+    from predict_badminton.tournament_catalog import CATALOG_PATH, CATEGORY_POLICY, TournamentCatalog
+
+    artifacts_dir = args.artifacts_dir or Path("outputs/runs") / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S_%fZ")
+    observations_db = getattr(args, "observations_db", OBSERVATIONS_PATH)
+    category_path = getattr(args, "category_catalog", CATALOG_PATH)
+    if observations_db is not None or category_path is not None:
+        from predict_badminton.config import REPO_ROOT
+
+        if artifacts_dir.resolve() == REPO_ROOT / "outputs/artifacts":
+            logger.error("New-policy training requires a separate --artifacts-dir; active artifacts are protected")
+            return 1
+    try:
+        category_catalog = TournamentCatalog.load(category_path) if category_path is not None else None
+    except (OSError, ValueError) as exc:
+        logger.error("Cannot load official tournament categories: %s", exc)
+        return 1
+    as_of = pd.to_datetime(getattr(args, "as_of", None) or datetime.now(timezone.utc), utc=True).tz_localize(None).to_pydatetime()
+    observed_results = None
+    if observations_db is not None:
+        if observations_db.exists():
+            try:
+                observed_results = observations_before(as_of.replace(tzinfo=timezone.utc), observations_db)
+            except sqlite3.Error as exc:
+                logger.error("Cannot read result receipts from %s: %s", observations_db, exc)
+                return 1
+        elif observations_db.resolve() == OBSERVATIONS_PATH.resolve():
+            observed_results = {}
+            logger.info("No result receipts database yet; using conservative timing for all history")
+        else:
+            logger.error("Result receipts database not found: %s", observations_db)
+            return 1
+        logger.info("Using observation receipts for %d tracked IDs, strictly before %s", len(observed_results), as_of)
+
     artifacts_dir.mkdir(parents=True, exist_ok=True)
+    if category_catalog is not None:
+        (artifacts_dir / "tournament_catalog.csv").write_text(category_catalog.text, encoding="utf-8")
+    if observed_results is not None:
+        with (artifacts_dir / "observed_result_receipts.json").open("w") as fh:
+            json.dump(observed_results, fh, indent=2, default=str)
 
     # ------------------------------------------------------------------
     # 1. Load and parse raw JSON
@@ -116,6 +169,8 @@ def main() -> int:
         args.data_dir,
         max_files=args.max_files,
         include_para=args.include_para,
+        observed_results=observed_results,
+        category_catalog=category_catalog,
     )
     from predict_badminton.match_rules import standard_match_exclusion
 
@@ -130,6 +185,12 @@ def main() -> int:
     if not matches:
         logger.error("No standard indoor MS/WS/MD/WD/XD matches remain after filtering")
         return 1
+    known = [m for m in matches if m["available_at"] < as_of]
+    drop_counts["result_not_yet_available"] = len(matches)-len(known)
+    matches = known
+    if not matches:
+        logger.error("No results eligible before %s", as_of)
+        return 1
     if len(matches) < 1000:
         logger.warning("Very few matches (%d) — results may be unreliable", len(matches))
 
@@ -139,21 +200,18 @@ def main() -> int:
     logger.info("Building feature matrix …")
     from predict_badminton.features import build_feature_matrix
 
-    df, feature_builder = build_feature_matrix(matches, player_names=player_names)
+    from predict_badminton.temporal import AVAILABILITY_POLICY, OBSERVED_AVAILABILITY_POLICY
+
+    df, feature_builder = build_feature_matrix(
+        matches, player_names=player_names, as_of=as_of,
+        result_availability_policy=OBSERVED_AVAILABILITY_POLICY if observations_db is not None else AVAILABILITY_POLICY,
+        category_catalog=category_catalog,
+    )
     logger.info("Feature matrix shape: %s", df.shape)
     logger.info("Label distribution: %.3f team1 wins", df["label"].mean())
 
     df.head(10000).to_csv(artifacts_dir / "features_sample.csv", index=False)
     logger.info("Feature matrix sample saved → %s/features_sample.csv", artifacts_dir)
-
-    # ------------------------------------------------------------------
-    # 2b. Export Elo leaderboards and complete inference state
-    # ------------------------------------------------------------------
-    logger.info("Exporting Elo leaderboards …")
-    feature_builder.export_leaderboards(artifacts_dir)
-
-    logger.info("Saving full inference feature state …")
-    feature_builder.save(artifacts_dir / "feature_state.pkl")
 
     # ------------------------------------------------------------------
     # 3. Chronological train/test split
@@ -209,7 +267,9 @@ def main() -> int:
     from predict_badminton.model import walk_forward_cv
     from predict_badminton.evaluate import metrics_summary
 
-    fold_metrics, oof_preds, oof_labels = walk_forward_cv(train_df, params=best_params)
+    fold_metrics, oof_preds, oof_labels = walk_forward_cv(
+        train_df, n_trials=None if args.no_tune else args.n_trials,
+    )
 
     if not fold_metrics:
         logger.error("No CV folds completed — not enough data for chosen time range")
@@ -250,7 +310,7 @@ def main() -> int:
         logger.info("Running rolling backtest …")
         from predict_badminton.model import rolling_backtest
 
-        backtest_report = rolling_backtest(df, params=best_params)
+        backtest_report = rolling_backtest(df, n_trials=None if args.no_tune else args.n_trials)
         bt_path = artifacts_dir / "rolling_backtest_report.json"
         with open(bt_path, "w") as fh:
             json.dump(backtest_report, fh, indent=2, default=str)
@@ -278,6 +338,7 @@ def main() -> int:
         final_report["feature_importance"] = feature_importance_df(model, FEATURE_COLS).to_dict("records")
         production_refit = {
             "rows": len(df), "through": df["match_time"].max().isoformat(),
+            "as_of": feature_builder.history_cutoff.isoformat(),
             "best_iteration": final_report["best_iteration"],
             "evaluation_model": "holdout_lgbm_model.pkl",
             "note": "Test metrics describe the pre-refit holdout model, not the all-results production model.",
@@ -287,6 +348,8 @@ def main() -> int:
     # 9. Save artifacts
     # ------------------------------------------------------------------
     logger.info("Saving artifacts …")
+    feature_builder.export_leaderboards(artifacts_dir)
+    feature_builder.save(artifacts_dir / "feature_state.pkl")
 
     with open(artifacts_dir / "lgbm_model.pkl", "wb") as fh:
         pickle.dump(model, fh)
@@ -305,6 +368,17 @@ def main() -> int:
     full_report = {
         "model_approach": "LightGBM + score-sensitive Elo + player-based TrueSkill",
         "feature_policy": feature_builder.model_policy,
+        "history_as_of": feature_builder.history_cutoff.isoformat(),
+        "availability_sources": df["availability_source"].value_counts().to_dict(),
+        "tournament_categories": {"policy": CATEGORY_POLICY, "snapshot": "tournament_catalog.csv",
+                                  "catalog_sha256": category_catalog.sha256,
+                                  "official_world_tour_matches": sum(m.get("tournament_tier_source") == "official_world_tour" for m in matches),
+                                  "heuristic_fallback_matches": sum(m.get("tournament_tier_source") != "official_world_tour" for m in matches)}
+                                 if category_catalog is not None else None,
+        "observed_results": {"database": str(observations_db), "receipts": "observed_result_receipts.json"}
+                            if observations_db is not None else None,
+        "evaluation_status": "reused_retrospective_benchmark",
+        "parameter_selection": "fixed_defaults" if args.no_tune else "nested_training_only",
         "score_margin_coverage": {
             "eligible": sum(match["score_margin"] is not None for match in matches),
             "matches": len(matches),
@@ -312,7 +386,9 @@ def main() -> int:
         "trueskill_parameters": feature_builder.model_policy["trueskill"],
         "cv_fold_metrics": fold_metrics,
         "cv_summary": cv_summary,
+        "cv_prediction_policy": final_report["prediction_policy"],
         "baselines": baseline_results,
+        "baseline_prediction_policy": "single_order",
         "best_params": best_params,
         **{k: v for k, v in final_report.items() if k != "feature_importance"},
         "drop_counts": drop_counts,
@@ -320,6 +396,7 @@ def main() -> int:
         "train_size": len(train_df),
         "test_size": len(test_df),
         "test_year": test_year,
+        "holdout_purged_rows": int((df["prediction_time"].dt.year < test_year).sum())-len(train_df),
         "label_balance": float(df["label"].mean()),
         "production_refit": production_refit,
     }

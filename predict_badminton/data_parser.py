@@ -11,6 +11,7 @@ Drop policy (tracked in counts dict returned by load_all_matches):
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import re
@@ -20,7 +21,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from predict_badminton.match_rules import point_margin
+from predict_badminton.match_rules import point_margin, unplayed_status
+from predict_badminton.temporal import match_timing
+from predict_badminton.tournament_catalog import TournamentCatalog, official_tier
 
 logger = logging.getLogger(__name__)
 
@@ -146,10 +149,13 @@ def parse_file(
     name_map: dict[str, str] | None = None,
     *,
     include_para: bool = False,
+    observed_results: dict[str, dict[str, Any] | None] | None = None,
+    category_catalog: TournamentCatalog | None = None,
 ) -> list[dict[str, Any]]:
     """Parse one JSON file; return list of normalised match dicts.
 
     If name_map is provided it is updated in-place with {player_id: display_name}.
+    Observation rejections stay marked until load_all_matches resolves fixture aliases.
     """
     records: list[dict[str, Any]] = []
     try:
@@ -165,12 +171,14 @@ def parse_file(
             drop_counts["para_match"] = drop_counts.get("para_match", 0) + 1
             continue
 
+        match_id = str(match.get("id", "")).strip()
+        tracked = observed_results is not None and match_id in observed_results
         winner = match.get("winner")
-        if winner not in (1, 2):
+        if winner not in (1, 2) and not tracked:
             drop_counts["bad_winner"] = drop_counts.get("bad_winner", 0) + 1
             continue
-        if match.get("scoreStatus") == 1 or str(match.get("scoreStatusValue", "")).casefold() == "walkover":
-            drop_counts["walkover"] = drop_counts.get("walkover", 0) + 1
+        if not tracked and (status := unplayed_status(match)):
+            drop_counts[status] = drop_counts.get(status, 0) + 1
             continue
 
         # Prefer UTC timestamp; fall back to local matchTime
@@ -190,6 +198,26 @@ def parse_file(
 
         disc = normalize_discipline(match.get("eventName") or "")
         t_name = match.get("tournamentName") or ""
+        category = category_catalog.lookup(match.get("tournamentCode"), match.get("sourceTournamentId")) if category_catalog else None
+        tier = official_tier(category["category"]) if category else None
+        timing = match_timing(
+            mt, utc=bool(match.get("matchTimeUtc")), duration=match.get("duration"),
+            coarse=(len(raw_time.strip()) == 10 or mt.time() == datetime.min.time()
+                    or match.get("timePrecision") == "date"),
+        )
+        observation_error = None
+        if tracked:
+            from predict_badminton.data_sources.observations import result_version
+
+            receipt = observed_results[match_id]
+            version = result_version(match)
+            if receipt is None or version is None or version[0] != receipt["result_sha256"]:
+                observation_error = "unobserved_or_conflicting_result_version"
+            elif receipt["available_at"] <= timing["prediction_time"]:
+                observation_error = "observation_before_match"
+            else:
+                timing.update(available_at=receipt["available_at"], availability_source="observed_completed_result")
+        teams = tuple(sorted((tuple(sorted(ids1)), tuple(sorted(ids2)))))
 
         records.append(
             {
@@ -197,7 +225,10 @@ def parse_file(
                 "match_time": mt,
                 "tournament_code": match.get("tournamentCode") or "",
                 "tournament_name": t_name,
-                "tournament_tier": infer_tournament_tier(t_name),
+                "tournament_tier": tier if tier is not None else infer_tournament_tier(t_name),
+                "tournament_id": category["tournament_id"] if category else "",
+                "tournament_category": category["category"] if category else "",
+                "tournament_tier_source": "official_world_tour" if tier is not None else "name_heuristic",
                 "event_name": match.get("eventName") or "",
                 "discipline": disc,
                 "round_name": match.get("roundName") or "",
@@ -209,16 +240,17 @@ def parse_file(
                 "team2_country": team2.get("countryCode") or "",
                 "team1_seed": match.get("team1seed"),
                 "team2_seed": match.get("team2seed"),
-                "winner": int(winner),  # 1 or 2
-                "label": int(winner == 1),  # target: 1 if team1 wins
+                "winner": int(winner) if winner in (1, 2) else None,
+                "label": int(winner == 1) if winner in (1, 2) else None,
                 "score_margin": point_margin(match),
+                **timing,
+                "_observation_error": observation_error,
                 "_has_utc_time": bool(match.get("matchTimeUtc")),
-                "_source_alias": (
-                    match.get("tournamentCode") or t_name, match.get("matchTime"),
-                    match.get("eventName"), match.get("roundName"), tuple(ids1), tuple(ids2),
-                    match.get("matchOrder"), match.get("matchTypeNo"), winner,
-                    json.dumps(match.get("score"), sort_keys=True),
-                ) if match.get("matchTime") else None,
+                "_fixture_key": (
+                    str(match.get("tournamentCode") or t_name).strip().casefold(),
+                    match.get("matchTime") or raw_time, match.get("eventName"),
+                    match.get("roundName"), teams, match.get("matchOrder"), match.get("matchTypeNo"),
+                ),
             }
         )
     return records
@@ -228,6 +260,8 @@ def _match_identity(record: dict[str, Any]) -> tuple[Any, ...]:
     match_id = record.get("match_id")
     if match_id is not None and str(match_id).strip():
         return ("id", str(match_id).strip())
+    if "_fixture_key" in record:
+        return ("signature", record["_fixture_key"])
 
     teams = tuple(
         sorted(
@@ -252,37 +286,56 @@ def _deduplicate_matches(
     records: list[dict[str, Any]],
     drop_counts: dict[str, int],
 ) -> list[dict[str, Any]]:
-    """Keep the first deterministic occurrence of each match identity."""
-    unique: list[dict[str, Any]] = []
-    seen: dict[tuple[Any, ...], dict[str, Any]] = {}
-    aliases: dict[tuple[Any, ...], int] = {}
-    for record in records:
-        identity = _match_identity(record)
-        if identity in seen:
-            previous = seen[identity]
-            if (previous["winner"], previous["score_margin"]) != (record["winner"], record["score_margin"]):
-                previous["score_margin"] = None
-            reason = "duplicate_match_id" if identity[0] == "id" else "duplicate_signature"
-            drop_counts[reason] = drop_counts.get(reason, 0) + 1
+    """Join ID/fixture aliases; exclude conflicting outcomes instead of choosing one."""
+    parents = list(range(len(records)))
+
+    def find(index: int) -> int:
+        while parents[index] != index:
+            parents[index] = parents[parents[index]]
+            index = parents[index]
+        return index
+
+    seen: dict[tuple, int] = {}
+    for index, record in enumerate(records):
+        for key in (_match_identity(record), ("fixture", record["_fixture_key"])):
+            if key in seen:
+                parents[find(index)] = find(seen[key])
+            seen[key] = index
+    groups: dict[int, list[dict[str, Any]]] = {}
+    for index, record in enumerate(records):
+        groups.setdefault(find(index), []).append(record)
+
+    unique = []
+    for group in groups.values():
+        # Keep rejected copies until alias grouping so an untracked copy cannot restore them.
+        errors = sorted({m["_observation_error"] for m in group if m.get("_observation_error")})
+        if errors:
+            drop_counts[errors[0]] = drop_counts.get(errors[0], 0) + len(group)
             continue
-        seen[identity] = record
-        alias = record.get("_source_alias")
-        if alias in aliases:
-            index = aliases[alias]
-            # Some BWF copies have new IDs and UTC clocks but identical local results.
-            if record["_has_utc_time"] != unique[index]["_has_utc_time"]:
-                drop_counts["duplicate_source_alias"] = drop_counts.get("duplicate_source_alias", 0) + 1
-                previous = unique[index]
-                if previous["score_margin"] != record["score_margin"]:
-                    previous["score_margin"] = record["score_margin"] = None
-                if record["_has_utc_time"]:
-                    unique[index] = record
-                    seen[_match_identity(previous)] = record
-                else:
-                    seen[identity] = previous
-                continue
-        if alias is not None:
-            aliases[alias] = len(unique)
+        teams = {tuple(sorted((tuple(sorted(m["team1_ids"])), tuple(sorted(m["team2_ids"]))))) for m in group}
+        winners = {tuple(sorted(m[f"team{m['winner']}_ids"])) for m in group}
+        if len(teams) != 1 or len(winners) != 1:
+            drop_counts["conflicting_result"] = drop_counts.get("conflicting_result", 0) + len(group)
+            continue
+        group.sort(key=lambda m: (m["availability_source"] != "observed_completed_result",
+                                  not m["_has_utc_time"], m["match_time"], str(m["match_id"])))
+        record = group[0]
+        preferred = [m for m in group if m["_has_utc_time"] == record["_has_utc_time"]
+                     and (record["availability_source"] != "observed_completed_result"
+                          or m["availability_source"] == "observed_completed_result")]
+        record["prediction_time"] = min(m["prediction_time"] for m in preferred)
+        record["available_at"] = max(m["available_at"] for m in preferred)
+        if len({m["score_margin"] for m in group}) > 1:
+            record["score_margin"] = None
+        if len(group) > 1:
+            identities = {_match_identity(m) for m in group}
+            if len({m["_has_utc_time"] for m in group}) > 1:
+                reason = "duplicate_source_alias"
+            elif len(identities) == 1:
+                reason = "duplicate_match_id" if next(iter(identities))[0] == "id" else "duplicate_signature"
+            else:
+                reason = "duplicate_fixture"
+            drop_counts[reason] = drop_counts.get(reason, 0) + len(group)-1
         unique.append(record)
     return unique
 
@@ -293,6 +346,8 @@ def load_all_matches(
     *,
     include_para: bool = False,
     deduplicate: bool = True,
+    observed_results: dict[str, dict[str, Any] | None] | None = None,
+    category_catalog: TournamentCatalog | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, int], dict[str, str]]:
     """Load all JSON files; return (sorted match list, drop counts, player name map).
 
@@ -312,18 +367,26 @@ def load_all_matches(
             drop_counts,
             name_map,
             include_para=include_para,
+            observed_results=observed_results,
+            category_catalog=category_catalog,
         )
         all_records.extend(records)
 
     if deduplicate:
         all_records = _deduplicate_matches(all_records, drop_counts)
 
+    valid_records = []
     for record in all_records:
-        record.pop("_source_alias", None)
+        if reason := record.pop("_observation_error", None):
+            drop_counts[reason] = drop_counts.get(reason, 0) + 1
+            continue
+        record["fixture_id"] = hashlib.sha256(json.dumps(record["_fixture_key"]).encode()).hexdigest()
+        record.pop("_fixture_key", None)
         record.pop("_has_utc_time", None)
+        valid_records.append(record)
+    all_records = valid_records
 
-    # Stable chronological sort (Python sort is stable)
-    all_records.sort(key=lambda x: x["match_time"])
+    all_records.sort(key=lambda m: (m["prediction_time"], str(m["match_id"])))
 
     logger.info(
         "Loaded %d matches from %d files | drops: %s | players with names: %d",
@@ -354,8 +417,8 @@ def build_data_report(
     return {
         "files_scanned": files_scanned,
         "matches_included": len(matches),
-        "date_min": matches[0]["match_time"].isoformat() if matches else None,
-        "date_max": matches[-1]["match_time"].isoformat() if matches else None,
+        "date_min": min(m["match_time"] for m in matches).isoformat() if matches else None,
+        "date_max": max(m["match_time"] for m in matches).isoformat() if matches else None,
         "tournaments": len(tournaments),
         "matches_by_year": dict(sorted(years.items())),
         "matches_by_discipline": dict(sorted(disciplines.items())),

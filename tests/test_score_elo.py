@@ -123,12 +123,13 @@ class ScoreEloTests(unittest.TestCase):
         match = {**_match("two", datetime(2024, 1, 9), 2), "score_margin": 0.05}
         self.assertEqual(restored.process(match), builder.process(match))
         self.assertEqual(restored.get_state(), builder.get_state())
-        self.assertEqual(restored.get_state()["version"], 4)
+        self.assertEqual(restored.get_state()["version"], 5)
 
     def test_legacy_states_keep_original_elo_updates(self):
         for version in (1, 2):
             state = FeatureBuilder(score_margin_weight=0).get_state()
             state["version"] = version
+            state.pop("history_cutoff")
             state.pop("trueskill")
             state["elo"].pop("score_margin_weight")
             state["elo"].pop("score_margin_reference")
@@ -155,6 +156,7 @@ class ScoreEloTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "rating policy"):
             history.validate_model(model)
         model.feature_policy_ = history.model_policy
+        model.trained_through_ = history.history_cutoff
         history.validate_model(model)
         model.feature_policy_ = FeatureBuilder(k_base=16).model_policy
         with self.assertRaisesRegex(ValueError, "rating policy"):

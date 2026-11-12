@@ -10,6 +10,14 @@ from predict_badminton.config import DISCIPLINES, DOUBLES_DISCIPLINES
 _AIR_EVENT = re.compile(r"\b(?:air\s*badminton|anoc\s+wbg|world\s+beach\s+games)\b", re.IGNORECASE)
 
 
+def unplayed_status(match: dict[str, Any]) -> str | None:
+    """Recognized statuses that must not count as a played result."""
+    status = str(match.get("scoreStatusValue") or "").strip().casefold()
+    if match.get("scoreStatus") in (1, "1") or status == "walkover":
+        return "walkover"
+    return status if status in {"withdrawn", "withdrawal", "cancelled", "canceled"} else None
+
+
 def standard_match_exclusion(match: dict[str, Any]) -> str | None:
     """Return why a normalized match/fixture is outside the production scope."""
     discipline = match.get("discipline")

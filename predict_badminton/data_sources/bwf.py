@@ -25,6 +25,7 @@ from typing import Any
 from predict_badminton.config import RAW_JSON_DIR, REPO_ROOT
 from predict_badminton.data_parser import load_all_matches, parse_file
 from predict_badminton.data_sources.bwf_schema import flatten_matches, indexed_list
+from predict_badminton.data_sources.observations import OBSERVATIONS_PATH, record_results
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +86,8 @@ class FetchResult:
     status_code: int | None = None
     cache_path: Path | None = None
     message: str = ""
+    completed_results_observed: int = 0
+    result_versions_added: int = 0
 
 
 @dataclass
@@ -248,6 +251,7 @@ def fetch_url(
     cache_dir: Path = SOURCE_CACHE_DIR,
     timeout: float = 30.0,
     transport: str = "standard",
+    *, observations_path: Path = OBSERVATIONS_PATH,
 ) -> FetchResult:
     if transport == "chrome":
         try:
@@ -290,12 +294,25 @@ def fetch_url(
     if not 200 <= status_code < 300:
         return FetchResult(url=url, status="failed", status_code=status_code, message=f"HTTP {status_code}")
 
+    observed, added = 0, 0
+    try:
+        payload = json.loads(body)
+        rounds, _ = normalize_json_data(payload, "source")
+    except (ValueError, UnicodeDecodeError):
+        rounds = []
+    if rounds:
+        observed, added = record_results(
+            [match for rnd in rounds for match in rnd], source_url=url,
+            response_sha256=hashlib.sha256(body).hexdigest(), observed_at=datetime.now(UTC), path=observations_path,
+        )
+
     suffix = ".json" if "json" in headers.get("content-type", "") else ".html"
     digest = hashlib.sha256(url.encode("utf-8")).hexdigest()[:16]
     path = cache_dir / f"{slugify(urllib.parse.urlparse(url).path, 'source')}-{digest}{suffix}"
     cache_dir.mkdir(parents=True, exist_ok=True)
     path.write_bytes(body)
-    return FetchResult(url=url, status="cached", status_code=status_code, cache_path=path)
+    return FetchResult(url=url, status="cached", status_code=status_code, cache_path=path,
+                       completed_results_observed=observed, result_versions_added=added)
 
 
 def is_blocked_response(status_code: int | None, headers: dict[str, str], body: bytes) -> bool:

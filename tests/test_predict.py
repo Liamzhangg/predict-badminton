@@ -7,6 +7,8 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
+import pandas as pd
+
 from predict import main, parse_args
 from predict_badminton.features import FeatureBuilder
 from tests.test_feature_state import _match
@@ -33,6 +35,11 @@ class PredictionArgsTests(unittest.TestCase):
                     "--output-dir", str(root / "predictions")]
             with patch("sys.argv", argv):
                 self.assertEqual(main(), 0)
+            output = pd.read_csv(next((root / "predictions").glob("*.csv")))
+            self.assertEqual(output["prediction_policy"].iloc[0], "two_order_average_v1")
+            self.assertEqual(output["team1_win_prob"].iloc[0], 0.5)
+            self.assertEqual(output["team2_win_prob"].iloc[0], 0.5)
+            self.assertEqual(output["predicted_winner"].iloc[0], "even")
             model.feature_policy_ = FeatureBuilder(score_margin_weight=0).model_policy
             (root / "model.pkl").write_bytes(pickle.dumps(model))
             with patch("sys.argv", argv):
@@ -42,6 +49,7 @@ class PredictionArgsTests(unittest.TestCase):
             calibrated = argv + ["--probabilities", "platt", "--calibrator-path", str(root / "calibrator.pkl")]
             with patch("sys.argv", calibrated):
                 self.assertEqual(main(), 0)
+            self.assertEqual(len(list((root / "predictions").glob("*.csv"))), 2)
             calibrator.feature_policy_ = FeatureBuilder(score_margin_weight=0).model_policy
             (root / "calibrator.pkl").write_bytes(pickle.dumps(calibrator))
             with patch("sys.argv", calibrated):

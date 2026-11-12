@@ -38,7 +38,7 @@ class DataParserTests(unittest.TestCase):
     def test_scores_are_normalized_without_removing_retirements(self) -> None:
         normal = {**_raw_match("normal"), "scoreStatusValue": "Normal",
                   "score": [{"home": 21, "away": 19}, {"home": 21, "away": 19}]}
-        retired = {**normal, "id": "retired", "scoreStatusValue": "Retired"}
+        retired = {**normal, "id": "retired", "scoreStatusValue": "Retired", "matchTimeUtc": "2024-01-02 10:00:00"}
         with tempfile.TemporaryDirectory() as tmp:
             (Path(tmp) / "matches.json").write_text(json.dumps([[normal, retired]]))
             matches, _, _ = load_all_matches(Path(tmp))
@@ -56,6 +56,16 @@ class DataParserTests(unittest.TestCase):
                 self.assertIsNone(matches[0]["score_margin"])
                 self.assertEqual(drops["duplicate_match_id"], 1)
 
+    def test_conservative_duplicates_keep_the_later_availability_bound(self) -> None:
+        precise = {**_raw_match("same"), "duration": 45}
+        uncertain = {**precise, "duration": None}
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "matches.json"
+            for records in ([precise, uncertain], [uncertain, precise]):
+                path.write_text(json.dumps([records]))
+                matches, _drops, _names = load_all_matches(Path(tmp))
+                self.assertEqual(str(matches[0]["available_at"]), "2024-01-03 00:00:00")
+
     def test_walkovers_do_not_update_training_history_but_retirements_remain(self) -> None:
         records = [{**_raw_match("code"), "scoreStatus": 1},
                    {**_raw_match("text"), "scoreStatusValue": "Walkover"},
@@ -68,6 +78,15 @@ class DataParserTests(unittest.TestCase):
             self.assertEqual(path.read_text(), original)
         self.assertEqual([m["match_id"] for m in matches], ["retired"])
         self.assertEqual(drops, {"walkover": 2})
+
+    def test_explicit_withdrawals_and_cancellations_are_not_played_results(self) -> None:
+        statuses = ("Withdrawn", "Withdrawal", "Cancelled", "Canceled")
+        records = [{**_raw_match(status), "scoreStatusValue": status} for status in statuses]
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "results.json").write_text(json.dumps([records]))
+            matches, drops, _ = load_all_matches(Path(tmp))
+        self.assertEqual(matches, [])
+        self.assertEqual(drops, {status.casefold(): 1 for status in statuses})
 
     def test_dated_reports_do_not_invent_individual_match_times(self) -> None:
         individual = {
@@ -144,7 +163,7 @@ class DataParserTests(unittest.TestCase):
                     match_time="2024-01-02 10:00:00",
                     team1="p4",
                     team2="p3",
-                ),
+                ) | {"winner": 2},
             ]
             (raw_dir / "a.json").write_text(json.dumps([first]), encoding="utf-8")
             (raw_dir / "b.json").write_text(json.dumps([second]), encoding="utf-8")
@@ -199,8 +218,9 @@ class DataParserTests(unittest.TestCase):
                 unfiltered, _, _ = load_all_matches(Path(tmp), deduplicate=False)
                 self.assertEqual(len(unfiltered), 3)
             path.write_text(json.dumps([[current, {**current, "id": "another-utc-record"}]]))
-            matches, _, _ = load_all_matches(Path(tmp))
-            self.assertEqual(len(matches), 2)
+            matches, drops, _ = load_all_matches(Path(tmp))
+            self.assertEqual(len(matches), 1)
+            self.assertEqual(drops["duplicate_fixture"], 1)
 
 
 if __name__ == "__main__":

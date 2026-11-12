@@ -1,4 +1,6 @@
-"""Local French Open forecasts. Run: uv run --extra app streamlit run app.py"""
+"""Historical viewer. Run from the repo root:
+uv run --extra app python -m streamlit run archive/french_open_app.py
+"""
 from __future__ import annotations
 
 import html
@@ -9,8 +11,9 @@ from pathlib import Path
 import streamlit as st
 
 from predict_badminton.tournament import forecast, load_bundle
+from predict_badminton.probabilities import PREDICTION_POLICY
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 DRAW = ROOT / "data/draws/french-open-2026-after-r32.json"
 MODEL = ROOT / "outputs/artifacts"
 
@@ -88,11 +91,12 @@ with st.expander("Model and sources"):
     selected_model = st.selectbox("Model history", list(model_options), index=default_model)
     MODEL = model_options[selected_model]
     metrics = json.loads((MODEL / "metrics_report.json").read_text(encoding="utf-8"))
-    version = (str(MODEL),) + tuple((MODEL / name).stat().st_mtime_ns for name in
+    version = (str(MODEL), PREDICTION_POLICY) + tuple((MODEL / name).stat().st_mtime_ns for name in
                 ("lgbm_model.pkl", "platt_calibrator.pkl", "isotonic_calibrator.pkl", "feature_state.pkl"))
     method = st.selectbox("Probabilities", ["Raw", "Isotonic", "Platt"])
     st.caption(f"Model: {metrics.get('model_approach', 'LightGBM + Elo')} · Draw retrieved: {data['retrieved_at_utc']} · No simulated results")
-    st.caption("2026 holdout log loss, before production refit: " + " · ".join(
+    evaluation = "Two-order averaged" if metrics.get("prediction_policy") == PREDICTION_POLICY else "Archived single-order"
+    st.caption(f"{evaluation} 2026 holdout log loss, before production refit: " + " · ".join(
         f"{name} {metrics[key]['log_loss']:.4f}" for name, key in
         (("Raw", "test_raw"), ("Isotonic", "test_isotonic"), ("Platt", "test_platt"))))
     st.markdown(f"[Official draw]({data['source_url']}) · [Official schedule]({data['schedule_source_url']})")
@@ -111,7 +115,7 @@ a.caption("Title favorite")
 a.markdown(f"**{favorite['Entry']}**")
 b.metric("Title probability", f"{favorite['Title']:.1f}%")
 c.metric("Remaining entries", len(draw["entries"]))
-st.caption(f"History through {result['cutoff'][:10]} · {method} probabilities")
+st.caption(f"History through {result['cutoff'][:10]} · Two-order averaged {method.lower()} probabilities")
 if (table["History"] < 10).any():
     st.warning(f"{int((table['History'] < 10).sum())} entries have fewer than 10 recorded matches for at least one player.")
 

@@ -15,14 +15,17 @@ Output:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import logging
 import pickle
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
+from predict_badminton.probabilities import PREDICTION_POLICY, average_directions, predict_directions
 
 logging.basicConfig(
     level=logging.INFO,
@@ -83,6 +86,10 @@ def main() -> int:
 
     with open(args.model_path, "rb") as fh:
         model = pickle.load(fh)
+        fh.seek(0)
+        model_hash = hashlib.file_digest(fh, "sha256").hexdigest()
+    with open(args.state_path, "rb") as fh:
+        state_hash = hashlib.file_digest(fh, "sha256").hexdigest()
 
     # ---- Build inference features -------------------------------------
     logger.info("Building features from fixtures …")
@@ -112,7 +119,8 @@ def main() -> int:
     all_discs = DISCIPLINES + ["OTHER"]
     X["discipline"] = pd.Categorical(X["discipline"], categories=all_discs)
 
-    raw_probs = model.predict_proba(X)[:, 1]
+    directions = predict_directions(model, X)
+    raw_probs = average_directions(directions)
     probs = raw_probs
     if args.calibrator_path is not None:
         logger.info("Loading calibrator from %s …", args.calibrator_path)
@@ -121,20 +129,35 @@ def main() -> int:
         if getattr(calibrator, "feature_policy_", None) != getattr(model, "feature_policy_", None):
             logger.error("Calibrator rating policy differs from its model; use a matching bundle")
             return 1
-        probs = calibrator.predict(raw_probs)
+        if feat_df.attrs["result_availability_policy"] != "legacy_start_order":
+            trained = getattr(calibrator, "trained_through_", None)
+            if not isinstance(trained, datetime) or trained > pd.Timestamp(feat_df.attrs["history_as_of"]):
+                logger.error("Calibrator training cutoff differs from the saved history; use a matching bundle")
+                return 1
+        probs = average_directions(directions, calibrator)
 
     # ---- Assemble output -----------------------------------------------
+    generated_at = datetime.now(timezone.utc)
     out_df = pd.DataFrame({
         "match_id": feat_df["match_id"].values,
         "match_time": feat_df["match_time"].values,
         "team1_win_prob_raw": np.round(raw_probs, 4),
+        "team2_win_prob_raw": np.round(1 - raw_probs, 4),
         "team1_win_prob": np.round(probs, 4),
+        "team2_win_prob": np.round(1 - probs, 4),
         "probability_method": args.probabilities,
-        "predicted_winner": np.where(probs >= 0.5, "team1", "team2"),
+        "prediction_policy": PREDICTION_POLICY,
+        "result_availability_policy": feat_df.attrs["result_availability_policy"],
+        "history_as_of": feat_df.attrs["history_as_of"],
+        "generated_at_utc": generated_at.isoformat(),
+        "model_sha256": model_hash,
+        "state_sha256": state_hash,
+        "predicted_winner": np.where(probs == 0.5, "even", np.where(probs > 0.5, "team1", "team2")),
         "confidence": np.round(np.abs(probs - 0.5) * 2, 4),
     })
     if args.calibrator_path is not None:
         out_df["team1_win_prob_calibrated"] = np.round(probs, 4)
+        out_df["team2_win_prob_calibrated"] = np.round(1 - probs, 4)
 
     # Merge in team IDs if available
     metadata_cols = [col for col in (
@@ -144,9 +167,9 @@ def main() -> int:
 
     # ---- Save ----------------------------------------------------------
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts = generated_at.strftime("%Y%m%d_%H%M%S_%f")
     out_path = args.output_dir / f"predictions_{ts}.csv"
-    out_df.to_csv(out_path, index=False)
+    out_df.to_csv(out_path, index=False, mode="x")
     logger.info("Predictions saved → %s", out_path)
 
     # Print summary

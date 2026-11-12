@@ -1,0 +1,1824 @@
+{
+  "name": "Kumamoto Masters Japan 2026",
+  "location": "Kumamoto, Japan",
+  "start_date": "2026-11-10",
+  "end_date": "2026-11-15",
+  "tournament_id": 5216,
+  "tournament_code": "5CC4D285-D8E0-4747-A6BF-A2D271B94BC7",
+  "official_category": "HSBC BWF World Tour Super 500",
+  "tournament_tier": 5,
+  "source_url": "https://bwfworldtour.bwfbadminton.com/tournament/5216/kumamoto-masters-japan-2026/draws/",
+  "schedule_source_url": "https://kumamotomasters-japan.com/schedule/",
+  "retrieved_at_utc": "2026-11-10T04:32:37.940898+00:00",
+  "assumptions": "Fixed pre-event main-draw R32 snapshot, not a live feed. Only named entrants with verified source IDs are included. Unpublished match times use November 10, 00:00 UTC (09:00 JST), solely as a forecast reference for rest-day features, not an announced start time. Tournament tier uses the unchanged training parser name heuristic. Withdrawals, qualifying results and later draw changes are not simulated.",
+  "sources": [
+    {
+      "event": "MS",
+      "url": "https://extranet-lv.bwfbadminton.com/api/vue-tournament-draw-data?tmtTab=draw&tmtId=5216&tmtType=1&drawId=2&isPara=false",
+      "sha256": "3a2715e11619a29b7adcb14374076d34cfa03dfcaa559cc8deec84eb3c4ec713",
+      "retrieved_at_utc": "2026-11-10T04:32:32.213728+00:00"
+    },
+    {
+      "event": "WS",
+      "url": "https://extranet-lv.bwfbadminton.com/api/vue-tournament-draw-data?tmtTab=draw&tmtId=5216&tmtType=1&drawId=4&isPara=false",
+      "sha256": "bf554faa9d87f7fe38ac89a402725fdff58c79d733350ce1a5ff3f3b2df1b373",
+      "retrieved_at_utc": "2026-11-10T04:32:33.643086+00:00"
+    },
+    {
+      "event": "MD",
+      "url": "https://extranet-lv.bwfbadminton.com/api/vue-tournament-draw-data?tmtTab=draw&tmtId=5216&tmtType=1&drawId=6&isPara=false",
+      "sha256": "b6e0f9a11ab2c9f148b918f22cfc9fe09d071b5ef3b61eceecc21a7ce4508257",
+      "retrieved_at_utc": "2026-11-10T04:32:35.113866+00:00"
+    },
+    {
+      "event": "WD",
+      "url": "https://extranet-lv.bwfbadminton.com/api/vue-tournament-draw-data?tmtTab=draw&tmtId=5216&tmtType=1&drawId=8&isPara=false",
+      "sha256": "25d0a44093e5c0662415e7e9cf890b11de65bb65665572cf3c11d22c81919fc2",
+      "retrieved_at_utc": "2026-11-10T04:32:36.553283+00:00"
+    },
+    {
+      "event": "XD",
+      "url": "https://extranet-lv.bwfbadminton.com/api/vue-tournament-draw-data?tmtTab=draw&tmtId=5216&tmtType=1&drawId=10&isPara=false",
+      "sha256": "3635740e9dbc7cdb0a41a2e72be61a0f6e146642ceda74dd41cd2525d6967919",
+      "retrieved_at_utc": "2026-11-10T04:32:37.940898+00:00"
+    }
+  ],
+  "matches": [
+    {
+      "match_id": "1565843",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 1,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "72885"
+      ],
+      "team1_name": "Christo POPOV",
+      "team1_country": "FRA",
+      "team1_seed": 1,
+      "team2_ids": [
+        "80062"
+      ],
+      "team2_name": "Minoru KOGA",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565917",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 2,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "60321"
+      ],
+      "team1_name": "Moh. Zaki UBAIDILLAH",
+      "team1_country": "INA",
+      "team1_seed": 0,
+      "team2_ids": [
+        "63122"
+      ],
+      "team2_name": "Brian YANG",
+      "team2_country": "CAN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565766",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 3,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "58089"
+      ],
+      "team1_name": "Alwi FARHAN",
+      "team1_country": "INA",
+      "team1_seed": 6,
+      "team2_ids": [
+        "86114"
+      ],
+      "team2_name": "LIN Chun-Yi",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565900",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 4,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "85095"
+      ],
+      "team1_name": "Nhat NGUYEN",
+      "team1_country": "IRL",
+      "team1_seed": 0,
+      "team2_ids": [
+        "85394"
+      ],
+      "team2_name": "Kenta NISHIMOTO",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565820",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 5,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "94151"
+      ],
+      "team1_name": "Victor LAI",
+      "team1_country": "CAN",
+      "team1_seed": 4,
+      "team2_ids": [
+        "90735"
+      ],
+      "team2_name": "Yudai OKIMOTO",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565774",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 6,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "86672"
+      ],
+      "team1_name": "Yushi TANAKA",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "97345"
+      ],
+      "team2_name": "ZHU Xuan Chen",
+      "team2_country": "CHN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565855",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 7,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "68870"
+      ],
+      "team1_name": "Lakshya SEN",
+      "team1_country": "IND",
+      "team1_seed": 8,
+      "team2_ids": [
+        "77848"
+      ],
+      "team2_name": "CHI Yu Jen",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565797",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 8,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "95516"
+      ],
+      "team1_name": "DONG Tian Yao",
+      "team1_country": "CHN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "59322"
+      ],
+      "team2_name": "LEE Chia Hao",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565881",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 9,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "93627"
+      ],
+      "team1_name": "KIDAMBI Srikanth",
+      "team1_country": "IND",
+      "team1_seed": 0,
+      "team2_ids": [
+        "62855"
+      ],
+      "team2_name": "Rasmus GEMKE",
+      "team2_country": "DEN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565935",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 10,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "85845"
+      ],
+      "team1_name": "Panitchaphon TEERARATSAKUL",
+      "team1_country": "THA",
+      "team1_seed": 0,
+      "team2_ids": [
+        "62063"
+      ],
+      "team2_name": "Kodai NARAOKA",
+      "team2_country": "JPN",
+      "team2_seed": 5
+    },
+    {
+      "match_id": "1565863",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 11,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "97174"
+      ],
+      "team1_name": "Koki WATANABE",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "65580"
+      ],
+      "team2_name": "JEON Hyeok Jin",
+      "team2_country": "KOR",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565832",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 12,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "73591"
+      ],
+      "team1_name": "HU Zhe An",
+      "team1_country": "CHN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "34810"
+      ],
+      "team2_name": "CHOU Tien Chen",
+      "team2_country": "TPE",
+      "team2_seed": 3
+    },
+    {
+      "match_id": "1565876",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 13,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "87029"
+      ],
+      "team1_name": "WANG Po-Wei",
+      "team1_country": "TPE",
+      "team1_seed": 0,
+      "team2_ids": [
+        "87375"
+      ],
+      "team2_name": "WANG Tzu Wei",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565909",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 14,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "94397"
+      ],
+      "team1_name": "SU Li  Yang",
+      "team1_country": "TPE",
+      "team1_seed": 0,
+      "team2_ids": [
+        "61628"
+      ],
+      "team2_name": "Toma Junior POPOV",
+      "team2_country": "FRA",
+      "team2_seed": 7
+    },
+    {
+      "match_id": "1565771",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 15,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "97115"
+      ],
+      "team1_name": "YOO Tae Bin",
+      "team1_country": "KOR",
+      "team1_seed": 0,
+      "team2_ids": [
+        "99466"
+      ],
+      "team2_name": "Riki TAKEI",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565780",
+      "discipline": "MS",
+      "round_name": "R32",
+      "slot": 16,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "97030"
+      ],
+      "team1_name": "Magnus JOHANNESEN",
+      "team1_country": "DEN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "64032"
+      ],
+      "team2_name": "Kunlavut VITIDSARN",
+      "team2_country": "THA",
+      "team2_seed": 2
+    },
+    {
+      "match_id": "1565884",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 1,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "96312"
+      ],
+      "team1_name": "Akane YAMAGUCHI",
+      "team1_country": "JPN",
+      "team1_seed": 1,
+      "team2_ids": [
+        "68479"
+      ],
+      "team2_name": "Hina AKECHI",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565792",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 2,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "91422"
+      ],
+      "team1_name": "Supanida KATETHONG",
+      "team1_country": "THA",
+      "team1_seed": 0,
+      "team2_ids": [
+        "97685"
+      ],
+      "team2_name": "HUANG Yu-Hsun",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565910",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 3,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "76890"
+      ],
+      "team1_name": "Putri Kusuma WARDANI",
+      "team1_country": "INA",
+      "team1_seed": 7,
+      "team2_ids": [
+        "76079"
+      ],
+      "team2_name": "Riko GUNJI",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565801",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 4,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "92928"
+      ],
+      "team1_name": "HAN Qian Xi",
+      "team1_country": "CHN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "61614"
+      ],
+      "team2_name": "TUNG Ciou-Tong",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565888",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 5,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "78778"
+      ],
+      "team1_name": "CHEN Yu Fei",
+      "team1_country": "CHN",
+      "team1_seed": 3,
+      "team2_ids": [
+        "80532"
+      ],
+      "team2_name": "Kaoru SUGIYAMA",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565775",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 6,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "87112"
+      ],
+      "team1_name": "Kaloyana NALBANTOVA",
+      "team1_country": "BUL",
+      "team1_seed": 0,
+      "team2_ids": [
+        "84523"
+      ],
+      "team2_name": "Michelle LI",
+      "team2_country": "CAN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565858",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 7,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "84062"
+      ],
+      "team1_name": "Pornpawee CHOCHUWONG",
+      "team1_country": "THA",
+      "team1_seed": 6,
+      "team2_ids": [
+        "77296"
+      ],
+      "team2_name": "WONG Ling Ching",
+      "team2_country": "MAS",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565924",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 8,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "59367"
+      ],
+      "team1_name": "Karupathevan LETSHANAA",
+      "team1_country": "MAS",
+      "team1_seed": 0,
+      "team2_ids": [
+        "91896"
+      ],
+      "team2_name": "Natsuki NIDAIRA",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565790",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 9,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "63437"
+      ],
+      "team1_name": "Line Højmark KJAERSFELDT",
+      "team1_country": "DEN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "94032"
+      ],
+      "team2_name": "Yevheniia KANTEMYR",
+      "team2_country": "UKR",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565812",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 10,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "67828"
+      ],
+      "team1_name": "Manami SUIZU",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "82070"
+      ],
+      "team2_name": "Tomoka MIYAZAKI",
+      "team2_country": "JPN",
+      "team2_seed": 5
+    },
+    {
+      "match_id": "1565922",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 11,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "96725"
+      ],
+      "team1_name": "LIN Hsiang Ti",
+      "team1_country": "TPE",
+      "team1_seed": 0,
+      "team2_ids": [
+        "80862"
+      ],
+      "team2_name": "CHIU Pin-Chian",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565764",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 12,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "89783"
+      ],
+      "team1_name": "Nodoka SUNAKAWA",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "35642"
+      ],
+      "team2_name": "Ratchanok INTANON",
+      "team2_country": "THA",
+      "team2_seed": 4
+    },
+    {
+      "match_id": "1565829",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 13,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "88807"
+      ],
+      "team1_name": "SUNG Shuo Yun",
+      "team1_country": "TPE",
+      "team1_seed": 0,
+      "team2_ids": [
+        "70651"
+      ],
+      "team2_name": "Amalie SCHULZ",
+      "team2_country": "DEN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565856",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 14,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "96877"
+      ],
+      "team1_name": "Polina BUHROVA",
+      "team1_country": "UKR",
+      "team1_seed": 0,
+      "team2_ids": [
+        "96713"
+      ],
+      "team2_name": "Nozomi OKUHARA",
+      "team2_country": "JPN",
+      "team2_seed": 8
+    },
+    {
+      "match_id": "1565768",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 15,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "91224"
+      ],
+      "team1_name": "Mia BLICHFELDT",
+      "team1_country": "DEN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "60915"
+      ],
+      "team2_name": "XU Wen Jing",
+      "team2_country": "CHN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565845",
+      "discipline": "WS",
+      "round_name": "R32",
+      "slot": 16,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "78208"
+      ],
+      "team1_name": "Rachel CHAN",
+      "team1_country": "CAN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "61854"
+      ],
+      "team2_name": "WANG Zhi Yi",
+      "team2_country": "CHN",
+      "team2_seed": 2
+    },
+    {
+      "match_id": "1565869",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 1,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "61444",
+        "66513"
+      ],
+      "team1_name": "KIM Won Ho / SEO Seung Jae",
+      "team1_country": "KOR",
+      "team1_seed": 1,
+      "team2_ids": [
+        "72885",
+        "61628"
+      ],
+      "team2_name": "Christo POPOV / Toma Junior POPOV",
+      "team2_country": "FRA",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565852",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 2,
+      "match_time": "2026-11-10 08:20:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "77262",
+        "62804"
+      ],
+      "team1_name": "KANG Min Hyuk / LEE JONGMIN",
+      "team1_country": "KOR",
+      "team1_seed": 0,
+      "team2_ids": [
+        "74816",
+        "90792"
+      ],
+      "team2_name": "JIN Yong / JO Song Hyun",
+      "team2_country": "KOR",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565894",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 3,
+      "match_time": "2026-11-10 09:10:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "93130",
+        "71223"
+      ],
+      "team1_name": "CHEN Bo Yang / LIU Yi",
+      "team1_country": "CHN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "55414",
+        "89909"
+      ],
+      "team2_name": "WANG Chang / XIE Haonan",
+      "team2_country": "CHN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565931",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 4,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "59673",
+        "84812"
+      ],
+      "team1_name": "HE Ji Ting / REN Xiang Yu",
+      "team1_country": "CHN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "79732",
+        "99066"
+      ],
+      "team2_name": "CHIA Weijie / TEO Ee Yi",
+      "team2_country": "MAS",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565862",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 5,
+      "match_time": "2026-11-10 05:00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "56203",
+        "99389"
+      ],
+      "team1_name": "Aaron CHIA / SOH Wooi Yik",
+      "team1_country": "MAS",
+      "team1_seed": 3,
+      "team2_ids": [
+        "69560",
+        "98935"
+      ],
+      "team2_name": "Hariharan AMSAKARUNAN / M.R. ARJUN",
+      "team2_country": "IND",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565838",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 6,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "88832",
+        "63670"
+      ],
+      "team1_name": "HUNG Kuei Chun / LUI Chun Wai",
+      "team1_country": "HKG",
+      "team1_seed": 0,
+      "team2_ids": [
+        "81657",
+        "67903"
+      ],
+      "team2_name": "Takuro HOKI / Yugo KOBAYASHI",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565859",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 7,
+      "match_time": "2026-11-10 08:30:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "76278",
+        "72478"
+      ],
+      "team1_name": "Ben LANE / Sean VENDY",
+      "team1_country": "ENG",
+      "team1_seed": 7,
+      "team2_ids": [
+        "57424",
+        "70231"
+      ],
+      "team2_name": "Fang-Chih LEE / Fang-Jen LEE",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565767",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 8,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "62618",
+        "63739"
+      ],
+      "team1_name": "CHEN ZHI YI / Presley SMITH",
+      "team1_country": "USA",
+      "team1_seed": 0,
+      "team2_ids": [
+        "76165",
+        "94252"
+      ],
+      "team2_name": "Haruki KAWABE / Kenta MATSUKAWA",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565873",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 9,
+      "match_time": "2026-11-10 06:00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "99102",
+        "76275"
+      ],
+      "team1_name": "LEE Jhe-Huei / YANG Po-Hsuan",
+      "team1_country": "TPE",
+      "team1_seed": 0,
+      "team2_ids": [
+        "78839",
+        "79501"
+      ],
+      "team2_name": "Takumi NOMURA / Yuichi SHIMOGAMI",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565918",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 10,
+      "match_time": "2026-11-10 05:10:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "97601",
+        "90531"
+      ],
+      "team1_name": "HU Ke Yuan / LIANG Wei Keng",
+      "team1_country": "CHN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "87432",
+        "86136"
+      ],
+      "team2_name": "Sabar Karyaman GUTAMA / Moh Reza Pahlevi ISFAHANI",
+      "team2_country": "INA",
+      "team2_seed": 6
+    },
+    {
+      "match_id": "1565895",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 11,
+      "match_time": "2026-11-10 06:50:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "57397",
+        "88322"
+      ],
+      "team1_name": "Aaron TAI / YAP Roy King",
+      "team1_country": "MAS",
+      "team1_seed": 0,
+      "team2_ids": [
+        "79906",
+        "63530"
+      ],
+      "team2_name": "Kakeru KUMAGAI / Hiroki NISHI",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565857",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 12,
+      "match_time": "2026-11-10 06:00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "75049",
+        "64729"
+      ],
+      "team1_name": "Christian Faust KJÆR / Rasmus KJÆR",
+      "team1_country": "DEN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "90768",
+        "94814"
+      ],
+      "team2_name": "GOH Sze Fei / Nur IZZUDDIN",
+      "team2_country": "MAS",
+      "team2_seed": 4
+    },
+    {
+      "match_id": "1565927",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 13,
+      "match_time": "2026-11-10 05:50:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "68134",
+        "60507"
+      ],
+      "team1_name": "Daniel LUNDGAARD / Mads VESTERGAARD",
+      "team1_country": "DEN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "70443",
+        "52071"
+      ],
+      "team2_name": "Nur Mohd Azriyn Ayub AZRIYN / TAN Wee Kiong",
+      "team2_country": "MAS",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565761",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 14,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "84102",
+        "65674"
+      ],
+      "team1_name": "Peeratchai SUKPHUN / Pakkapon TEERARATSAKUL",
+      "team1_country": "THA",
+      "team1_seed": 0,
+      "team2_ids": [
+        "78409",
+        "85129"
+      ],
+      "team2_name": "MAN Wei Chong / TEE Kai Wun",
+      "team2_country": "MAS",
+      "team2_seed": 8
+    },
+    {
+      "match_id": "1565892",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 15,
+      "match_time": "2026-11-10 08:30:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "92913",
+        "96514"
+      ],
+      "team1_name": "CHIU Hsiang Chieh / WANG Chi-Lin",
+      "team1_country": "TPE",
+      "team1_seed": 0,
+      "team2_ids": [
+        "75829",
+        "92504"
+      ],
+      "team2_name": "CHEN Zhi  Ray / LIN Yu Chieh",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565793",
+      "discipline": "MD",
+      "round_name": "R32",
+      "slot": 16,
+      "match_time": "2026-11-10 07:30:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "86479",
+        "82009"
+      ],
+      "team1_name": "Hiroki OKAMURA / Kyohei YAMASHITA",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "88876",
+        "91440"
+      ],
+      "team2_name": "Fajar ALFIAN / Muhammad Shohibul FIKRI",
+      "team2_country": "INA",
+      "team2_seed": 2
+    },
+    {
+      "match_id": "1565818",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 1,
+      "match_time": "2026-11-10 05:50:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "71023",
+        "81609"
+      ],
+      "team1_name": "Yuki FUKUSHIMA / Mayu MATSUMOTO",
+      "team1_country": "JPN",
+      "team1_seed": 1,
+      "team2_ids": [
+        "85540",
+        "92945"
+      ],
+      "team2_name": "LI Yi Jing / WANG Yi Duo",
+      "team2_country": "CHN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565934",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 2,
+      "match_time": "2026-11-10 06:40:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "83419",
+        "80005"
+      ],
+      "team1_name": "KIM Hye Jeong / LEE Yeon Woo",
+      "team1_country": "KOR",
+      "team1_seed": 0,
+      "team2_ids": [
+        "56934",
+        "64767"
+      ],
+      "team2_name": "Jackie DENT / Crystal LAI",
+      "team2_country": "CAN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565769",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 3,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "43840",
+        "46169"
+      ],
+      "team1_name": "Gabriela STOEVA / Stefani STOEVA",
+      "team1_country": "BUL",
+      "team1_seed": 7,
+      "team2_ids": [
+        "73838",
+        "66115"
+      ],
+      "team2_name": "KIM Yu Jung / LEE Yu Lim",
+      "team2_country": "KOR",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565864",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 4,
+      "match_time": "2026-11-10 06:50:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "87893",
+        "95205"
+      ],
+      "team1_name": "LUI Lok Lok / TSANG Hiu Yan",
+      "team1_country": "HKG",
+      "team1_seed": 0,
+      "team2_ids": [
+        "85808",
+        "70860"
+      ],
+      "team2_name": "LIN Chih-Chun / YANG Chu Yun",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565834",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 5,
+      "match_time": "2026-11-10 05:00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "88135",
+        "87428"
+      ],
+      "team1_name": "Rin IWANAGA / Kie NAKANISHI",
+      "team1_country": "JPN",
+      "team1_seed": 3,
+      "team2_ids": [
+        "61882",
+        "83074"
+      ],
+      "team2_name": "Francesca CORBETT / Jennie GAI",
+      "team2_country": "USA",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565795",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 6,
+      "match_time": "2026-11-10 05:10:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "76295",
+        "66794"
+      ],
+      "team1_name": "Hinata SUZUKI / Nao YAMAKITA",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "71612",
+        "59966"
+      ],
+      "team2_name": "Treesa JOLLY / GAYATRI GOPICHAND PULLELA",
+      "team2_country": "IND",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565835",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 7,
+      "match_time": "2026-11-10 07:30:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "79664",
+        "82364"
+      ],
+      "team1_name": "Febriana Dwipuji KUSUMA / Meilysa Trias PUSPITASARI",
+      "team1_country": "INA",
+      "team1_seed": 8,
+      "team2_ids": [
+        "75270",
+        "78687"
+      ],
+      "team2_name": "CHANG Ching  Hui / YANG Ching Tun",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565872",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 8,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "90762",
+        "57950"
+      ],
+      "team1_name": "Mio KONEGAWA / An UESUGI",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "68015",
+        "75864"
+      ],
+      "team2_name": "YEUNG Nga Ting / YEUNG Pui Lam",
+      "team2_country": "HKG",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565839",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 9,
+      "match_time": "2026-11-10 07:40:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "74561",
+        "65349"
+      ],
+      "team1_name": "HSU Ya Ching / SUNG Yu-Hsuan",
+      "team1_country": "TPE",
+      "team1_seed": 0,
+      "team2_ids": [
+        "97313",
+        "62035"
+      ],
+      "team2_name": "LUO Yi / WANG Ting Ge",
+      "team2_country": "CHN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565799",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 10,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "86532",
+        "65300"
+      ],
+      "team1_name": "CHEN Fan Shu Tian / LUO Xu Min",
+      "team1_country": "CHN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "19726",
+        "70692"
+      ],
+      "team2_name": "Sumire NAKADE / Miyu TAKAHASHI",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565804",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 11,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "87289",
+        "90323"
+      ],
+      "team1_name": "Miki KANEHIRO / Yuna KATO",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "85452",
+        "70376"
+      ],
+      "team2_name": "Kokona ISHIKAWA / Haruna KONISHI",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565827",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 12,
+      "match_time": "2026-11-10 07:40:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "62277",
+        "18889"
+      ],
+      "team1_name": "BAO Li Jing / CAO Zi Han",
+      "team1_country": "CHN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "96973",
+        "69009"
+      ],
+      "team2_name": "HSU Yin-Hui / LIN Jhih Yun",
+      "team2_country": "TPE",
+      "team2_seed": 5
+    },
+    {
+      "match_id": "1565891",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 13,
+      "match_time": "2026-11-10 06:40:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "94519",
+        "83211"
+      ],
+      "team1_name": "Sayaka HIROTA / Ayako SAKURAMOTO",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "96877",
+        "94032"
+      ],
+      "team2_name": "Polina BUHROVA / Yevheniia KANTEMYR",
+      "team2_country": "UKR",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565830",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 14,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "84159",
+        "59014"
+      ],
+      "team1_name": "Rui HIROKAMI / Sayaka HOBARA",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "67761",
+        "88097"
+      ],
+      "team2_name": "Amallia Cahaya PRATIWI / Siti Fadia Silva RAMADHANTI",
+      "team2_country": "INA",
+      "team2_seed": 6
+    },
+    {
+      "match_id": "1565919",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 15,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "99988",
+        "76513"
+      ],
+      "team1_name": "Ornnicha JONGSATHAPORNPARN / Sabrina Sophita WEDLER",
+      "team1_country": "THA",
+      "team1_seed": 0,
+      "team2_ids": [
+        "69091",
+        "65708"
+      ],
+      "team2_name": "Lauren LAM / Allison Quynh LEE",
+      "team2_country": "USA",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565914",
+      "discipline": "WD",
+      "round_name": "R32",
+      "slot": 16,
+      "match_time": "2026-11-10 08:20:00",
+      "time_estimated": false,
+      "winner": 0,
+      "team1_ids": [
+        "86778",
+        "68282"
+      ],
+      "team1_name": "Ririna HIRAMOTO / Chiharu SHIDA",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "85551",
+        "68628"
+      ],
+      "team2_name": "Pearly TAN / THINAAH Muralitharan",
+      "team2_country": "MAS",
+      "team2_seed": 2
+    },
+    {
+      "match_id": "1565811",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 1,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "63029",
+        "57246"
+      ],
+      "team1_name": "JIANG Zhen Bang / WEI Ya Xin",
+      "team1_country": "CHN",
+      "team1_seed": 1,
+      "team2_ids": [
+        "69560",
+        "94165"
+      ],
+      "team2_name": "Hariharan AMSAKARUNAN / Tanisha CRASTO",
+      "team2_country": "IND",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565819",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 2,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "96537",
+        "64767"
+      ],
+      "team1_name": "Jonathan Bing Tsan LAI / Crystal LAI",
+      "team1_country": "CAN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "72675",
+        "47007"
+      ],
+      "team2_name": "HOO Pang Ron / LAI Pei Jing",
+      "team2_country": "MAS",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565809",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 3,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "58931",
+        "88450"
+      ],
+      "team1_name": "CHENG Xing / ZHANG Chi",
+      "team1_country": "CHN",
+      "team1_seed": 5,
+      "team2_ids": [
+        "62618",
+        "61882"
+      ],
+      "team2_name": "CHEN ZHI YI / Francesca CORBETT",
+      "team2_country": "USA",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565763",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 4,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "80293",
+        "64819"
+      ],
+      "team1_name": "KIM Jae Hyeon / JANG Ha Jeong",
+      "team1_country": "KOR",
+      "team1_seed": 0,
+      "team2_ids": [
+        "63739",
+        "83074"
+      ],
+      "team2_name": "Presley SMITH / Jennie GAI",
+      "team2_country": "USA",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565842",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 5,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "81108",
+        "62713"
+      ],
+      "team1_name": "YE Hong Wei / Nicole Gonzales CHAN",
+      "team1_country": "TPE",
+      "team1_seed": 4,
+      "team2_ids": [
+        "84666",
+        "56836"
+      ],
+      "team2_name": "Dhruv RAWAT / MANEESHA K",
+      "team2_country": "IND",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565831",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 6,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "65674",
+        "67158"
+      ],
+      "team1_name": "Pakkapon TEERARATSAKUL / Sapsiree TAERATTANACHAI",
+      "team1_country": "THA",
+      "team1_seed": 0,
+      "team2_ids": [
+        "59609",
+        "96973"
+      ],
+      "team2_name": "LIU Kuang Heng / HSU Yin-Hui",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565762",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 7,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "76281",
+        "60838"
+      ],
+      "team1_name": "Amri SYAHNAWI / Nita Violina MARWAH",
+      "team1_country": "INA",
+      "team1_seed": 6,
+      "team2_ids": [
+        "94156",
+        "92404"
+      ],
+      "team2_name": "Ruben GARCIA / Lucia RODRIGUEZ",
+      "team2_country": "ESP",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565878",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 8,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "72782",
+        "79077"
+      ],
+      "team1_name": "Marwan FAZA / Aisyah Salsabila Putri PRANATA",
+      "team1_country": "INA",
+      "team1_seed": 0,
+      "team2_ids": [
+        "58240",
+        "60335"
+      ],
+      "team2_name": "Yuta WATANABE / Maya TAGUCHI",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565911",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 9,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "79501",
+        "59014"
+      ],
+      "team1_name": "Yuichi SHIMOGAMI / Sayaka HOBARA",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "91090",
+        "79015"
+      ],
+      "team2_name": "CHEN Tang Jie / CHAN Wen Tse",
+      "team2_country": "MAS",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565848",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 10,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "82167",
+        "82367"
+      ],
+      "team1_name": "ZHU Yi Jun / LI Qian",
+      "team1_country": "CHN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "92593",
+        "56352"
+      ],
+      "team2_name": "GOH Soon Huat / LAI Shevon Jemie",
+      "team2_country": "MAS",
+      "team2_seed": 8
+    },
+    {
+      "match_id": "1565932",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 11,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "57943",
+        "91533"
+      ],
+      "team1_name": "GAO Jia Xuan / WU Meng Ying",
+      "team1_country": "CHN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "81458",
+        "69193"
+      ],
+      "team2_name": "Dejan FERDINANSYAH / Felisha Alberta Nathaniel PASARIBU",
+      "team2_country": "INA",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565933",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 12,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "84340",
+        "80605"
+      ],
+      "team1_name": "Jimmy WONG / CHENG Su Yin",
+      "team1_country": "MAS",
+      "team1_seed": 0,
+      "team2_ids": [
+        "81844",
+        "50469"
+      ],
+      "team2_name": "GUO Xin Wa / CHEN Fang Hui",
+      "team2_country": "CHN",
+      "team2_seed": 3
+    },
+    {
+      "match_id": "1565770",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 13,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "97737",
+        "70860"
+      ],
+      "team1_name": "WU Hsuan-Yi / YANG Chu Yun",
+      "team1_country": "TPE",
+      "team1_seed": 0,
+      "team2_ids": [
+        "64944",
+        "90851"
+      ],
+      "team2_name": "Hiroki MIDORIKAWA / Mao YAMAKITA",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565861",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 14,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "76165",
+        "85452"
+      ],
+      "team1_name": "Haruki KAWABE / Kokona ISHIKAWA",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "76275",
+        "87176"
+      ],
+      "team2_name": "YANG Po-Hsuan / HU Ling Fang",
+      "team2_country": "TPE",
+      "team2_seed": 7
+    },
+    {
+      "match_id": "1565794",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 15,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "88405",
+        "55417"
+      ],
+      "team1_name": "Akira KOGA / Natsu SAITO",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "57924",
+        "61986"
+      ],
+      "team2_name": "CHAN Yin Chak / NG Tsz Yau",
+      "team2_country": "HKG",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565875",
+      "discipline": "XD",
+      "round_name": "R32",
+      "slot": 16,
+      "match_time": "2026-11-10 00:00:00",
+      "time_estimated": true,
+      "winner": 0,
+      "team1_ids": [
+        "10453",
+        "61435"
+      ],
+      "team1_name": "YU Zhirui Jerry / TSE Ying Suet",
+      "team1_country": "HKG",
+      "team1_seed": 0,
+      "team2_ids": [
+        "61731",
+        "74980"
+      ],
+      "team2_name": "Dechapol PUAVARANUKROH / Supissara PAEWSAMPRAN",
+      "team2_country": "THA",
+      "team2_seed": 2
+    }
+  ]
+}
