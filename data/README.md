@@ -152,11 +152,19 @@ Generated forecasts, result logs, models, and original Elo exports stay under th
 
 `odds/<sportsbook>_<jurisdiction>/<tournament>/<recorded-date>-<round>.csv` stores one quoted selection per row. The November 11 Bet365 Ontario batch contains 64 prices for 32 Kumamoto R16 matches across MS, WS, MD and WD; no XD prices were supplied. Both sides' prices are retained, not only model-positive selections. Add a new dated/batch file for later prices instead of overwriting an existing snapshot.
 
+The November 12 `2026-11-12-qf.csv` snapshots contain 78 prices for November 13 quarter-finals: 20 Kumamoto matches and 19 Kaohsiung matches across all five disciplines. The duplicated Japan MS screenshots are consolidated. No price was supplied for Kaohsiung's Justin HOH vs KUO Kuan Lin match. These comparisons use the unchanged active model, whose latest rating result is November 8, not a retrain on this week's results. Kaohsiung's book times differ by one hour from BWF times converted to Toronto time; both source values are preserved without assuming the book's timezone.
+
 Rows preserve official match/player IDs and full names, the American moneyline, official UTC fixture time, literal book date/time labels, and source image names/phone clock labels. Duplicate overlapping views of the same quote are consolidated. No screenshot files are copied or committed. `recorded_at_utc` is the transcription record time, not proof of when the price was available. `captured_at_utc` stays blank because the images do not establish a full capture date, AM/PM, or timezone. Cropped book times stay blank. Book display clocks are not assumed to be UTC or substituted for official BWF times.
 
 These are user-supplied Bet365 Ontario quotes, not independently fetched or verified live prices. In particular, the two WD Kim/Lee pairs are distinguished by their official player IDs and opponents. Preserve the short book labels separately from the resolved names to keep the mapping auditable.
 
 Model-specific comparisons stay in ignored `outputs/odds/<tournament>/`, separate from the immutable price inputs. The November 11 comparison pins the existing R16 model/state SHA-256 hashes and full-precision probabilities. Net EV per unit staked is `p * decimal_odds - 1`; the comparison retains all positive and negative results. This does not establish profitable betting, settlement rules, closing lines, actual wagers or outcomes. Odds are not added to model features or training data.
+
+### Paper Bet Settlement
+
+After fetching/importing results into `raw/bwf_matches/`, run `uv run python settle_bets.py`. Use `uv run python settle_bets.py --dry-run` to preview without writing. The command reads frozen bets from `outputs/profits.json` and regenerates the human-readable `outputs/profits.md`; record future bets in the JSON ledger, not the generated Markdown.
+
+Only normal, finished matches with matching tournament/player IDs and complete, consistent scores settle automatically. Missing/live results stay pending; retirements, walkovers and conflicting records are flagged for review rather than assumed void. Existing settled bets, original odds, probabilities, raw data and models are not changed. This is a separate post-fetch command, not a fetcher hook or scheduled task. Both ledger and report remain local and Git-ignored.
 
 ## Public Elo Snapshots
 

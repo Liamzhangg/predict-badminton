@@ -1,0 +1,112 @@
+{
+  "name": "AIG VICTOR Irish Open 2026",
+  "location": "Dublin, Ireland",
+  "tournament_id": 5773,
+  "tournament_code": "29E421F7-9592-4FBC-98F7-D92BD0ECD960",
+  "official_category": "International Challenge",
+  "tournament_tier": 5,
+  "source_url": "https://bwfbadminton.com/tournament/5773/aig-victor-irish-open-2026",
+  "round_name": "SF",
+  "date": "2026-11-13",
+  "retrieved_at_utc": "2026-11-13T16:38:41.167968+00:00",
+  "sources": [
+    {
+      "tournament_id": 5773,
+      "date": "2026-11-13",
+      "url": "https://extranet-lv.bwfbadminton.com/api/tournaments/day-matches?tournamentCode=29E421F7-9592-4FBC-98F7-D92BD0ECD960&date=2026-11-13&order=2&court=0",
+      "status": "cached",
+      "http_status": 200,
+      "retrieved_at_utc": "2026-11-13T16:38:41.167319+00:00",
+      "cache_path": "data/source_cache/bwf/sf-quotes-20261113T163815Z/fixtures/api-tournaments-day-matches-e9b0f95fc57165ae.json",
+      "sha256": "0e80a016eb4026e24ee28ed44244a20b7b8219693f8d93a03a940cd675bc6378"
+    }
+  ],
+  "matches": [
+    {
+      "match_id": "1565967",
+      "discipline": "MS",
+      "round_name": "SF",
+      "slot": 1,
+      "match_time": "2026-11-13T15:05:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "pre_match_eligible": false,
+      "team1_ids": [
+        "71510"
+      ],
+      "team1_name": "William BØGEBJERG",
+      "team1_country": "DEN",
+      "team1_seed": "6",
+      "team2_ids": [
+        "90360"
+      ],
+      "team2_name": "Victor ørding KAUFFMANN",
+      "team2_country": "DEN",
+      "team2_seed": 0
+    }
+  ],
+  "unquoted_matches": [
+    {
+      "match_id": "1566178",
+      "discipline": "XD",
+      "team1_name": "Jesper TOFT / Amalie Cecilie KUDSK",
+      "team2_name": "Patrick VOLKMANN / Franziska VOLKMANN"
+    },
+    {
+      "match_id": "1565940",
+      "discipline": "WS",
+      "team1_name": "Petra MAIXNEROVÁ",
+      "team2_name": "Yvonne LI"
+    },
+    {
+      "match_id": "1566173",
+      "discipline": "MD",
+      "team1_name": "Alex GREEN / Zach RUSS",
+      "team2_name": "Julien MAIO / William VILLEGER"
+    },
+    {
+      "match_id": "1566086",
+      "discipline": "WD",
+      "team1_name": "Seung Hee LEE / PARK Min Ji",
+      "team2_name": "Lærke HVID / Anna KLAUSHOLM"
+    },
+    {
+      "match_id": "1566182",
+      "discipline": "XD",
+      "team1_name": "JIN Sung Ik / Seung Hee LEE",
+      "team2_name": "Rasmus ESPERSEN / Anna-Sofie NIELSEN"
+    },
+    {
+      "match_id": "1565938",
+      "discipline": "WS",
+      "team1_name": "KIM Min Ji",
+      "team2_name": "Frederikke ØSTERGAARD"
+    },
+    {
+      "match_id": "1565956",
+      "discipline": "MS",
+      "team1_name": "CHO Hyeon Woo",
+      "team2_name": "Joakim OLDORFF"
+    },
+    {
+      "match_id": "1566084",
+      "discipline": "WD",
+      "team1_name": "Mihane ENDO / Natsumi TAKASAKI",
+      "team2_name": "MOON In Seo / PARK Seul"
+    },
+    {
+      "match_id": "1566068",
+      "discipline": "MD",
+      "team1_name": "Christopher GRIMLEY / Matthew GRIMLEY",
+      "team2_name": "JIN Sung Ik / LEE Hyeong Woo"
+    }
+  ],
+  "model_run": "outputs/artifacts",
+  "model_sha256": "987f360f2afe7cb5393870469b39c836bc5872bef7345f61a2056c844221aa51",
+  "state_sha256": "2e7b1578ad941c0bac325a4f16069bc31bea304fdc078d8b0e6bd0718e7bd7c7",
+  "refreshed_state": "outputs/experiments/japan-kaohsiung-irish-2026-11-13/feature_state.pkl",
+  "history_as_of": "2026-11-13T16:40:38.631761+00:00",
+  "assumptions": "Classifier and formulas unchanged. Historical ratings rebuilt separately with the production conservative timing rule. Same-day results are withheld. Only fixtures with a future official start are scored."
+}
