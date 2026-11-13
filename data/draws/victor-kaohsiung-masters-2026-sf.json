@@ -1,0 +1,268 @@
+{
+  "name": "VICTOR Kaohsiung Masters 2026",
+  "location": "Kaohsiung, Chinese Taipei",
+  "tournament_id": 5652,
+  "tournament_code": "3B80AD0D-D7E7-4674-BEF6-6BE27DEAA033",
+  "official_category": "BWF Tour Super 100",
+  "tournament_tier": 5,
+  "source_url": "https://bwfbadminton.com/tournament/5652/victor-kaohsiung-masters-2026",
+  "round_name": "SF",
+  "date": "2026-11-14",
+  "retrieved_at_utc": "2026-11-13T16:38:41.167968+00:00",
+  "sources": [
+    {
+      "tournament_id": 5652,
+      "date": "2026-11-14",
+      "url": "https://extranet-lv.bwfbadminton.com/api/tournaments/day-matches?tournamentCode=3B80AD0D-D7E7-4674-BEF6-6BE27DEAA033&date=2026-11-14&order=2&court=0",
+      "status": "cached",
+      "http_status": 200,
+      "retrieved_at_utc": "2026-11-13T16:38:39.779416+00:00",
+      "cache_path": "data/source_cache/bwf/sf-quotes-20261113T163815Z/fixtures/api-tournaments-day-matches-8860848682bf8b91.json",
+      "sha256": "ed4e5abd45f20e1f3d5ccf54f9b5858b36b007b65e65bf03c60bbc59602a473f"
+    }
+  ],
+  "matches": [
+    {
+      "match_id": "1565605",
+      "discipline": "MS",
+      "round_name": "SF",
+      "slot": 1,
+      "match_time": "2026-11-14T05:00:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "pre_match_eligible": true,
+      "team1_ids": [
+        "63097"
+      ],
+      "team1_name": "KIM Hae Deun",
+      "team1_country": "KOR",
+      "team1_seed": 0,
+      "team2_ids": [
+        "94579"
+      ],
+      "team2_name": "Rei MIYASHITA",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565688",
+      "discipline": "WS",
+      "round_name": "SF",
+      "slot": 2,
+      "match_time": "2026-11-14T04:50:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "pre_match_eligible": true,
+      "team1_ids": [
+        "71280"
+      ],
+      "team1_name": "Yuan Chi LIAO",
+      "team1_country": "TPE",
+      "team1_seed": 0,
+      "team2_ids": [
+        "92444"
+      ],
+      "team2_name": "Ni Kadek Dhinda Amartya PRATIWI",
+      "team2_country": "INA",
+      "team2_seed": "6"
+    },
+    {
+      "match_id": "1565687",
+      "discipline": "WS",
+      "round_name": "SF",
+      "slot": 3,
+      "match_time": "2026-11-14T05:50:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "pre_match_eligible": true,
+      "team1_ids": [
+        "86261"
+      ],
+      "team1_name": "LO Sin Yan Happy",
+      "team1_country": "HKG",
+      "team1_seed": "1",
+      "team2_ids": [
+        "64956"
+      ],
+      "team2_name": "Mutiara Ayu PUSPITASARI",
+      "team2_country": "INA",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565637",
+      "discipline": "MD",
+      "round_name": "SF",
+      "slot": 4,
+      "match_time": "2026-11-14T06:30:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "pre_match_eligible": true,
+      "team1_ids": [
+        "70185",
+        "97717"
+      ],
+      "team1_name": "Eng Keat Wesley KOH / Jia Hao Howin WONG",
+      "team1_country": "SGP",
+      "team1_seed": "6",
+      "team2_ids": [
+        "97376",
+        "79915"
+      ],
+      "team2_name": "CHENG Kai Wen / LIAO Chao Pang",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565630",
+      "discipline": "MD",
+      "round_name": "SF",
+      "slot": 5,
+      "match_time": "2026-11-14T08:10:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "pre_match_eligible": true,
+      "team1_ids": [
+        "68681",
+        "60896"
+      ],
+      "team1_name": "CHANG Ko-Chi / LU Chen",
+      "team1_country": "TPE",
+      "team1_seed": 0,
+      "team2_ids": [
+        "68612",
+        "62430"
+      ],
+      "team2_name": "Taufik ADERYA / Alexius Ongkytama SUBAGIO",
+      "team2_country": "INA",
+      "team2_seed": "5"
+    },
+    {
+      "match_id": "1565581",
+      "discipline": "WD",
+      "round_name": "SF",
+      "slot": 6,
+      "match_time": "2026-11-14T07:20:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "pre_match_eligible": true,
+      "team1_ids": [
+        "80386",
+        "60219"
+      ],
+      "team1_name": "ONG Xin Yee / Carmen TING",
+      "team1_country": "MAS",
+      "team1_seed": "1",
+      "team2_ids": [
+        "64300",
+        "64277"
+      ],
+      "team2_name": "LIN YEN YU / WANG Yi Zhen",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565590",
+      "discipline": "WD",
+      "round_name": "SF",
+      "slot": 7,
+      "match_time": "2026-11-14T08:00:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "pre_match_eligible": true,
+      "team1_ids": [
+        "33185",
+        "39782"
+      ],
+      "team1_name": "Mikoto AISO / Momoha NIIMI",
+      "team1_country": "JPN",
+      "team1_seed": "6",
+      "team2_ids": [
+        "80653",
+        "87259"
+      ],
+      "team2_name": "Isyana Syahira MEIDA / Rinjani Kwinnara NASTINE",
+      "team2_country": "INA",
+      "team2_seed": "2"
+    },
+    {
+      "match_id": "1565514",
+      "discipline": "XD",
+      "round_name": "SF",
+      "slot": 8,
+      "match_time": "2026-11-14T04:00:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "pre_match_eligible": true,
+      "team1_ids": [
+        "99413",
+        "50985"
+      ],
+      "team1_name": "WEE Yee Hern / Vannee GOBI",
+      "team1_country": "MAS",
+      "team1_seed": "4",
+      "team2_ids": [
+        "95797",
+        "85508"
+      ],
+      "team2_name": "Sheng-Ming LIN / Liang Ching SUN",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565512",
+      "discipline": "XD",
+      "round_name": "SF",
+      "slot": 9,
+      "match_time": "2026-11-14T04:10:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "pre_match_eligible": true,
+      "team1_ids": [
+        "82494",
+        "99778"
+      ],
+      "team1_name": "KI Dong Ju / JEONG Na Eun",
+      "team1_country": "KOR",
+      "team1_seed": 0,
+      "team2_ids": [
+        "65854",
+        "87259"
+      ],
+      "team2_name": "Jafar HIDAYATULLAH / Rinjani Kwinnara NASTINE",
+      "team2_country": "INA",
+      "team2_seed": "7"
+    }
+  ],
+  "unquoted_matches": [
+    {
+      "match_id": "1565598",
+      "discipline": "MS",
+      "team1_name": "KUO Kuan Lin",
+      "team2_name": "CHO Geon Yeop"
+    }
+  ],
+  "model_run": "outputs/artifacts",
+  "model_sha256": "987f360f2afe7cb5393870469b39c836bc5872bef7345f61a2056c844221aa51",
+  "state_sha256": "2e7b1578ad941c0bac325a4f16069bc31bea304fdc078d8b0e6bd0718e7bd7c7",
+  "refreshed_state": "outputs/experiments/japan-kaohsiung-irish-2026-11-13/feature_state.pkl",
+  "history_as_of": "2026-11-13T16:40:38.631761+00:00",
+  "assumptions": "Classifier and formulas unchanged. Historical ratings rebuilt separately with the production conservative timing rule. Same-day results are withheld. Only fixtures with a future official start are scored."
+}
