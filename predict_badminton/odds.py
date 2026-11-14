@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import math
+from datetime import UTC, datetime
 
 import pandas as pd
 
 from predict_badminton.config import DISCIPLINES
+from predict_badminton.forecast_history import history_sha256, refresh_history
 from predict_badminton.probabilities import PREDICTION_POLICY, predict_probabilities
 
 
@@ -42,19 +44,21 @@ def positive_ev_from(probability: float) -> int:
     return price
 
 
-def first_round_predictions(snapshot: dict, bundle: tuple) -> tuple[pd.DataFrame, str]:
-    """Score named, unplayed R32 opponents using fixed, matching model history."""
-    return round_predictions(snapshot, bundle, round_name="R32")
+def first_round_predictions(snapshot: dict, bundle: tuple, *, refresh: bool = True,
+                            as_of: datetime | None = None) -> tuple[pd.DataFrame, str]:
+    """Score named, unplayed R32 opponents using freshly eligible history."""
+    return round_predictions(snapshot, bundle, round_name="R32", refresh=refresh, as_of=as_of)
 
 
-def round_predictions(snapshot: dict, bundle: tuple, *, round_name: str) -> tuple[pd.DataFrame, str]:
+def round_predictions(snapshot: dict, bundle: tuple, *, round_name: str, refresh: bool = True,
+                      as_of: datetime | None = None) -> tuple[pd.DataFrame, str]:
     """Score one confirmed, unplayed round across all five standard disciplines."""
     if round_name not in {"R128", "R64", "R32", "R16", "QF", "SF", "Final"}:
         raise ValueError("Unsupported knockout round")
     model, _, _, history = bundle
     history.validate_model(model)
     cutoff = history.history_cutoff
-    fixtures, rows, seen = [], [], set()
+    fixtures, matches, seen = [], [], set()
     for fixture in snapshot["matches"]:
         if fixture["match_id"] in seen:
             raise ValueError("Round match IDs must be unique")
@@ -75,14 +79,27 @@ def round_predictions(snapshot: dict, bundle: tuple, *, round_name: str) -> tupl
         match = {**fixture, "match_time": stamp, "tournament_name": snapshot["name"],
                  "tournament_code": snapshot["tournament_code"],
                  "tournament_tier": snapshot["tournament_tier"]}
-        rows.append(history.preview(match))
+        matches.append(match)
         fixtures.append(fixture)
-    if not rows:
+    if not matches:
         raise ValueError("No confirmed unplayed matches are available")
+    if refresh:
+        stamp = as_of or datetime.now(UTC)
+        if stamp.tzinfo is None or stamp.utcoffset() is None:
+            raise ValueError("Forecast cutoff must have a UTC offset")
+        if any(m["match_time"] <= stamp.astimezone(UTC).replace(tzinfo=None) for m in matches):
+            raise ValueError("Live fixtures must follow the forecast cutoff; use frozen history for archival replay")
+        history = refresh_history(history, as_of=stamp, target_match_ids={str(f["match_id"]) for f in fixtures})
+        history.validate_model(model)
+        cutoff = history.history_cutoff
+    rows = [history.preview(match) for match in matches]
     frame = pd.DataFrame(rows)[history.feature_columns]
     frame["discipline"] = pd.Categorical(frame["discipline"], categories=DISCIPLINES + ["OTHER"])
     probabilities = predict_probabilities(model, frame)
+    if refresh and as_of is None and any(m["match_time"] <= datetime.now(UTC).replace(tzinfo=None) for m in matches):
+        raise ValueError("A fixture started while refreshing history; no live forecast is available")
     selections = []
+    state_hash = history_sha256(history)
     for fixture, probability in zip(fixtures, probabilities, strict=True):
         for side, chance in ((1, float(probability)), (2, float(1 - probability))):
             selections.append({
@@ -92,6 +109,7 @@ def round_predictions(snapshot: dict, bundle: tuple, *, round_name: str) -> tupl
                 "probability": chance, "fair_american": fair_american(chance),
                 "prediction_policy": PREDICTION_POLICY,
                 "history_as_of": cutoff.isoformat(),
+                "history_refreshed": refresh, "state_sha256": state_hash,
                 "result_availability_policy": history.model_policy.get("result_availability", "legacy_start_order"),
                 "positive_ev_from": positive_ev_from(chance),
                 "recorded_matches": history.elo.team_disc_count(fixture[f"team{side}_ids"], fixture["discipline"]),

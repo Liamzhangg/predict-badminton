@@ -28,7 +28,7 @@ def bundle(version: tuple):
 @st.cache_data(show_spinner="Calculating the draw...")
 def prediction(snapshot: str, event: str, method: str, version: tuple):
     data = json.loads(snapshot)
-    return forecast(data["draws"][event], event, bundle(version), method)
+    return forecast(data["draws"][event], event, bundle(version), method, refresh=False)
 
 
 def bracket(draw: dict, result: dict) -> str:

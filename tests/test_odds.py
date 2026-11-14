@@ -75,7 +75,7 @@ class OddsTests(unittest.TestCase):
         history = FeatureBuilder()
         history.elo._last_match["known"] = datetime(2030, 1, 1)
         before = pickle.dumps(history.get_state())
-        table, cutoff = first_round_predictions(data, (FixedModel(history), None, None, history))
+        table, cutoff = first_round_predictions(data, (FixedModel(history), None, None, history), refresh=False)
         self.assertEqual(table["probability"].tolist(), [0.5, 0.5])
         self.assertEqual(table["positive_ev_from"].tolist(), [101, 101])
         self.assertEqual(cutoff, "2030-01-01T00:00:00")
@@ -88,7 +88,7 @@ class OddsTests(unittest.TestCase):
         history = FeatureBuilder()
         history.elo._last_match["known"] = datetime(2030, 1, 2)
         with self.assertRaisesRegex(ValueError, "cutoff"):
-            first_round_predictions(data, (FixedModel(history), None, None, history))
+            first_round_predictions(data, (FixedModel(history), None, None, history), refresh=False)
 
     def test_completed_duplicate_missing_or_nonstandard_fixtures_are_rejected(self):
         history = FeatureBuilder()
@@ -98,11 +98,11 @@ class OddsTests(unittest.TestCase):
             data = snapshot()
             data["matches"][0][field] = value
             with self.subTest(field=field, value=value), self.assertRaises(ValueError):
-                first_round_predictions(data, (FixedModel(history), None, None, history))
+                first_round_predictions(data, (FixedModel(history), None, None, history), refresh=False)
         data = snapshot()
         data["matches"] *= 2
         with self.assertRaisesRegex(ValueError, "unique"):
-            first_round_predictions(data, (FixedModel(history), None, None, history))
+            first_round_predictions(data, (FixedModel(history), None, None, history), refresh=False)
 
     def test_official_snapshot_contains_80_unplayed_main_draw_matches(self):
         path = Path(__file__).resolve().parents[1] / "data/draws/kumamoto-masters-japan-2026-first-round.json"
@@ -115,7 +115,7 @@ class OddsTests(unittest.TestCase):
         self.assertEqual(sum(m["time_estimated"] for m in data["matches"]), 59)
         self.assertTrue(all(m["winner"] == 0 and m["round_name"] == "R32" for m in data["matches"]))
         history = FeatureBuilder()
-        table, _ = first_round_predictions(data, (FixedModel(history), None, None, history))
+        table, _ = first_round_predictions(data, (FixedModel(history), None, None, history), refresh=False)
         self.assertEqual(len(table), 160)
         np.testing.assert_allclose(table.groupby("match_id")["probability"].sum(), 1)
 
@@ -131,7 +131,7 @@ class OddsTests(unittest.TestCase):
         self.assertEqual(data["excluded_matches"][0]["status"], "Walkover")
         history = FeatureBuilder()
         before = pickle.dumps(history.get_state())
-        table, _ = round_predictions(data, (FixedModel(history), None, None, history), round_name="R16")
+        table, _ = round_predictions(data, (FixedModel(history), None, None, history), round_name="R16", refresh=False)
         self.assertEqual(len(table), 78)
         self.assertNotIn("1565902", set(table["match_id"]))
         np.testing.assert_allclose(table.groupby("match_id")["probability"].sum(), 1)
@@ -145,6 +145,6 @@ class OddsTests(unittest.TestCase):
             data["matches"][0]["round_name"] = "R16"
             data["matches"][0].update(changes)
             with self.subTest(changes=changes), self.assertRaisesRegex(ValueError, "Only unplayed R16"):
-                round_predictions(data, (model, None, None, history), round_name="R16")
+                round_predictions(data, (model, None, None, history), round_name="R16", refresh=False)
         with self.assertRaisesRegex(ValueError, "Unsupported knockout round"):
-            round_predictions(snapshot(), (model, None, None, history), round_name="qualifying")
+            round_predictions(snapshot(), (model, None, None, history), round_name="qualifying", refresh=False)

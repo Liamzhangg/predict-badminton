@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import unittest
 import pickle
+import hashlib
+import json
 import tempfile
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import patch
 
@@ -11,7 +13,11 @@ import pandas as pd
 
 from predict import main, parse_args
 from predict_badminton.features import FeatureBuilder
+from predict_badminton.config import forecast_bundle_directory
+from predict_badminton.data_sources.observations import record_results
+from predict_badminton.temporal import OBSERVED_AVAILABILITY_POLICY
 from tests.test_feature_state import _match
+from tests.test_observations import completed_match
 from tests.test_tournament import FixedCalibrator, FixedModel
 
 
@@ -32,7 +38,7 @@ class PredictionArgsTests(unittest.TestCase):
                                                 "next,2030-01-01 10:00:00,MS,p1,p2\n")
             argv = ["predict.py", "--fixtures-csv", str(root / "fixtures.csv"),
                     "--model-path", str(root / "model.pkl"), "--state-path", str(root / "state.pkl"),
-                    "--output-dir", str(root / "predictions")]
+                    "--output-dir", str(root / "predictions"), "--frozen-history"]
             with patch("sys.argv", argv):
                 self.assertEqual(main(), 0)
             output = pd.read_csv(next((root / "predictions").glob("*.csv")))
@@ -60,6 +66,7 @@ class PredictionArgsTests(unittest.TestCase):
             args = parse_args()
         self.assertEqual(args.probabilities, "raw")
         self.assertIsNone(args.calibrator_path)
+        self.assertFalse(args.frozen_history)
 
     def test_calibration_uses_the_models_bundle_directory(self):
         for method in ("platt", "isotonic"):
@@ -68,6 +75,56 @@ class PredictionArgsTests(unittest.TestCase):
                                     "--probabilities", method]):
                 args = parse_args()
             self.assertEqual(args.calibrator_path, Path(f"outputs/runs/example/{method}_calibrator.pkl"))
+            self.assertEqual(args.state_path, Path("outputs/runs/example/feature_state.pkl"))
+
+    def test_default_forecast_pointer_does_not_replace_artifacts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with patch("predict_badminton.config.REPO_ROOT", root):
+                self.assertEqual(forecast_bundle_directory(), root / "outputs/artifacts")
+                (root / "outputs").mkdir()
+                pointer = root / "outputs/forecast_bundle.json"
+                pointer.write_text(json.dumps({"directory": "outputs/runs/observed"}))
+                self.assertEqual(forecast_bundle_directory(), (root / "outputs/runs/observed").resolve())
+                pointer.write_text(json.dumps({"directory": "../outside"}))
+                with self.assertRaises(ValueError):
+                    forecast_bundle_directory()
+
+    def test_cli_refreshes_by_default_and_never_overwrites_existing_predictions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            raw, out = root / "raw", root / "predictions"
+            raw.mkdir()
+            out.mkdir()
+            (out / "saved.csv").write_text("Existing forecast\n")
+            history = FeatureBuilder(result_availability_policy=OBSERVED_AVAILABILITY_POLICY)
+            history.save(root / "feature_state.pkl")
+            model = FixedModel()
+            model.feature_policy_ = history.model_policy
+            (root / "model.pkl").write_bytes(pickle.dumps(model))
+            match = {**completed_match(), "matchStatus": "F"}
+            (raw / "match.json").write_text(json.dumps([[match]]))
+            db = root / "observations.sqlite3"
+            record_results([match], source_url="https://example.com/results", response_sha256="source",
+                           observed_at=datetime(2026, 11, 11, 16, tzinfo=UTC), path=db)
+            (root / "fixtures.csv").write_text("match_id,match_time,discipline,team1_player_ids,team2_player_ids\n"
+                                                "next,2030-01-01 10:00:00,MS,p1,p2\n")
+            before = {p: p.read_bytes() for p in root.rglob("*") if p.is_file()}
+            argv = ["predict.py", "--fixtures-csv", str(root / "fixtures.csv"),
+                    "--model-path", str(root / "model.pkl"), "--output-dir", str(out),
+                    "--raw-dir", str(raw), "--observations-db", str(db)]
+            for _ in range(2):
+                with patch("sys.argv", argv):
+                    self.assertEqual(main(), 0)
+            self.assertTrue(all(p.read_bytes() == content for p, content in before.items()))
+            exports = list(out.glob("predictions_*.csv"))
+            self.assertEqual(len(exports), 2)
+            for export in exports:
+                row = pd.read_csv(export).iloc[0]
+                self.assertTrue(row["history_refreshed"])
+                self.assertEqual(row["base_state_sha256"], hashlib.sha256(before[root / "feature_state.pkl"]).hexdigest())
+                self.assertNotEqual(row["state_sha256"], row["base_state_sha256"])
+                self.assertLess(pd.Timestamp(row["history_as_of"]), pd.Timestamp(row["generated_at_utc"]).tz_localize(None))
 
     def test_calibrator_cannot_be_silently_ignored(self):
         with patch("sys.argv", ["predict.py", "--fixtures-csv", "fixtures.csv",

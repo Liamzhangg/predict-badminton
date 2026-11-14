@@ -671,6 +671,27 @@ class FeatureBuilder:
                 return tier
         return match["tournament_tier"]
 
+    def _validate_replay(self, matches: list[dict[str, Any]], as_of: datetime | None) -> None:
+        if self._result_availability_policy not in OBSERVED_AVAILABILITY_POLICIES and any(
+                m.get("availability_source") == "observed_completed_result" for m in matches):
+            raise ValueError("Observed results require the observed-result availability policy")
+        if any(not isinstance(m.get(key), datetime) for m in matches for key in ("prediction_time", "available_at")):
+            raise ValueError("Historical replay requires prediction_time and available_at; reload raw data")
+        if any(m["available_at"] <= m["prediction_time"] for m in matches):
+            raise ValueError("Result availability must follow prediction_time")
+        if as_of is not None and any(m["available_at"] >= as_of for m in matches):
+            raise ValueError("Training labels are not yet eligible at as_of")
+
+    def replay_results(self, matches: list[dict[str, Any]], *, as_of: datetime) -> None:
+        """Rebuild an empty history without allocating historical feature rows."""
+        if self._state_version < 5 or self.history_cutoff != datetime.min:
+            raise ValueError("Result replay requires an empty, availability-aware history")
+        self._validate_replay(matches, as_of)
+        for match in sorted(matches, key=lambda m: (m["available_at"], m["match_time"],
+                                                   str(m.get("match_id")), m.get("fixture_id", ""))):
+            self._observe_result(match, match["available_at"])
+        self._history_cutoff = as_of
+
     def build_dataframe(
         self, matches: list[dict[str, Any]], *, as_of: datetime | None = None,
     ) -> pd.DataFrame:
@@ -678,15 +699,7 @@ class FeatureBuilder:
         if self._state_version < 5:
             rows = [self.process(m) for m in matches]
         else:
-            if self._result_availability_policy not in OBSERVED_AVAILABILITY_POLICIES and any(
-                    m.get("availability_source") == "observed_completed_result" for m in matches):
-                raise ValueError("Observed results require the observed-result availability policy")
-            if any(not isinstance(m.get(key), datetime) for m in matches for key in ("prediction_time", "available_at")):
-                raise ValueError("Historical replay requires prediction_time and available_at; reload raw data")
-            if any(m["available_at"] <= m["prediction_time"] for m in matches):
-                raise ValueError("Result availability must follow prediction_time")
-            if as_of is not None and any(m["available_at"] >= as_of for m in matches):
-                raise ValueError("Training labels are not yet eligible at as_of")
+            self._validate_replay(matches, as_of)
             ordered = sorted(matches, key=lambda m: (m["prediction_time"], str(m.get("match_id")), m.get("fixture_id", "")))
             pending, rows = [], []
             for stamp, group in groupby(ordered, key=lambda m: m["prediction_time"]):

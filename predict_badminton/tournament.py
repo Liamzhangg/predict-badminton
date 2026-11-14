@@ -4,19 +4,21 @@ from __future__ import annotations
 import json
 import math
 import pickle
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from predict_badminton.config import DISCIPLINES
+from predict_badminton.config import DISCIPLINES, forecast_bundle_directory
 from predict_badminton.features import FeatureBuilder
+from predict_badminton.forecast_history import history_sha256, refresh_history
 from predict_badminton.probabilities import PREDICTION_POLICY, predict_probabilities
 
 
-def load_bundle(directory: Path) -> tuple:
+def load_bundle(directory: Path | None = None) -> tuple:
     """Load only a trusted local model bundle, never an uploaded pickle."""
+    directory = directory if directory is not None else forecast_bundle_directory()
     history = FeatureBuilder.load(directory / "feature_state.pkl")
     columns = json.loads((directory / "feature_list.json").read_text())
     if columns != history.feature_columns:
@@ -88,18 +90,32 @@ def propagate(count: int, probabilities: list[float]) -> tuple[np.ndarray, list[
     return advance, matchups
 
 
-def forecast(draw: dict, discipline: str, bundle: tuple, method: str = "Raw") -> dict:
+def forecast(draw: dict, discipline: str, bundle: tuple, method: str = "Raw", *,
+             refresh: bool = True, as_of: datetime | None = None) -> dict:
     validate_draw(draw, discipline)
     model, platt, isotonic, history = bundle
     if method not in {"Raw", "Platt", "Isotonic"}:
         raise ValueError("Unknown probability method")
+    if refresh:
+        stamp = as_of or datetime.now(UTC)
+        if stamp.tzinfo is None or stamp.utcoffset() is None:
+            raise ValueError("Forecast cutoff must have a UTC offset")
+        if any(pd.to_datetime(m["time_utc"], utc=True).to_pydatetime() <= stamp
+               for rnd in draw["rounds"] for m in rnd["matches"]):
+            raise ValueError("Live forecast times must follow the forecast cutoff; use frozen history for archival replay")
+        history.validate_model(model)
+        history = refresh_history(history, as_of=stamp)
+        history.validate_model(model)
+        for calibrator in (platt, isotonic):
+            if calibrator is not None:
+                history.validate_training_cutoff(calibrator)
     cutoff = history.history_cutoff
     entries, rounds = draw["entries"], draw["rounds"]
     rows = []
     for level, rnd in enumerate(rounds):
         width = 2 ** (level + 1)
         for slot, match in enumerate(rnd["matches"]):
-            stamp = datetime.fromisoformat(match["time_utc"])
+            stamp = pd.to_datetime(match["time_utc"], utc=True).tz_localize(None).to_pydatetime()
             if stamp <= cutoff:
                 raise ValueError("Forecast times must follow the saved history cutoff")
             start = slot * width
@@ -120,6 +136,9 @@ def forecast(draw: dict, discipline: str, bundle: tuple, method: str = "Raw") ->
     frame["discipline"] = pd.Categorical(frame["discipline"], categories=DISCIPLINES + ["OTHER"])
     calibrator = None if method == "Raw" else platt if method == "Platt" else isotonic
     probabilities = predict_probabilities(model, frame, calibrator)
+    if refresh and as_of is None and any(pd.to_datetime(m["time_utc"], utc=True) <= datetime.now(UTC)
+                                        for rnd in rounds for m in rnd["matches"]):
+        raise ValueError("A fixture started while refreshing history; no live forecast is available")
     advance, matchups = propagate(len(entries), probabilities)
     labels = [rnd["name"] for rnd in rounds[1:]] + ["Title"]
     records = []
@@ -131,4 +150,5 @@ def forecast(draw: dict, discipline: str, bundle: tuple, method: str = "Raw") ->
                         **{label: float(advance[index, level + 1] * 100) for level, label in enumerate(labels)}})
     return {"advance": advance, "matchups": matchups, "table": pd.DataFrame(records),
             "cutoff": cutoff.isoformat(), "method": method, "prediction_policy": PREDICTION_POLICY,
+            "history_refreshed": refresh, "state_sha256": history_sha256(history),
             "result_availability_policy": history.model_policy.get("result_availability", "legacy_start_order")}

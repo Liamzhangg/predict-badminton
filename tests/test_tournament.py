@@ -90,7 +90,7 @@ class TournamentTests(unittest.TestCase):
                     if columns != LEGACY_FEATURE_COLS:
                         value.feature_policy_ = history.model_policy
                     (path / name).write_bytes(pickle.dumps(value))
-                result = forecast(draw(), "MS", load_bundle(path))
+                result = forecast(draw(), "MS", load_bundle(path), refresh=False)
                 self.assertEqual(result["table"]["Title"].tolist(), [25] * 4)
                 wrong = FEATURE_COLS if columns == LEGACY_FEATURE_COLS else LEGACY_FEATURE_COLS
                 (path / "lgbm_model.pkl").write_bytes(pickle.dumps(FixedModel(wrong)))
@@ -149,7 +149,7 @@ class TournamentTests(unittest.TestCase):
         history = FeatureBuilder()
         history.elo._last_match["known"] = datetime(2029, 1, 1)
         before = pickle.dumps(history.get_state())
-        result = forecast(data, "MS", (FixedModel(), FixedCalibrator(), FixedCalibrator(), history))
+        result = forecast(data, "MS", (FixedModel(), FixedCalibrator(), FixedCalibrator(), history), refresh=False)
         self.assertEqual(pickle.dumps(history.get_state()), before)
         self.assertEqual(data, original)
         self.assertEqual(result["table"]["Title"].tolist(), [25] * 4)
@@ -158,18 +158,18 @@ class TournamentTests(unittest.TestCase):
     def test_probability_method_is_explicit_and_calibrators_are_used(self):
         bundle = (FixedModel(), FixedCalibrator(), FixedCalibrator(), FeatureBuilder())
         for method in ["Platt", "Isotonic"]:
-            result = forecast(draw(), "MS", bundle, method)
+            result = forecast(draw(), "MS", bundle, method, refresh=False)
             self.assertEqual(result["matchups"][0]["win"], 0.5)
             calibrator = bundle[1 if method == "Platt" else 2]
             self.assertEqual(len(calibrator.seen), 12)
         with self.assertRaises(ValueError):
-            forecast(draw(), "MS", bundle, "unknown")
+            forecast(draw(), "MS", bundle, "unknown", refresh=False)
 
     def test_past_fixtures_cannot_use_future_history(self):
         history = FeatureBuilder()
         history.elo._last_match["known"] = datetime(2030, 1, 1, 10)
         with self.assertRaisesRegex(ValueError, "cutoff"):
-            forecast(draw(), "MS", (FixedModel(), None, None, history))
+            forecast(draw(), "MS", (FixedModel(), None, None, history), refresh=False)
 
     def test_french_open_snapshot_has_all_official_draw_slots(self):
         path = Path(__file__).resolve().parents[1] / "data/draws/french-open-2026.json"

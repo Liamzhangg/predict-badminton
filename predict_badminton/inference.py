@@ -7,14 +7,16 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
 
-from predict_badminton.config import DISCIPLINES
+from predict_badminton.config import DISCIPLINES, RAW_JSON_DIR
+from predict_badminton.data_sources.observations import OBSERVATIONS_PATH
 from predict_badminton.features import FeatureBuilder
+from predict_badminton.forecast_history import history_sha256, refresh_history
 
 logger = logging.getLogger(__name__)
 
@@ -196,14 +198,31 @@ def build_inference_features(
     state_path: Path,
     *,
     model: Any | None = None,
+    refresh: bool = True,
+    as_of: datetime | None = None,
+    raw_dir: Path = RAW_JSON_DIR,
+    observations_db: Path = OBSERVATIONS_PATH,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Load fixtures and training state; return features and raw fixtures."""
+    """Refresh local results by default; frozen history is for archival replay."""
     feature_builder = FeatureBuilder.load(state_path)
     if model is not None:
         feature_builder.validate_model(model)
     fixtures = load_fixtures(fixtures_path)
+    if refresh:
+        cutoff = as_of or datetime.now(UTC)
+        if cutoff.tzinfo is None or cutoff.utcoffset() is None:
+            raise ValueError("Forecast cutoff must have a UTC offset")
+        if (fixtures["match_time"] <= cutoff.astimezone(UTC).replace(tzinfo=None)).any():
+            raise ValueError("Live fixture times must follow the forecast cutoff; use frozen history for archival replay")
+        feature_builder = refresh_history(feature_builder, as_of=cutoff, raw_dir=raw_dir,
+                                          observations_db=observations_db,
+                                          target_match_ids=set(fixtures["match_id"].astype(str)))
+        if model is not None:
+            feature_builder.validate_model(model)
     builder = InferenceBuilder(feature_builder)
     features = builder.build_features(fixtures)
     features.attrs["history_as_of"] = feature_builder.history_cutoff.isoformat()
     features.attrs["result_availability_policy"] = feature_builder.model_policy.get("result_availability", "legacy_start_order")
+    features.attrs["history_refreshed"] = refresh
+    features.attrs["state_sha256"] = history_sha256(feature_builder)
     return features, fixtures

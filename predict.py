@@ -4,10 +4,11 @@
 Usage:
   uv run python predict.py --fixtures-csv data/upcoming_fixtures.csv
   uv run python predict.py --fixtures-csv data/upcoming_fixtures.csv \\
-      --model-path outputs/artifacts/lgbm_model.pkl \\
-      --probabilities isotonic \\
-      --calibrator-path outputs/artifacts/isotonic_calibrator.pkl \\
-      --state-path outputs/artifacts/feature_state.pkl
+      --model-path outputs/runs/<run>/lgbm_model.pkl \\
+      --probabilities isotonic
+
+New forecasts refresh local completed results by default. Use --frozen-history
+only for an explicit archival replay.
 
 Output:
   outputs/predictions/predictions_<timestamp>.csv
@@ -26,6 +27,8 @@ import numpy as np
 import pandas as pd
 
 from predict_badminton.probabilities import PREDICTION_POLICY, average_directions, predict_directions
+from predict_badminton.config import RAW_JSON_DIR, forecast_bundle_directory
+from predict_badminton.data_sources.observations import OBSERVATIONS_PATH
 
 logging.basicConfig(
     level=logging.INFO,
@@ -37,11 +40,15 @@ logger = logging.getLogger("predict")
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Score future badminton fixtures")
+    try:
+        default_bundle = forecast_bundle_directory()
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        p.error(f"Invalid default forecast bundle: {exc}")
     p.add_argument("--fixtures-csv", type=Path, required=True)
     p.add_argument(
         "--model-path",
         type=Path,
-        default=Path("outputs/artifacts/lgbm_model.pkl"),
+        default=default_bundle / "lgbm_model.pkl",
     )
     p.add_argument(
         "--probabilities", choices=("raw", "platt", "isotonic"), default="raw",
@@ -55,14 +62,20 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--state-path",
         type=Path,
-        default=Path("outputs/artifacts/feature_state.pkl"),
+        help="Matching base state; defaults to the model's bundle directory",
     )
     p.add_argument(
         "--output-dir",
         type=Path,
         default=Path("outputs/predictions"),
     )
+    p.add_argument("--raw-dir", type=Path, default=RAW_JSON_DIR)
+    p.add_argument("--observations-db", type=Path, default=OBSERVATIONS_PATH)
+    p.add_argument("--frozen-history", action="store_true",
+                   help="Use the saved state without refreshing; archival replay only")
     args = p.parse_args()
+    if args.state_path is None:
+        args.state_path = args.model_path.parent / "feature_state.pkl"
     if args.probabilities == "raw" and args.calibrator_path is not None:
         p.error("--calibrator-path requires --probabilities platt or isotonic")
     if args.probabilities != "raw" and args.calibrator_path is None:
@@ -72,6 +85,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    forecast_cutoff = datetime.now(timezone.utc)
 
     # ---- Validate paths ------------------------------------------------
     for attr, path in [
@@ -89,7 +103,7 @@ def main() -> int:
         fh.seek(0)
         model_hash = hashlib.file_digest(fh, "sha256").hexdigest()
     with open(args.state_path, "rb") as fh:
-        state_hash = hashlib.file_digest(fh, "sha256").hexdigest()
+        base_state_hash = hashlib.file_digest(fh, "sha256").hexdigest()
 
     # ---- Build inference features -------------------------------------
     logger.info("Building features from fixtures …")
@@ -100,8 +114,12 @@ def main() -> int:
             fixtures_path=args.fixtures_csv,
             state_path=args.state_path,
             model=model,
+            refresh=not args.frozen_history,
+            as_of=forecast_cutoff,
+            raw_dir=args.raw_dir,
+            observations_db=args.observations_db,
         )
-    except ValueError as exc:
+    except (ValueError, OSError) as exc:
         logger.error("%s", exc)
         return 1
     logger.info("Feature rows: %d", len(feat_df))
@@ -138,6 +156,9 @@ def main() -> int:
 
     # ---- Assemble output -----------------------------------------------
     generated_at = datetime.now(timezone.utc)
+    if not args.frozen_history and (raw_fixtures["match_time"] <= generated_at.replace(tzinfo=None)).any():
+        logger.error("A fixture started while refreshing history; no live predictions were saved")
+        return 1
     out_df = pd.DataFrame({
         "match_id": feat_df["match_id"].values,
         "match_time": feat_df["match_time"].values,
@@ -149,9 +170,11 @@ def main() -> int:
         "prediction_policy": PREDICTION_POLICY,
         "result_availability_policy": feat_df.attrs["result_availability_policy"],
         "history_as_of": feat_df.attrs["history_as_of"],
+        "history_refreshed": feat_df.attrs["history_refreshed"],
         "generated_at_utc": generated_at.isoformat(),
         "model_sha256": model_hash,
-        "state_sha256": state_hash,
+        "state_sha256": base_state_hash if args.frozen_history else feat_df.attrs["state_sha256"],
+        "base_state_sha256": base_state_hash,
         "predicted_winner": np.where(probs == 0.5, "even", np.where(probs > 0.5, "team1", "team2")),
         "confidence": np.round(np.abs(probs - 0.5) * 2, 4),
     })

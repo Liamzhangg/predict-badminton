@@ -1,0 +1,140 @@
+{
+  "name": "VICTOR Kaohsiung Masters 2026",
+  "tournament_id": 5652,
+  "tournament_code": "3B80AD0D-D7E7-4674-BEF6-6BE27DEAA033",
+  "tournament_tier": 5,
+  "official_category": "BWF Tour Super 100",
+  "source_url": "https://bwfbadminton.com/tournament/5652/victor-kaohsiung-masters-2026",
+  "round_name": "Final",
+  "date": "2026-11-15",
+  "retrieved_at_utc": "2026-11-14T19:24:01.058343+00:00",
+  "sources": [
+    {
+      "url": "https://extranet-lv.bwfbadminton.com/api/tournaments/day-matches?tournamentCode=3B80AD0D-D7E7-4674-BEF6-6BE27DEAA033&date=2026-11-15&order=2&court=0",
+      "date": "2026-11-15",
+      "status": "cached",
+      "http_status": 200,
+      "cache_path": "data/source_cache/bwf/finals-20261114T192359Z/api-tournaments-day-matches-d8e93e8a19c70faa.json",
+      "sha256": "b29526f87904065113dfa91e2e4bd64e414adfbb460015f43eb7af9bc3ed3526",
+      "retrieved_at_utc": "2026-11-14T19:24:01.058343+00:00"
+    }
+  ],
+  "matches": [
+    {
+      "match_id": "1565683",
+      "discipline": "WS",
+      "round_name": "Final",
+      "slot": 1,
+      "match_time": "2026-11-15T04:50:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "team1_ids": [
+        "64956"
+      ],
+      "team1_name": "Mutiara Ayu PUSPITASARI",
+      "team1_country": "INA",
+      "team1_seed": 0,
+      "team2_ids": [
+        "71280"
+      ],
+      "team2_name": "Yuan Chi LIAO",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565636",
+      "discipline": "MD",
+      "round_name": "Final",
+      "slot": 2,
+      "match_time": "2026-11-15T07:20:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "team1_ids": [
+        "97376",
+        "79915"
+      ],
+      "team1_name": "CHENG Kai Wen / LIAO Chao Pang",
+      "team1_country": "TPE",
+      "team1_seed": 0,
+      "team2_ids": [
+        "68681",
+        "60896"
+      ],
+      "team2_name": "CHANG Ko-Chi / LU Chen",
+      "team2_country": "TPE",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565580",
+      "discipline": "WD",
+      "round_name": "Final",
+      "slot": 3,
+      "match_time": "2026-11-15T06:30:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "team1_ids": [
+        "80386",
+        "60219"
+      ],
+      "team1_name": "ONG Xin Yee / Carmen TING",
+      "team1_country": "MAS",
+      "team1_seed": "1",
+      "team2_ids": [
+        "80653",
+        "87259"
+      ],
+      "team2_name": "Isyana Syahira MEIDA / Rinjani Kwinnara NASTINE",
+      "team2_country": "INA",
+      "team2_seed": "2"
+    },
+    {
+      "match_id": "1565515",
+      "discipline": "XD",
+      "round_name": "Final",
+      "slot": 4,
+      "match_time": "2026-11-15T04:00:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "team1_ids": [
+        "82494",
+        "99778"
+      ],
+      "team1_name": "KI Dong Ju / JEONG Na Eun",
+      "team1_country": "KOR",
+      "team1_seed": 0,
+      "team2_ids": [
+        "99413",
+        "50985"
+      ],
+      "team2_name": "WEE Yee Hern / Vannee GOBI",
+      "team2_country": "MAS",
+      "team2_seed": "4"
+    }
+  ],
+  "unquoted_matches": [
+    {
+      "match_id": "1565601",
+      "discipline": "MS",
+      "team1_name": "KUO Kuan Lin",
+      "team2_name": "KIM Hae Deun"
+    }
+  ],
+  "prediction_generated_at_utc": "2026-11-14T19:28:01.728272+00:00",
+  "model_history_as_of": "2026-11-14T19:27:26.453345+00:00",
+  "model_sha256": "1ac05853bf7efc9a192dce703305c8445f7a64468b0732c9964019d3ba4ca594",
+  "base_state_sha256": "f59f94efb9fd035d7b89f49eb797ef64c72a0cbca838d6d1bdfa6c8c030c48e6",
+  "state_sha256": "2a74e9f0640e2cf89866e2d3604022ec53b05bea02d9a0f9b312cb59d4a7a1a5",
+  "prediction_policy": "two_order_average_v1",
+  "result_availability_policy": "observed_results_with_conservative_history_v2",
+  "history_refreshed": true,
+  "model_run": "outputs/runs/2026-11-12-observed-timing-v2-054212Z",
+  "assumptions": "Upcoming official finals only. Local completed results refreshed using strictly earlier observation receipts and conservative older history. No target final results enter history. Screenshot capture time and continued price availability are unverified."
+}

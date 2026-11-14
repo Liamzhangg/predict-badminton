@@ -55,6 +55,18 @@ Timing policy `conservative_day_history_v1` releases a result at the UTC midnigh
 
 `uv run python audit_data.py` writes `processed/data_audit.json` with coverage and exclusion counts. `--include-para` opts into para records; `--no-deduplicate` retains source duplicates for inspection.
 
+## New Forecasts
+
+After fetching results, `uv run python predict.py --fixtures-csv <fixtures.csv>` now refreshes Elo, player-based TrueSkill, recent form and H2H from local raw data and result receipts before scoring. Round/draw prediction APIs use the same refresh by default. This does not fetch data or retrain the classifier.
+
+One UTC cutoff is frozen when the forecast begins. Only results available strictly before that cutoff enter history, even if another result arrives before the future match starts. Tracked corrections must match their observed version; retracted, conflicting and not-yet-observed versions stay excluded. Untracked older history retains the conservative timing fallback. Past fixtures and already-completed target IDs, including known aliases, cannot be scored as live predictions. Unknown historical publication times remain an assumption, not a guarantee of perfect historical data.
+
+Ratings are rebuilt rather than appended, so duplicates do not count twice and corrections/withdrawals can remove old contributions. The rebuild skips historical feature-matrix creation. Each new CSV records the cutoff, whether history was refreshed, and model/base-state/refreshed-state hashes. Existing forecast CSVs, sportsbook prices, paper bets, model bundles and public leaderboards are never rewritten by prediction.
+
+The local `outputs/forecast_bundle.json` pointer selects `outputs/runs/2026-11-12-observed-timing-v2-054212Z` for new forecasts. The older `outputs/artifacts/` bundle stays unchanged. Without a pointer, prediction uses `outputs/artifacts/`; live refresh requires a matching observed-v2 bundle and an existing result-receipts database. `--model-path` overrides the selection, with state/calibrators taken from that model's directory unless explicitly supplied.
+
+Use `--frozen-history` only to reproduce a saved bundle's historical view. The pinned R16 odds viewer and archived French Open viewer explicitly use frozen history. This opt-out does not refresh history and is not the live forecasting path. `--raw-dir` and `--observations-db` support separate local datasets without changing production.
+
 ## Official Categories
 
 `catalogs/bwf_tournaments.csv` records official edition IDs/codes, names, calendar dates, categories, status, tournament-page URLs, and the path/checksum of the saved official calendar response. It is metadata, not match results. Empty categories stay empty; conflicting nonempty categories/codes for the same ID stop a rebuild. Response-file mtime only selects among saved snapshots, never supplies a result-publication time.
@@ -152,7 +164,11 @@ Generated forecasts, result logs, models, and original Elo exports stay under th
 
 `odds/<sportsbook>_<jurisdiction>/<tournament>/<recorded-date>-<round>.csv` stores one quoted selection per row. The November 11 Bet365 Ontario batch contains 64 prices for 32 Kumamoto R16 matches across MS, WS, MD and WD; no XD prices were supplied. Both sides' prices are retained, not only model-positive selections. Add a new dated/batch file for later prices instead of overwriting an existing snapshot.
 
+The recovered `2026-11-09-r32.csv` batch contains 24 prices for the 12 Kumamoto men's singles matches quoted in the original screenshots, not all 16 R32 matches. Its filename retains the original screenshot batch date; `recorded_at_utc` records the November 13 recovery, and the unverified capture time stays blank. Literal book labels are retained alongside official result clocks recovered later. The saved forecast comparison preserves both the original single-order probabilities and the ordering-corrected pre-match probabilities; the paper ledger identifies which version is counted. Neither version is regenerated with a newer model, and these historical forecasts predate the result-availability fixes.
+
 The November 12 `2026-11-12-qf.csv` snapshots contain 78 prices for November 13 quarter-finals: 20 Kumamoto matches and 19 Kaohsiung matches across all five disciplines. The duplicated Japan MS screenshots are consolidated. No price was supplied for Kaohsiung's Justin HOH vs KUO Kuan Lin match. These comparisons use the unchanged active model, whose latest rating result is November 8, not a retrain on this week's results. Kaohsiung's book times differ by one hour from BWF times converted to Toronto time; both source values are preserved without assuming the book's timezone.
+
+The November 14 `2026-11-14-final.csv` snapshots contain 18 prices for nine November 15 finals: all five Kumamoto events and Kaohsiung WS, MD, WD and XD. Kaohsiung MS has no supplied price and is excluded. Finals predictions use the default observed-timing model with freshly replayed local results. All prices and both sides' probabilities are retained in the comparison; only model-positive selections receive pending $10 paper stakes in the profit ledger.
 
 Rows preserve official match/player IDs and full names, the American moneyline, official UTC fixture time, literal book date/time labels, and source image names/phone clock labels. Duplicate overlapping views of the same quote are consolidated. No screenshot files are copied or committed. `recorded_at_utc` is the transcription record time, not proof of when the price was available. `captured_at_utc` stays blank because the images do not establish a full capture date, AM/PM, or timezone. Cropped book times stay blank. Book display clocks are not assumed to be UTC or substituted for official BWF times.
 

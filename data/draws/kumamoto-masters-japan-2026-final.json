@@ -1,0 +1,156 @@
+{
+  "name": "Kumamoto Masters Japan 2026",
+  "tournament_id": 5216,
+  "tournament_code": "5CC4D285-D8E0-4747-A6BF-A2D271B94BC7",
+  "tournament_tier": 5,
+  "official_category": "HSBC BWF World Tour Super 500",
+  "source_url": "https://bwfworldtour.bwfbadminton.com/tournament/5216/kumamoto-masters-japan-2026/",
+  "round_name": "Final",
+  "date": "2026-11-15",
+  "retrieved_at_utc": "2026-11-14T19:23:59.801555+00:00",
+  "sources": [
+    {
+      "url": "https://extranet-lv.bwfbadminton.com/api/tournaments/day-matches?tournamentCode=5CC4D285-D8E0-4747-A6BF-A2D271B94BC7&date=2026-11-15&order=2&court=0",
+      "date": "2026-11-15",
+      "status": "cached",
+      "http_status": 200,
+      "cache_path": "data/source_cache/bwf/finals-20261114T192359Z/api-tournaments-day-matches-6b414a7ec3fdc2ce.json",
+      "sha256": "d8fecc70269dd3a29d8eccc307ae06ab48d600e1fa7717e14141a167da18e823",
+      "retrieved_at_utc": "2026-11-14T19:23:59.801555+00:00"
+    }
+  ],
+  "matches": [
+    {
+      "match_id": "1565805",
+      "discipline": "MS",
+      "round_name": "Final",
+      "slot": 1,
+      "match_time": "2026-11-15T02:50:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "team1_ids": [
+        "68870"
+      ],
+      "team1_name": "Lakshya SEN",
+      "team1_country": "IND",
+      "team1_seed": "8",
+      "team2_ids": [
+        "97174"
+      ],
+      "team2_name": "Koki WATANABE",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565905",
+      "discipline": "MD",
+      "round_name": "Final",
+      "slot": 2,
+      "match_time": "2026-11-15T03:40:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "team1_ids": [
+        "81657",
+        "67903"
+      ],
+      "team1_name": "Takuro HOKI / Yugo KOBAYASHI",
+      "team1_country": "JPN",
+      "team1_seed": 0,
+      "team2_ids": [
+        "57397",
+        "88322"
+      ],
+      "team2_name": "Aaron TAI / YAP Roy King",
+      "team2_country": "MAS",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565920",
+      "discipline": "XD",
+      "round_name": "Final",
+      "slot": 3,
+      "match_time": "2026-11-15T02:00:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "team1_ids": [
+        "63029",
+        "57246"
+      ],
+      "team1_name": "JIANG Zhen Bang / WEI Ya Xin",
+      "team1_country": "CHN",
+      "team1_seed": "1",
+      "team2_ids": [
+        "57943",
+        "91533"
+      ],
+      "team2_name": "GAO Jia Xuan / WU Meng Ying",
+      "team2_country": "CHN",
+      "team2_seed": 0
+    },
+    {
+      "match_id": "1565851",
+      "discipline": "WS",
+      "round_name": "Final",
+      "slot": 4,
+      "match_time": "2026-11-15T05:20:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "team1_ids": [
+        "96312"
+      ],
+      "team1_name": "Akane YAMAGUCHI",
+      "team1_country": "JPN",
+      "team1_seed": "1",
+      "team2_ids": [
+        "61854"
+      ],
+      "team2_name": "WANG Zhi Yi",
+      "team2_country": "CHN",
+      "team2_seed": "2"
+    },
+    {
+      "match_id": "1565813",
+      "discipline": "WD",
+      "round_name": "Final",
+      "slot": 5,
+      "match_time": "2026-11-15T04:30:00+00:00",
+      "time_estimated": false,
+      "winner": 0,
+      "score_status": 0,
+      "status": "Normal",
+      "team1_ids": [
+        "88135",
+        "87428"
+      ],
+      "team1_name": "Rin IWANAGA / Kie NAKANISHI",
+      "team1_country": "JPN",
+      "team1_seed": "3",
+      "team2_ids": [
+        "86778",
+        "68282"
+      ],
+      "team2_name": "Ririna HIRAMOTO / Chiharu SHIDA",
+      "team2_country": "JPN",
+      "team2_seed": 0
+    }
+  ],
+  "unquoted_matches": [],
+  "prediction_generated_at_utc": "2026-11-14T19:28:01.728272+00:00",
+  "model_history_as_of": "2026-11-14T19:27:26.453345+00:00",
+  "model_sha256": "1ac05853bf7efc9a192dce703305c8445f7a64468b0732c9964019d3ba4ca594",
+  "base_state_sha256": "f59f94efb9fd035d7b89f49eb797ef64c72a0cbca838d6d1bdfa6c8c030c48e6",
+  "state_sha256": "2a74e9f0640e2cf89866e2d3604022ec53b05bea02d9a0f9b312cb59d4a7a1a5",
+  "prediction_policy": "two_order_average_v1",
+  "result_availability_policy": "observed_results_with_conservative_history_v2",
+  "history_refreshed": true,
+  "model_run": "outputs/runs/2026-11-12-observed-timing-v2-054212Z",
+  "assumptions": "Upcoming official finals only. Local completed results refreshed using strictly earlier observation receipts and conservative older history. No target final results enter history. Screenshot capture time and continued price availability are unverified."
+}

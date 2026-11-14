@@ -1,8 +1,21 @@
 """Global constants and configuration."""
+import json
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent
 RAW_JSON_DIR = REPO_ROOT / "data" / "raw" / "bwf_matches"
+
+
+def forecast_bundle_directory() -> Path:
+    """Use the selected local forecast bundle without replacing trained artifacts."""
+    pointer = REPO_ROOT / "outputs/forecast_bundle.json"
+    if not pointer.exists():
+        return REPO_ROOT / "outputs/artifacts"
+    directory = (REPO_ROOT / json.loads(pointer.read_text())["directory"]).resolve()
+    if not directory.is_relative_to(REPO_ROOT.resolve()):
+        raise ValueError("The default forecast bundle must be inside this repository")
+    return directory
+
 
 SEED = 42
 

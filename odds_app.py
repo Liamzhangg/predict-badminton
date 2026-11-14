@@ -35,7 +35,7 @@ def bundle(directory: str, version: tuple, expected_hashes: tuple):
 def predictions(snapshot: str, directory: str, version: tuple):
     data = json.loads(snapshot)
     model = bundle(directory, version, (data["model_sha256"], data["state_sha256"]))
-    table, cutoff = round_predictions(data, model, round_name=data["round_name"])
+    table, cutoff = round_predictions(data, model, round_name=data["round_name"], refresh=False)
     table["model_sha256"] = data["model_sha256"]
     table["state_sha256"] = data["state_sha256"]
     table["generated_at_utc"] = datetime.now(UTC).isoformat()

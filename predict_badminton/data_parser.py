@@ -222,6 +222,7 @@ def parse_file(
         records.append(
             {
                 "match_id": match.get("id"),
+                "match_status": match.get("matchStatus"),
                 "match_time": mt,
                 "tournament_code": match.get("tournamentCode") or "",
                 "tournament_name": t_name,
@@ -320,6 +321,7 @@ def _deduplicate_matches(
         group.sort(key=lambda m: (m["availability_source"] != "observed_completed_result",
                                   not m["_has_utc_time"], m["match_time"], str(m["match_id"])))
         record = group[0]
+        record["source_match_ids"] = sorted({str(m["match_id"]) for m in group})
         preferred = [m for m in group if m["_has_utc_time"] == record["_has_utc_time"]
                      and (record["availability_source"] != "observed_completed_result"
                           or m["availability_source"] == "observed_completed_result")]
