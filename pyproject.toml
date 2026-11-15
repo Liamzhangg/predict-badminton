@@ -14,5 +14,4 @@ dependencies = [
 
 [project.optional-dependencies]
 fetch = ["curl-cffi>=0.13,<1"]
-app = ["streamlit>=1.50,<2"]
 benchmark = ["xgboost>=2.0"]
