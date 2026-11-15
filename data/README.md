@@ -176,6 +176,28 @@ These are user-supplied Bet365 Ontario quotes, not independently fetched or veri
 
 Model-specific comparisons stay in ignored `outputs/odds/<tournament>/`, separate from the immutable price inputs. The November 11 comparison pins the existing R16 model/state SHA-256 hashes and full-precision probabilities. Net EV per unit staked is `p * decimal_odds - 1`; the comparison retains all positive and negative results. This does not establish profitable betting, settlement rules, closing lines, actual wagers or outcomes. Odds are not added to model features or training data.
 
+### Reusable Round Workflow
+
+```bash
+uv run python forecast_round.py --fixtures-csv <fixtures.csv> --odds-csv <japan-prices.csv> <kaohsiung-prices.csv>
+```
+
+This separate command uses the selected forecast bundle and the existing live-history refresh once for the whole round. It does not fetch, retrain, change the production bundle/pointer, or modify previous forecasts. Probabilities use the existing raw, two-order-averaged policy. All supplied fixtures must still be upcoming when the run finishes.
+
+Use the existing fixture CSV format with these additional required metadata columns: `tournament_name`, `tournament_code`, `tournament_id`, `round_name`, and `raw_file`. The last column is the repository-relative canonical results path, such as `data/raw/bwf_matches/kumamoto-masters-japan-2026.json`. Supply verified positive numeric BWF match/player IDs, one knockout round per run, and explicit UTC-offset start times. Multiple tournaments and unquoted fixtures are allowed. Supply `tournament_tier` for editions absent from the saved model's catalog.
+
+Price CSVs use the saved bet365 Ontario snapshot format. Required columns are `match_id`, `selection_id` (`<match_id>:<official side 1 or 2>`), `tournament_id`, `round_name`, `discipline`, `selection_player_ids`, `opponent_player_ids`, `selection_name`, `opponent_name`, `american_odds`, `official_start_time_utc`, `recorded_at_utc`, `sportsbook`, and `jurisdiction`. Optional source/capture fields are retained. Partial one-sided prices are valid; missing prices are never invented. IDs, round, event, edition and start time must match the fixture. Duplicate/mismatched quotes, invalid odds and future-dated quote records stop the run rather than being dropped.
+
+Each run creates a new local `outputs/rounds/<UTC timestamp>/` directory containing:
+
+- `forecast.json`: every fixture's full-precision probabilities, every quoted selection, cutoff/policy details and input/model/state checksums.
+- `comparison.csv`: all supplied prices with full-precision probabilities and model EV, including negative and zero EV.
+- `pending_bets.json`: a draft ledger containing only strictly positive-EV selections, frozen at $10 each in assumed CAD. Batch dates use UTC fixture dates.
+
+By default, **neither `outputs/profits.json` nor `outputs/profits.md` changes**. Add `--record-bets` to the same command when intentionally recording a new upcoming round: this appends new batches to the existing ledger and regenerates its Markdown report. Existing bets, odds, probabilities and settlements are preserved. Already-recorded fixtures are rejected, including reversed sides or alternate source IDs for the same participants/round. A preview is not promoted later: recording runs a fresh forecast and rechecks timing. Existing output directories are never reused; `--output-dir` can select a new directory inside `outputs`, and `--model-dir` can select a separate trusted local bundle without changing the default pointer.
+
+The command does not verify that saved sportsbook prices remain available. Model-positive EV is conditional on the model probability and is not proof of a profitable edge. New run folders and the central ledger remain Git-ignored.
+
 ### Paper Bet Settlement
 
 After fetching/importing results into `raw/bwf_matches/`, run `uv run python settle_bets.py`. Use `uv run python settle_bets.py --dry-run` to preview without writing. The command reads frozen bets from `outputs/profits.json` and regenerates the human-readable `outputs/profits.md`; record future bets in the JSON ledger, not the generated Markdown.
