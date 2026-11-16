@@ -7,8 +7,10 @@ Publish source code, synthetic tests, model metadata and aggregate research repo
 Install the committed hooks in every clone:
 
 ```sh
-git config core.hooksPath .githooks
+python3 scripts/install_git_hooks.py
 ```
+
+The installer stores hooks and a copy of the checker inside `.git/publication-hooks/`, so checking out an old branch cannot remove the guards. Rerun the installer after pulling changes to the checker. It refuses to replace an unrelated custom hook configuration.
 
 The pre-commit hook checks the entire index, including forced additions. The pre-push hook checks every reachable commit in the branches/tags being pushed, not just the latest tree. It rejects private paths and recognizable betting records copied into other JSON, CSV or Markdown files. Only source and reviewed aggregate report formats may be published from `outputs/`.
 

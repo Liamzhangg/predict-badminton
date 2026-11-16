@@ -51,6 +51,27 @@ class PublicationTests(unittest.TestCase):
             self.assertEqual(result.returncode, 1)
             self.assertIn(b"renamed.json", result.stderr)
 
+    def test_installed_guard_survives_branches_without_the_checker(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            def git(*args):
+                return subprocess.check_output(["git", "-C", str(root), *args], stderr=subprocess.DEVNULL)
+            git("init", "-q")
+            git("config", "user.name", "Synthetic Test")
+            git("config", "user.email", "test@example.invalid")
+            (root / "renamed.json").write_text('{"stake":10}')
+            git("add", ".")
+            git("commit", "-qm", "Synthetic old branch")
+            oid = git("rev-parse", "HEAD").decode().strip()
+            installer = PATH.with_name("install_git_hooks.py")
+            subprocess.run(["python3", str(installer)], cwd=root, check=True, capture_output=True)
+            hooks = Path(git("config", "core.hooksPath").decode().strip())
+            self.assertFalse((root / "scripts/check_publication.py").exists())
+            payload = f"refs/heads/main {oid} refs/heads/main {'0' * 40}\n".encode()
+            result = subprocess.run([str(hooks / "pre-push")], cwd=root, input=payload, capture_output=True)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn(b"renamed.json", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()
