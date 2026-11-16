@@ -57,13 +57,19 @@ Timing policy `conservative_day_history_v1` releases a result at the UTC midnigh
 
 ## New Forecasts
 
-After fetching results, `uv run python predict.py --fixtures-csv <fixtures.csv>` now refreshes Elo, player-based TrueSkill, recent form and H2H from local raw data and result receipts before scoring. Round/draw prediction APIs use the same refresh by default. This does not fetch data or retrain the classifier.
+After fetching results, `uv run python predict.py --fixtures-csv <fixtures.csv>` now refreshes Elo, player-based TrueSkill, country Elo/counts, recent form and H2H from local raw data and result receipts before scoring. Round/draw prediction APIs use the same refresh by default. This does not fetch data or retrain the classifier.
 
 One UTC cutoff is frozen when the forecast begins. Only results available strictly before that cutoff enter history, even if another result arrives before the future match starts. Tracked corrections must match their observed version; retracted, conflicting and not-yet-observed versions stay excluded. Untracked older history retains the conservative timing fallback. Past fixtures and already-completed target IDs, including known aliases, cannot be scored as live predictions. Unknown historical publication times remain an assumption, not a guarantee of perfect historical data.
 
 Ratings are rebuilt rather than appended, so duplicates do not count twice and corrections/withdrawals can remove old contributions. The rebuild skips historical feature-matrix creation. Each new CSV records the cutoff, whether history was refreshed, and model/base-state/refreshed-state hashes. Existing forecast CSVs, sportsbook prices, paper bets, model bundles and public leaderboards are never rewritten by prediction.
 
-The local `outputs/forecast_bundle.json` pointer selects `outputs/runs/2026-11-12-observed-timing-v2-054212Z` for new forecasts. The older `outputs/artifacts/` bundle stays unchanged. Without a pointer, prediction uses `outputs/artifacts/`; live refresh requires a matching observed-v2 bundle and an existing result-receipts database. `--model-path` overrides the selection, with state/calibrators taken from that model's directory unless explicitly supplied.
+The local `outputs/forecast_bundle.json` pointer selects `outputs/runs/2026-11-16-country-context-181718Z` for new forecasts. This 55-feature bundle adds the tested country Elo + identity + counts group, including its three location-coverage indicators, to the prior 44 features. Country Elo starts at 1500 with K=20, separately per discipline; domestic and unknown-country results do not update it. Counts use `log1p` of intercountry match counts. Country categories and the reference coverage registry are frozen in the bundle; unseen identities become missing values, not new category codes. Home advantage and travel distance are not included.
+
+The previous `outputs/runs/2026-11-12-observed-timing-v2-054212Z` model remains byte-for-byte unchanged. `outputs/forecast_bundle.backup.json` retains its original pointer. For a single-run rollback, pass `--model-dir outputs/runs/2026-11-12-observed-timing-v2-054212Z` to `forecast_round.py`, or `--model-path outputs/runs/2026-11-12-observed-timing-v2-054212Z/lgbm_model.pkl` to `predict.py`. To restore the default permanently, replace the selected pointer with the backup pointer; neither operation requires changing model files or old forecasts.
+
+The new bundle supports **raw, two-order-averaged probabilities only**. Old calibrators are not reused with the new schema. Country-model fixture CSVs must include `team1_country` and `team2_country` using verified BWF/federation codes; explicit empty values are allowed when unknown. Draw entries require the equivalent `country` field. No country is guessed from a player's name. The bundle is self-contained and does not read experiment folders during forecasting. `train.py` remains the existing baseline training/evaluation pipeline and does not change this pointer automatically.
+
+The older `outputs/artifacts/` bundle also stays unchanged. Without a pointer, prediction uses `outputs/artifacts/`; live refresh requires a matching observed-v2 bundle and an existing result-receipts database. `--model-path` overrides the selection, with state/calibrators taken from that model's directory unless explicitly supplied.
 
 Use `--frozen-history` only to reproduce a saved bundle's historical view. This opt-out does not refresh history and is not the live forecasting path. `--raw-dir` and `--observations-db` support separate local datasets without changing production.
 
@@ -156,7 +162,7 @@ The pinned R16 forecast covers all 78 player/pair selections. This preserved mod
 
 The default active model uses `two_order_average_v1` and `conservative_day_history_v1`; the separate R16 run uses `observed_results_with_conservative_history_v1`. Both opponent orders are scored from fixed eligible history and combined into complementary probabilities. Optional calibrators act on each direction before averaging. CLI exports record generation time, model/state hashes and the history cutoff. Current November 11 snapshots reject the historical Kumamoto R32 times; previous R32 exports remain archival, not corrected predictions. Older state versions remain supported only with matching legacy bundles.
 
-Generated forecasts, result logs, models, and original Elo exports stay under the repository's ignored `outputs/` directory, not in `data/draws/`. Only the selected public Elo copies described below are committed. See the root [README](../README.md) for training and prediction commands.
+Generated forecasts, result logs, models, and original Elo exports stay under `outputs/`, not in `data/draws/`. New outputs are Git-ignored by default. Betting slips, odds and individual forecasts are local-only. Only aggregate audit/research reports are published alongside the public Elo copies described below; see [published snapshot scope](../outputs/README.md). Raw data, response caches and model binaries remain excluded. See the root [README](../README.md) for training and prediction commands.
 
 ## Sportsbook Odds Snapshots
 

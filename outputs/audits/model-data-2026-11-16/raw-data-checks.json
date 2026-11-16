@@ -1,0 +1,297 @@
+{
+  "counts": {
+    "source_rows_for_eligible_ids": 303801,
+    "missing_or_nonstandard_point_margin_source": 13147,
+    "normal_21point_score_contradicts_winner_or_match_end": 87
+  },
+  "examples": {
+    "normal_21point_score_contradicts_winner_or_match_end": [
+      {
+        "path": "data/raw/bwf_matches/19th-victor-dutch-international-2018.json",
+        "id": "534634",
+        "event": "MS",
+        "winner": 2,
+        "score": [
+          [
+            21,
+            16
+          ],
+          [
+            9,
+            21
+          ]
+        ],
+        "status": null
+      },
+      {
+        "path": "data/raw/bwf_matches/2018-european-championships.json",
+        "id": "536840",
+        "event": "WS",
+        "winner": 2,
+        "score": [
+          [
+            21,
+            19
+          ],
+          [
+            15,
+            21
+          ]
+        ],
+        "status": null
+      },
+      {
+        "path": "data/raw/bwf_matches/2019-carebaco-junior-international.json",
+        "id": "1179177",
+        "event": "MS-U19",
+        "winner": 2,
+        "score": [
+          [
+            16,
+            21
+          ],
+          [
+            14,
+            21
+          ],
+          [
+            20,
+            22
+          ]
+        ],
+        "status": null
+      },
+      {
+        "path": "data/raw/bwf_matches/2024-european-mens-womens-team-championships-qualification-france.json",
+        "id": "1406126",
+        "event": "WS",
+        "winner": 1,
+        "score": [
+          [
+            15,
+            21
+          ],
+          [
+            21,
+            10
+          ]
+        ],
+        "status": "F"
+      },
+      {
+        "path": "data/raw/bwf_matches/2026-european-junior-championships.json",
+        "id": "1535703",
+        "event": "WS-U19",
+        "winner": 2,
+        "score": [
+          [
+            21,
+            17
+          ],
+          [
+            21,
+            23
+          ]
+        ],
+        "status": "F"
+      },
+      {
+        "path": "data/raw/bwf_matches/2026-european-senior-championships.json",
+        "id": "1542455",
+        "event": "MS 50",
+        "winner": 1,
+        "score": [
+          [
+            15,
+            21
+          ],
+          [
+            21,
+            19
+          ]
+        ],
+        "status": "F"
+      },
+      {
+        "path": "data/raw/bwf_matches/51th-victor-fz-forza-hungarian-international-championships.json",
+        "id": "1560533",
+        "event": "MS",
+        "winner": 2,
+        "score": [
+          [
+            21,
+            15
+          ],
+          [
+            14,
+            21
+          ]
+        ],
+        "status": "F"
+      },
+      {
+        "path": "data/raw/bwf_matches/5th-iran-junior-international-series-2024.json",
+        "id": "1351813",
+        "event": "MS-U19",
+        "winner": 2,
+        "score": [
+          [
+            18,
+            21
+          ],
+          [
+            17,
+            21
+          ],
+          [
+            21,
+            15
+          ]
+        ],
+        "status": null
+      },
+      {
+        "path": "data/raw/bwf_matches/algeria-international-2018.json",
+        "id": "523268",
+        "event": "MS",
+        "winner": 2,
+        "score": [
+          [
+            19,
+            21
+          ],
+          [
+            21,
+            23
+          ],
+          [
+            19,
+            21
+          ]
+        ],
+        "status": null
+      },
+      {
+        "path": "data/raw/bwf_matches/all-africa-men-s-and-women-s-team-championships-2018.json",
+        "id": "524573",
+        "event": "MS",
+        "winner": 1,
+        "score": [
+          [
+            24,
+            22
+          ],
+          [
+            21,
+            14
+          ],
+          [
+            21,
+            15
+          ]
+        ],
+        "status": null
+      },
+      {
+        "path": "data/raw/bwf_matches/all-africa-mixed-team-championships-2025.json",
+        "id": "1418783",
+        "event": "WS",
+        "winner": 1,
+        "score": [
+          [
+            21,
+            15
+          ],
+          [
+            21,
+            9
+          ],
+          [
+            21,
+            15
+          ]
+        ],
+        "status": "F"
+      },
+      {
+        "path": "data/raw/bwf_matches/all-africa-mixed-team-championships-2025.json",
+        "id": "1418830",
+        "event": "MD",
+        "winner": 2,
+        "score": [
+          [
+            19,
+            21
+          ],
+          [
+            17,
+            21
+          ],
+          [
+            16,
+            21
+          ]
+        ],
+        "status": "F"
+      },
+      {
+        "path": "data/raw/bwf_matches/amazing-thailand-pattaya-bwf-world-senior-championships-2025.json",
+        "id": "1454970",
+        "event": "MS 50",
+        "winner": 2,
+        "score": [
+          [
+            23,
+            21
+          ],
+          [
+            15,
+            21
+          ]
+        ],
+        "status": "F"
+      },
+      {
+        "path": "data/raw/bwf_matches/arctic-open-2023.json",
+        "id": "1331791",
+        "event": "XD",
+        "winner": 2,
+        "score": [
+          [
+            21,
+            19
+          ],
+          [
+            14,
+            21
+          ]
+        ],
+        "status": null
+      },
+      {
+        "path": "data/raw/bwf_matches/austrian-u17-open-2025.json",
+        "id": "1430568",
+        "event": "XD-U17",
+        "winner": 1,
+        "score": [
+          [
+            21,
+            15
+          ],
+          [
+            21,
+            11
+          ],
+          [
+            21,
+            11
+          ]
+        ],
+        "status": "F"
+      }
+    ]
+  },
+  "player_ids_with_multiple_disjoint_frequent_names": [],
+  "player_ids_with_both_MS_and_WS": [],
+  "note": "Raw checks count source copies of eligible IDs; identity flags require manual confirmation and are not automatically declared errors."
+}

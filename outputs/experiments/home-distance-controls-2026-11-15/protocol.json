@@ -1,0 +1,184 @@
+{
+  "started_at_utc": "2026-11-15T16:44:38.855696+00:00",
+  "frozen_cutoff": "2026-11-15T05:54:42.807512+00:00",
+  "seeds": [
+    42,
+    7,
+    2026
+  ],
+  "variants": {
+    "raw_control": [],
+    "baseline": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2"
+    ],
+    "home": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "home_t1",
+      "home_t2",
+      "home_diff"
+    ],
+    "country_strength": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "country_rating_t1",
+      "country_rating_t2",
+      "country_rating_diff",
+      "country_log_n_t1",
+      "country_log_n_t2",
+      "country_log_n_diff",
+      "country_id_t1",
+      "country_id_t2"
+    ],
+    "home_country_strength": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "home_t1",
+      "home_t2",
+      "home_diff",
+      "country_rating_t1",
+      "country_rating_t2",
+      "country_rating_diff",
+      "country_log_n_t1",
+      "country_log_n_t2",
+      "country_log_n_diff",
+      "country_id_t1",
+      "country_id_t2"
+    ],
+    "distance": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "home_log_km_t1",
+      "home_log_km_t2",
+      "home_log_km_diff"
+    ],
+    "home_distance": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "home_t1",
+      "home_t2",
+      "home_diff",
+      "home_log_km_t1",
+      "home_log_km_t2",
+      "home_log_km_diff"
+    ],
+    "country_strength_distance": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "country_rating_t1",
+      "country_rating_t2",
+      "country_rating_diff",
+      "country_log_n_t1",
+      "country_log_n_t2",
+      "country_log_n_diff",
+      "country_id_t1",
+      "country_id_t2",
+      "home_log_km_t1",
+      "home_log_km_t2",
+      "home_log_km_diff"
+    ],
+    "all": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "home_t1",
+      "home_t2",
+      "home_diff",
+      "country_rating_t1",
+      "country_rating_t2",
+      "country_rating_diff",
+      "country_log_n_t1",
+      "country_log_n_t2",
+      "country_log_n_diff",
+      "country_id_t1",
+      "country_id_t2",
+      "home_log_km_t1",
+      "home_log_km_t2",
+      "home_log_km_diff"
+    ]
+  },
+  "contrasts": {
+    "home_alone": [
+      "baseline",
+      "home"
+    ],
+    "country_strength_alone": [
+      "baseline",
+      "country_strength"
+    ],
+    "distance_alone": [
+      "baseline",
+      "distance"
+    ],
+    "home_beyond_country_strength": [
+      "country_strength",
+      "home_country_strength"
+    ],
+    "country_strength_beyond_home": [
+      "home",
+      "home_country_strength"
+    ],
+    "distance_beyond_home": [
+      "home",
+      "home_distance"
+    ],
+    "distance_beyond_country_strength": [
+      "country_strength",
+      "country_strength_distance"
+    ],
+    "distance_beyond_both": [
+      "home_country_strength",
+      "all"
+    ]
+  },
+  "primary": "all minus home_country_strength: does home-country distance add beyond home advantage and country strength?",
+  "home": "1 when represented-country geographic code matches host, 0 otherwise; missing when location unknown. UK subdivisions use GB, as in the earlier distance study.",
+  "country_strength": "Uniform K=20 country Elo, initial 1500, separate disciplines, no decay or score weighting; skip domestic/unknown-country matches. Update only when available_at < target prediction_time, deterministic available-time order. Include log1p count and represented-country categories fit only on the training split; ENG/SCO/WAL remain separate country-rating identities.",
+  "distance": "log1p country representative-point km, each side and difference; represented country always used, not previous tournament. Team-country proxy, including doubles, not verified individual residences or actual journeys.",
+  "coverage": "Same host-known and represented-country-location-known flags in every factorial variant. Raw 44-feature control is an extra reproducibility anchor.",
+  "timing": "Matching observed-v2 historical replay; training labels available before each year boundary; availability-purged inner early stopping then earlier-year refit; two-order averaged probabilities.",
+  "evaluation": "2024-2025 validation plus reused retrospective 2026 benchmark; three seeds are not independent test sets. No tuning of feature definitions or automatic promotion. Fixed LightGBM defaults.",
+  "base_bundle": "outputs/runs/2026-11-12-observed-timing-v2-054212Z",
+  "base_policy": {
+    "version": 3,
+    "disciplines": [
+      "MS",
+      "WS",
+      "MD",
+      "WD",
+      "XD"
+    ],
+    "elo": {
+      "default_elo": 1500.0,
+      "k_base": 32.0,
+      "pair_lambda": 20.0,
+      "alpha_player": 0.8,
+      "score_margin_weight": 0.5,
+      "score_margin_reference": 0.2
+    },
+    "glicko": null,
+    "trueskill": {
+      "parameters": {
+        "mu": 25.0,
+        "sigma": 8.333333333333334,
+        "beta": 4.166666666666667,
+        "tau": 0.08333333333333333
+      },
+      "entity": "player",
+      "library": "trueskill==0.4.5",
+      "draw_probability": 0.0,
+      "backend": null,
+      "calendar_inactivity": false
+    },
+    "result_availability": "observed_results_with_conservative_history_v2"
+  },
+  "source_script_sha256": "7d5f6f3bcc0fb28f55d7fe0a133cdabf5746067bdc8a26fb6e94f2267a17d5b4"
+}

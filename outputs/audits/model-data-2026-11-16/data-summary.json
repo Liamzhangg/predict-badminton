@@ -1,0 +1,86 @@
+{
+  "training_rows": 302941,
+  "cohort_reproduced_exactly": true,
+  "drops": {
+    "walkover": 8577,
+    "bad_winner": 6538,
+    "no_player_ids": 5795,
+    "para_match": 29757,
+    "no_time": 1199,
+    "duplicate_fixture": 652,
+    "duplicate_source_alias": 208
+  },
+  "availability_sources": {
+    "unverified_local_two_day_embargo": 167270,
+    "utc_day_after_recorded_end": 134278,
+    "utc_uncertain_two_day_embargo": 784,
+    "observed_completed_result": 609
+  },
+  "year_counts": {
+    "2018": 40036,
+    "2019": 38555,
+    "2020": 8213,
+    "2021": 17045,
+    "2022": 29175,
+    "2023": 35561,
+    "2024": 39789,
+    "2025": 50378,
+    "2026": 44189
+  },
+  "discipline_counts": {
+    "MS": 97069,
+    "WS": 68170,
+    "MD": 48970,
+    "WD": 38197,
+    "XD": 50535
+  },
+  "label_mean": 0.5185465156581645,
+  "junior_tagged_rows": 115599,
+  "suspect_same_edition_round_opponents_groups": 0,
+  "direct_outcome_features": [],
+  "actual_feature_policy": {
+    "version": 5,
+    "disciplines": [
+      "MS",
+      "WS",
+      "MD",
+      "WD",
+      "XD"
+    ],
+    "elo": {
+      "default_elo": 1500.0,
+      "k_base": 32.0,
+      "pair_lambda": 20.0,
+      "alpha_player": 0.8,
+      "score_margin_weight": 0.5,
+      "score_margin_reference": 0.2
+    },
+    "glicko": null,
+    "trueskill": {
+      "parameters": {
+        "mu": 25.0,
+        "sigma": 8.333333333333334,
+        "beta": 4.166666666666667,
+        "tau": 0.08333333333333333
+      },
+      "entity": "player",
+      "library": "trueskill==0.4.5",
+      "draw_probability": 0.0,
+      "backend": null,
+      "calendar_inactivity": false
+    },
+    "result_availability": "observed_results_with_conservative_history_v2",
+    "country_context": {
+      "version": 1,
+      "entity": "country_per_discipline",
+      "initial_rating": 1500,
+      "k": 20,
+      "scale": 400,
+      "domestic_results": "excluded",
+      "counts": "log1p_intercountry_matches",
+      "unknown_identity": "missing",
+      "registry_sha256": "bb762fd47a118ff7d60cd4fffa68730cc31eca53b198990f27c056053f8a07c0"
+    }
+  },
+  "audit_cutoff_utc": "2026-11-16T18:17:18+00:00"
+}

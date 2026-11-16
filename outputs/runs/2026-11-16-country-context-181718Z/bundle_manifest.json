@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "probability_methods": [
+    "Raw"
+  ],
+  "prediction_policy": "two_order_average_v1"
+}

@@ -109,6 +109,9 @@ class InferenceBuilder:
         cutoff = self.feature_builder.history_cutoff
         if (fixtures["match_time"] <= cutoff).any():
             raise ValueError("Fixture times must follow the saved history cutoff")
+        if (self.feature_builder.country_context is not None
+                and not {"team1_country", "team2_country"}.issubset(fixtures.columns)):
+            raise ValueError("Country-model fixtures require team1_country and team2_country columns; use empty values for unknown countries")
         rows = []
         for _, fix in fixtures.iterrows():
             row = self._build_row(fix)
@@ -120,9 +123,7 @@ class InferenceBuilder:
 
         df = pd.DataFrame(rows)
 
-        # Ensure discipline is categorical (same encoding as training)
-        all_discs = DISCIPLINES + ["OTHER"]
-        df["discipline"] = pd.Categorical(df["discipline"], categories=all_discs)
+        self.feature_builder.encode_categories(df)
 
         return df[["match_id", "match_time"] + self.feature_builder.feature_columns]
 

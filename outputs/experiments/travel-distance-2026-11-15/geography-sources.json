@@ -1,0 +1,14 @@
+[
+  {
+    "url": "https://developers.google.com/public-data/docs/canonical/countries_csv",
+    "file": "countries.html",
+    "sha256": "db28e7985cd278aafd0524bc72289240c8a8ffc3abe19f959986f0631b8747e1",
+    "retrieved_at_utc": "2026-11-15T05:53:56.966796+00:00"
+  },
+  {
+    "url": "https://download.geonames.org/export/dump/countryInfo.txt",
+    "file": "countryInfo.txt",
+    "sha256": "79f8f59ea01cbb40438bf1856dd6c2ff201f03f8fc72d0530b2646aaf603ef04",
+    "retrieved_at_utc": "2026-11-15T05:53:57.799786+00:00"
+  }
+]

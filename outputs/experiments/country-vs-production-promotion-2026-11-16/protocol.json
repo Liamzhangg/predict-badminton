@@ -1,0 +1,115 @@
+{
+  "locked_at_utc": "2026-11-16T07:04:46.855261+00:00",
+  "frozen_cutoff": "2026-11-15T05:54:42.807512+00:00",
+  "seeds": [
+    42,
+    7,
+    2026,
+    13,
+    99
+  ],
+  "variants": {
+    "production_recipe": [],
+    "country_candidate": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "country_rating_t1",
+      "country_rating_t2",
+      "country_rating_diff",
+      "country_log_n_t1",
+      "country_log_n_t2",
+      "country_log_n_diff",
+      "country_id_t1",
+      "country_id_t2"
+    ]
+  },
+  "primary": "Production 44-feature recipe versus unchanged 55-feature country candidate; pooled quarterly-retraining 2026 comparison",
+  "feature_difference": "Country Elo/discipline and log international-history counts (side values/differences), two training-only country identities, and the same three location-coverage flags as earlier country studies. No home/distance features.",
+  "training": "Both use active production model hyperparameters; only random seed and execution thread count vary in replay. Availability-purged early stopping then refit earlier available rows. Raw two-order probabilities, no calibrator change.",
+  "evaluation": "Annual 2024-2025 validation and 2026 reused benchmark; quarterly retraining January/April/July/October 2026 on earlier prediction times and labels available strictly before boundary. Same fixtures; Q1 reuses identical January fit.",
+  "artifact_diagnostic": "Never score the current all-results artifact on historical training matches. Reconstruct its original training snapshot from saved receipts, verify row count and numerical/booster reproduction, then compare against a country candidate trained on that same snapshot/parameters using only later target prediction times.",
+  "statistics": "5000 paired tournament-edition/year resamples; crossed intervals also resample the five seeds without multiplying match count. Per-seed averages, not ensembles. Artifact diagnostic has one original seed and few later events.",
+  "fixed_gates": {
+    "validation_accuracy_delta": ">=0",
+    "validation_log_loss_delta": "<=0",
+    "annual_2026_accuracy_delta": ">=0",
+    "rolling_accuracy_crossed_ci95_lower": ">0",
+    "rolling_log_loss_crossed_ci95_upper": "<=0",
+    "rolling_brier_mean_delta": "<=0",
+    "prospective_forward": "Not currently available for the candidate; required before declaring fully ready for promotion."
+  },
+  "scope": "Research-only check. No production/default pointer, saved forecast, odds or bet edits. Reused historical outcomes, not fresh forward validation. No model export.",
+  "research_helper_sha256": "0d850fae10cb9862cb32ef1c2ddff6a63b99bd35bb32dbaa87ae9d359e639035",
+  "production_reference": {
+    "directory": "outputs/runs/2026-11-12-observed-timing-v2-054212Z",
+    "model_sha256": "1ac05853bf7efc9a192dce703305c8445f7a64468b0732c9964019d3ba4ca594",
+    "state_sha256": "f59f94efb9fd035d7b89f49eb797ef64c72a0cbca838d6d1bdfa6c8c030c48e6",
+    "active_feature_count": 44,
+    "parameters": {
+      "boosting_type": "gbdt",
+      "class_weight": null,
+      "colsample_bytree": 0.8,
+      "importance_type": "split",
+      "learning_rate": 0.05,
+      "max_depth": 6,
+      "min_child_samples": 50,
+      "min_child_weight": 0.001,
+      "min_split_gain": 0.0,
+      "n_estimators": 500,
+      "n_jobs": -1,
+      "num_leaves": 63,
+      "objective": "binary",
+      "random_state": 42,
+      "reg_alpha": 0.1,
+      "reg_lambda": 0.1,
+      "subsample": 0.8,
+      "subsample_for_bin": 200000,
+      "subsample_freq": 1,
+      "metric": "binary_logloss",
+      "verbose": -1
+    },
+    "trained_through": "2026-11-11 16:05:46.934658",
+    "production_refit": {
+      "rows": 302429,
+      "through": "2026-11-11T12:50:00",
+      "as_of": "2026-11-12T05:42:12",
+      "best_iteration": 500,
+      "evaluation_model": "holdout_lgbm_model.pkl",
+      "note": "Test metrics describe the pre-refit holdout model, not the all-results production model."
+    },
+    "model_policy": {
+      "version": 3,
+      "disciplines": [
+        "MS",
+        "WS",
+        "MD",
+        "WD",
+        "XD"
+      ],
+      "elo": {
+        "default_elo": 1500.0,
+        "k_base": 32.0,
+        "pair_lambda": 20.0,
+        "alpha_player": 0.8,
+        "score_margin_weight": 0.5,
+        "score_margin_reference": 0.2
+      },
+      "glicko": null,
+      "trueskill": {
+        "parameters": {
+          "mu": 25.0,
+          "sigma": 8.333333333333334,
+          "beta": 4.166666666666667,
+          "tau": 0.08333333333333333
+        },
+        "entity": "player",
+        "library": "trueskill==0.4.5",
+        "draw_probability": 0.0,
+        "backend": null,
+        "calendar_inactivity": false
+      },
+      "result_availability": "observed_results_with_conservative_history_v2"
+    }
+  }
+}

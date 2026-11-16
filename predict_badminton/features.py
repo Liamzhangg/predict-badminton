@@ -47,6 +47,7 @@ from predict_badminton.config import (
     DOUBLES_DISCIPLINES,
     K_BASE,
     FEATURE_COLS,
+    COUNTRY_FEATURE_COLS,
     GLICKO_MODEL_FEATURE_COLS,
     LEGACY_FEATURE_COLS,
     PAIR_LAMBDA,
@@ -55,6 +56,7 @@ from predict_badminton.config import (
     SCORE_MARGIN_WEIGHT,
 )
 from predict_badminton.glicko import GlickoEngine
+from predict_badminton.country import CountryContext
 from predict_badminton.match_rules import score_multiplier, standard_match_exclusion
 from predict_badminton.trueskill import TrueSkillEngine
 from predict_badminton.temporal import AVAILABILITY_POLICY, OBSERVED_AVAILABILITY_POLICIES
@@ -331,6 +333,7 @@ class FeatureBuilder:
         score_margin_reference: float = SCORE_MARGIN_REFERENCE,
         result_availability_policy: str = AVAILABILITY_POLICY,
         category_catalog: TournamentCatalog | None = None,
+        country_context: CountryContext | None = None,
     ) -> None:
         if result_availability_policy not in (AVAILABILITY_POLICY, *OBSERVED_AVAILABILITY_POLICIES):
             raise ValueError("Unsupported result-availability policy")
@@ -338,7 +341,8 @@ class FeatureBuilder:
         self.elo = EloEngine(k_base=k_base, score_margin_weight=score_margin_weight,
                              score_margin_reference=score_margin_reference)
         self.category_catalog = category_catalog
-        self._state_version = 6 if category_catalog is not None else 5
+        self.country_context = country_context
+        self._state_version = 7 if country_context is not None else 6 if category_catalog is not None else 5
         self._history_cutoff: datetime | None = None
         self.glicko: GlickoEngine | None = None
         self.trueskill: TrueSkillEngine | None = TrueSkillEngine()
@@ -369,6 +373,7 @@ class FeatureBuilder:
             "h2h": dict(self._h2h),
             "player_names": dict(self._player_names),
             **({"tournament_catalog": self.category_catalog.get_state()} if self.category_catalog is not None else {}),
+            **({"country_context": self.country_context.get_state()} if self.country_context is not None else {}),
             **({"history_cutoff": self._history_cutoff} if self._state_version >= 5 else {}),
             **({"result_availability_policy": self._result_availability_policy}
                if self._state_version >= 5 and self._result_availability_policy != AVAILABILITY_POLICY else {}),
@@ -388,12 +393,12 @@ class FeatureBuilder:
 
         required = {"elo", "player_hist", "h2h", "player_names"}
         if (not isinstance(state, dict) or state.get("state_type") != "feature_builder"
-                or state.get("version") not in {1, 2, 3, 4, 5, 6} or not required.issubset(state)
+                or state.get("version") not in {1, 2, 3, 4, 5, 6, 7} or not required.issubset(state)
                 or not isinstance(state.get("elo"), dict)
                 or (state.get("version") in {2, 3} and "glicko" not in state)
                 or (state.get("version") == 2 and not isinstance(state.get("glicko"), dict))
                 or (state.get("version") in {1, 2} and state["elo"].get("score_margin_weight", 0) != 0)
-                or (state.get("version") in {3, 4, 5, 6}
+                or (state.get("version") in {3, 4, 5, 6, 7}
                     and not {"score_margin_weight", "score_margin_reference"}.issubset(state["elo"]))
                 or (state.get("version") < 4 and "trueskill" in state)
                 or (state.get("version") >= 4
@@ -401,12 +406,15 @@ class FeatureBuilder:
                 or (state.get("version") >= 5 and ("history_cutoff" not in state
                     or state["history_cutoff"] is not None and not isinstance(state["history_cutoff"], datetime)))
                 or (state.get("version") == 6 and not isinstance(state.get("tournament_catalog"), dict))
-                or (state.get("version") < 6 and "tournament_catalog" in state)):
+                or (state.get("version") < 6 and "tournament_catalog" in state)
+                or (state.get("version") == 7 and not isinstance(state.get("country_context"), dict))
+                or (state.get("version") < 7 and "country_context" in state)):
             raise ValueError("Incomplete or unsupported feature state; retrain and use feature_state.pkl")
 
         builder = cls(player_names=state.get("player_names"),
                       result_availability_policy=state.get("result_availability_policy", AVAILABILITY_POLICY),
-                      category_catalog=TournamentCatalog.from_state(state["tournament_catalog"]) if state["version"] == 6 else None)
+                      category_catalog=TournamentCatalog.from_state(state["tournament_catalog"]) if "tournament_catalog" in state else None,
+                      country_context=CountryContext.from_state(state["country_context"]) if state["version"] == 7 else None)
         builder._state_version = state["version"]
         builder.elo = EloEngine.from_state(state["elo"])
         builder.glicko = GlickoEngine.from_state(state["glicko"]) if state.get("glicko") is not None else None
@@ -427,6 +435,8 @@ class FeatureBuilder:
     @property
     def feature_columns(self) -> list[str]:
         """Keep complete older bundles usable without inventing rating history."""
+        if self.country_context is not None:
+            return COUNTRY_FEATURE_COLS
         if self.trueskill is not None:
             return FEATURE_COLS
         return GLICKO_MODEL_FEATURE_COLS if self.glicko is not None else LEGACY_FEATURE_COLS
@@ -434,7 +444,7 @@ class FeatureBuilder:
     @property
     def model_policy(self) -> dict[str, Any]:
         return {
-            "version": 4 if self._state_version >= 6 else 3 if self._state_version >= 5 else 2 if self._state_version == 4 else 1,
+            "version": 5 if self._state_version >= 7 else 4 if self._state_version >= 6 else 3 if self._state_version >= 5 else 2 if self._state_version == 4 else 1,
             "disciplines": list(DISCIPLINES) if self._state_version >= 3 else DISCIPLINES + ["OTHER"],
             "elo": {name: getattr(self.elo, name) for name in (
                 "default_elo", "k_base", "pair_lambda", "alpha_player",
@@ -447,7 +457,14 @@ class FeatureBuilder:
             **({"result_availability": self._result_availability_policy} if self._state_version >= 5 else {}),
             **({"tournament_categories": {"policy": CATEGORY_POLICY, "catalog_sha256": self.category_catalog.sha256}}
                if self.category_catalog is not None else {}),
+            **({"country_context": self.country_context.policy} if self.country_context is not None else {}),
         }
+
+    def encode_categories(self, frame: pd.DataFrame) -> None:
+        """Use the bundle's frozen categorical encoding in every prediction path."""
+        frame["discipline"] = pd.Categorical(frame["discipline"], categories=DISCIPLINES + ["OTHER"])
+        if self.country_context is not None:
+            self.country_context.encode_categories(frame)
 
     def validate_model(self, model: Any) -> None:
         if list(model.feature_name_) != self.feature_columns:
@@ -615,6 +632,8 @@ class FeatureBuilder:
             row.update(self.glicko.features(match))
         if self.trueskill is not None:
             row.update(self.trueskill.features(match))
+        if self.country_context is not None:
+            row.update(self.country_context.preview(match))
         if "label" in match:
             row["label"] = match["label"]
         return row
@@ -631,6 +650,8 @@ class FeatureBuilder:
             self.glicko.observe(observed)
         if self.trueskill is not None:
             self.trueskill.observe(observed)
+        if self.country_context is not None:
+            self.country_context.observe(match)
         ids1: list[str] = match["team1_ids"]
         ids2: list[str] = match["team2_ids"]
         disc: str = match["discipline"]
@@ -722,8 +743,7 @@ class FeatureBuilder:
                 self._history_cutoff = max(self.history_cutoff, as_of)
         df = pd.DataFrame(rows)
 
-        all_discs = DISCIPLINES + ["OTHER"]
-        df["discipline"] = pd.Categorical(df["discipline"], categories=all_discs)
+        self.encode_categories(df)
 
         logger.info(
             "Feature matrix: %d rows × %d cols | label balance: %.3f",

@@ -165,7 +165,7 @@ def render_report(ledger: dict) -> str:
         lines.append(f"- [Original betting record]({os.path.relpath(source, 'outputs')})")
     lines.extend(["", "After fetching results, run `uv run python settle_bets.py`. Use `--dry-run` to preview without writing.", "",
                   "Scores are shown from the selected side. Winning payouts are rounded per bet to the nearest cent. Missing or unfinished results stay pending. Retirements, walkovers and conflicting results need manual review; no sportsbook void rules are assumed. Previously settled bets are not automatically resettled.", "",
-                  "These local outputs are Git-ignored. Screenshot prices and capture times are unverified. Model-positive EV does not establish a durable betting edge.", ""])
+                  "New outputs are Git-ignored by default; selected frozen forecasts and paper-bet reports may be published to GitHub. Raw data, response caches and model binaries remain local. Screenshot prices and capture times are unverified. Model-positive EV does not establish a durable betting edge.", ""])
     return "\n".join(lines)
 
 

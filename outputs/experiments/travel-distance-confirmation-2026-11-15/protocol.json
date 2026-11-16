@@ -1,0 +1,58 @@
+{
+  "cutoff": "2026-11-15T05:54:42.807512+00:00",
+  "seeds": [
+    42,
+    7,
+    2026
+  ],
+  "variants": [
+    "control",
+    "geography_14d",
+    "home_only",
+    "travel_7d",
+    "travel_14d",
+    "travel_21d",
+    "travel_28d"
+  ],
+  "source_experiment": "outputs/experiments/travel-distance-2026-11-15",
+  "source_script_sha256": "7d5f6f3bcc0fb28f55d7fe0a133cdabf5746067bdc8a26fb6e94f2267a17d5b4",
+  "base_bundle": "outputs/runs/2026-11-12-observed-timing-v2-054212Z",
+  "base_policy": {
+    "version": 3,
+    "disciplines": [
+      "MS",
+      "WS",
+      "MD",
+      "WD",
+      "XD"
+    ],
+    "elo": {
+      "default_elo": 1500.0,
+      "k_base": 32.0,
+      "pair_lambda": 20.0,
+      "alpha_player": 0.8,
+      "score_margin_weight": 0.5,
+      "score_margin_reference": 0.2
+    },
+    "glicko": null,
+    "trueskill": {
+      "parameters": {
+        "mu": 25.0,
+        "sigma": 8.333333333333334,
+        "beta": 4.166666666666667,
+        "tau": 0.08333333333333333
+      },
+      "entity": "player",
+      "library": "trueskill==0.4.5",
+      "draw_probability": 0.0,
+      "backend": null,
+      "calendar_inactivity": false
+    },
+    "result_availability": "observed_results_with_conservative_history_v2"
+  },
+  "primary": "14-day distance versus matched control; other fixed cutoffs are sensitivity checks.",
+  "selection": "Lowest mean per-seed pooled 2024-2025 log loss; record selection before scoring 2026.",
+  "evaluation": "Reused retrospective 2026 benchmark, not a fresh holdout. Fixed LightGBM defaults, strict result availability, two-order probabilities. No automatic promotion.",
+  "origin": "Last earlier observed completed tournament country across disciplines; after gap >7/14/21/28 days use federation-home country. Retain inbound trip across rounds. Unknown locations remain missing; doubles average partners.",
+  "distance": "Great-circle km between cached country representative points, not actual flights/residences/venues. Geography-only and always-home controls distinguish geographic proxy signal from itineraries."
+}

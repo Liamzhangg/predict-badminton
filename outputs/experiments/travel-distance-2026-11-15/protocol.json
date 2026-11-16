@@ -1,0 +1,90 @@
+{
+  "started_at_utc": "2026-11-15T05:54:42.807512+00:00",
+  "variants": {
+    "control": [
+      null,
+      false,
+      false
+    ],
+    "geography_14d": [
+      14,
+      false,
+      false
+    ],
+    "home_only": [
+      0,
+      true,
+      false
+    ],
+    "travel_7d": [
+      7,
+      true,
+      false
+    ],
+    "travel_14d": [
+      14,
+      true,
+      false
+    ],
+    "travel_21d": [
+      21,
+      true,
+      false
+    ],
+    "travel_28d": [
+      28,
+      true,
+      false
+    ],
+    "travel_14d_monotone": [
+      14,
+      true,
+      true
+    ]
+  },
+  "validation_years": [
+    2024,
+    2025
+  ],
+  "threshold_selection": "Minimum pooled 2024-2025 log loss among predeclared travel variants, before scoring 2026; no retuning or promotion.",
+  "seed": 42,
+  "probabilities": "raw two-order average",
+  "model_parameters": "Existing fixed LightGBM defaults; early stopping on availability-purged training tail, then refit earlier-year rows only.",
+  "base_bundle": "outputs/runs/2026-11-12-observed-timing-v2-054212Z",
+  "base_policy": {
+    "version": 3,
+    "disciplines": [
+      "MS",
+      "WS",
+      "MD",
+      "WD",
+      "XD"
+    ],
+    "elo": {
+      "default_elo": 1500.0,
+      "k_base": 32.0,
+      "pair_lambda": 20.0,
+      "alpha_player": 0.8,
+      "score_margin_weight": 0.5,
+      "score_margin_reference": 0.2
+    },
+    "glicko": null,
+    "trueskill": {
+      "parameters": {
+        "mu": 25.0,
+        "sigma": 8.333333333333334,
+        "beta": 4.166666666666667,
+        "tau": 0.08333333333333333
+      },
+      "entity": "player",
+      "library": "trueskill==0.4.5",
+      "draw_probability": 0.0,
+      "backend": null,
+      "calendar_inactivity": false
+    },
+    "result_availability": "observed_results_with_conservative_history_v2"
+  },
+  "origin_policy": "Last observed completed event location across disciplines; federation home proxy when no history or gap > threshold. Retain inbound trip features within a continuous edition; tied-time targets preview before committing label-free trip metadata. Results release only at available_at < prediction_time. Unknown locations stay missing.",
+  "distance_policy": "Great-circle km between Google country representative points, not actual flights, residence or venue distance. Doubles use mean partner km, missing if either partner is unknown. Home/coverage controls distinguish geography flags from distance. Monotone variant constrains longer own distance to lower chance.",
+  "evaluation_status": "Reused retrospective 2026 benchmark; not prospective evidence or sportsbook profitability."
+}

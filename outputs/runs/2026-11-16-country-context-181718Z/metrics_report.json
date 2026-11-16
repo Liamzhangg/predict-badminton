@@ -1,0 +1,96 @@
+{
+  "bundle": "country_elo_identity_counts",
+  "backup_directory": "outputs/runs/2026-11-12-observed-timing-v2-054212Z",
+  "production_refit": {
+    "rows": 302941,
+    "as_of": "2026-11-16T18:17:18",
+    "through": "2026-11-15T16:06:00.961766",
+    "best_iteration": 500
+  },
+  "feature_policy": {
+    "version": 5,
+    "disciplines": [
+      "MS",
+      "WS",
+      "MD",
+      "WD",
+      "XD"
+    ],
+    "elo": {
+      "default_elo": 1500.0,
+      "k_base": 32.0,
+      "pair_lambda": 20.0,
+      "alpha_player": 0.8,
+      "score_margin_weight": 0.5,
+      "score_margin_reference": 0.2
+    },
+    "glicko": null,
+    "trueskill": {
+      "parameters": {
+        "mu": 25.0,
+        "sigma": 8.333333333333334,
+        "beta": 4.166666666666667,
+        "tau": 0.08333333333333333
+      },
+      "entity": "player",
+      "library": "trueskill==0.4.5",
+      "draw_probability": 0.0,
+      "backend": null,
+      "calendar_inactivity": false
+    },
+    "result_availability": "observed_results_with_conservative_history_v2",
+    "country_context": {
+      "version": 1,
+      "entity": "country_per_discipline",
+      "initial_rating": 1500,
+      "k": 20,
+      "scale": 400,
+      "domestic_results": "excluded",
+      "counts": "log1p_intercountry_matches",
+      "unknown_identity": "missing",
+      "registry_sha256": "bb762fd47a118ff7d60cd4fffa68730cc31eca53b198990f27c056053f8a07c0"
+    }
+  },
+  "model_parameters": {
+    "boosting_type": "gbdt",
+    "class_weight": null,
+    "colsample_bytree": 0.8,
+    "importance_type": "split",
+    "learning_rate": 0.05,
+    "max_depth": 6,
+    "min_child_samples": 50,
+    "min_child_weight": 0.001,
+    "min_split_gain": 0.0,
+    "n_estimators": 500,
+    "n_jobs": 4,
+    "num_leaves": 63,
+    "objective": "binary",
+    "random_state": 42,
+    "reg_alpha": 0.1,
+    "reg_lambda": 0.1,
+    "subsample": 0.8,
+    "subsample_for_bin": 200000,
+    "subsample_freq": 1,
+    "metric": "binary_logloss",
+    "verbose": -1
+  },
+  "cohort_sha256": "ce0f0fce8f1d2c6a9fa60cabecfeab4c9d8c792d3498bd43f2487c5fbfe530ab",
+  "country_feature_parity": {
+    "rows": 302941,
+    "features": 11,
+    "exact": true
+  },
+  "evaluation": {
+    "source": "outputs/experiments/country-vs-production-promotion-2026-11-16/report.json",
+    "kind": "prior five-seed historical quarterly replay, not evaluation of this all-data refit",
+    "n": 44179,
+    "accuracy": 0.7774146087507638,
+    "log_loss": 0.4549719888395691,
+    "brier": 0.15013093329450433,
+    "prospective_forward_validation": false
+  },
+  "no_home_advantage_or_distance": true,
+  "probability_method": "Raw",
+  "prediction_policy": "two_order_average_v1",
+  "elapsed_seconds": 135.76661833398975
+}

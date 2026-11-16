@@ -24,17 +24,29 @@ def load_bundle(directory: Path | None = None) -> tuple:
     if columns != history.feature_columns:
         raise ValueError("Model feature list differs from its saved history; retrain first")
     objects = []
+    manifest_path = directory / "bundle_manifest.json"
+    raw_only = False
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text())
+        if (manifest.get("version") != 1 or manifest.get("probability_methods") != ["Raw"]
+                or manifest.get("prediction_policy") != PREDICTION_POLICY):
+            raise ValueError("Unsupported bundle manifest")
+        raw_only = True
     for name in ("lgbm_model.pkl", "platt_calibrator.pkl", "isotonic_calibrator.pkl"):
+        if raw_only and name != "lgbm_model.pkl":
+            objects.append(None)
+            continue
         with (directory / name).open("rb") as handle:
             objects.append(pickle.load(handle))
     if list(objects[0].feature_name_) != columns:
         raise ValueError("Model feature list differs from its saved model; retrain first")
     history.validate_model(objects[0])
     if any(getattr(calibrator, "feature_policy_", None) != getattr(objects[0], "feature_policy_", None)
-           for calibrator in objects[1:]):
+           for calibrator in objects[1:] if calibrator is not None):
         raise ValueError("Calibrator rating policy differs from its saved model; use a matching bundle")
     for calibrator in objects[1:]:
-        history.validate_training_cutoff(calibrator)
+        if calibrator is not None:
+            history.validate_training_cutoff(calibrator)
     return (*objects, history)
 
 
@@ -96,6 +108,11 @@ def forecast(draw: dict, discipline: str, bundle: tuple, method: str = "Raw", *,
     model, platt, isotonic, history = bundle
     if method not in {"Raw", "Platt", "Isotonic"}:
         raise ValueError("Unknown probability method")
+    calibrator = None if method == "Raw" else platt if method == "Platt" else isotonic
+    if method != "Raw" and calibrator is None:
+        raise ValueError(f"{method} probabilities are unavailable in this model bundle")
+    if history.country_context is not None and any("country" not in entry for entry in draw["entries"]):
+        raise ValueError("Country-model draw entries require country; use an empty value when unknown")
     if refresh:
         stamp = as_of or datetime.now(UTC)
         if stamp.tzinfo is None or stamp.utcoffset() is None:
@@ -133,8 +150,7 @@ def forecast(draw: dict, discipline: str, bundle: tuple, method: str = "Raw", *,
                         "team1_country": a.get("country", ""), "team2_country": b.get("country", ""),
                     }))
     frame = pd.DataFrame(rows)[history.feature_columns]
-    frame["discipline"] = pd.Categorical(frame["discipline"], categories=DISCIPLINES + ["OTHER"])
-    calibrator = None if method == "Raw" else platt if method == "Platt" else isotonic
+    history.encode_categories(frame)
     probabilities = predict_probabilities(model, frame, calibrator)
     if refresh and as_of is None and any(pd.to_datetime(m["time_utc"], utc=True) <= datetime.now(UTC)
                                         for rnd in rounds for m in rnd["matches"]):

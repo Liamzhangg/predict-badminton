@@ -1,0 +1,38 @@
+{
+  "kind": "Exploratory subgroup of the already-used primary replay; not fresh evidence or multiplicity-adjusted",
+  "source": "outputs/experiments/country-vs-production-promotion-2026-11-16/paired-clusters-rolling_2026.json",
+  "n": 4554,
+  "clusters": 27,
+  "seeds": [
+    42,
+    7,
+    2026,
+    13,
+    99
+  ],
+  "bootstrap_seed": 20261116,
+  "replicates": 5000,
+  "deltas": {
+    "accuracy": {
+      "mean": 0.0024154589371980675,
+      "crossed_seed_tournament_ci95": [
+        -0.0020584361773545046,
+        0.006816624617214175
+      ]
+    },
+    "log_loss": {
+      "mean": 0.0001323651539344033,
+      "crossed_seed_tournament_ci95": [
+        -0.003021921536709596,
+        0.0033005216816695262
+      ]
+    },
+    "brier_score": {
+      "mean": -0.00031912261441228746,
+      "crossed_seed_tournament_ci95": [
+        -0.0016563547233970882,
+        0.0010559806100312766
+      ]
+    }
+  }
+}

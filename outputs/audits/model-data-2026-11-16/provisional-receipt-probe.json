@@ -1,0 +1,7 @@
+{
+  "live_winner_can_create_receipt": true,
+  "later_final_same_version_accepted_at_earlier_cutoff": true,
+  "release": "2026-01-01 10:05:00",
+  "recorded_end": "2026-01-01 11:00:00",
+  "explanation": "matchStatus is not required or fingerprinted by the receipt snapshot. The final-status source can reuse an earlier provisional-winner receipt."
+}

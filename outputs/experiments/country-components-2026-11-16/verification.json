@@ -1,0 +1,14 @@
+{
+  "verified_at_utc": "2026-11-16T06:10:32.858863+00:00",
+  "pre_existing_files_unchanged": 15143,
+  "only_existing_file_change": "Append-only EXPERIMENTS.md update",
+  "original_document_preserved": true,
+  "production_default_and_saved_predictions_unchanged": true,
+  "all_saved_bets_and_settlements_unchanged": 84,
+  "profits_json_sha256": "4040c102b19a3c37992c94eda60ab620ca800bbdb2296496bdfbfc1457954245",
+  "profits_md_sha256": "2f3c34574eba9271e751b8f6607c2f0e9d3ab3e2228e5a6ece50205556eac64f",
+  "core_tests_passed": 284,
+  "component_tests_passed": 6,
+  "country_context_tests_passed": 10,
+  "baseline_and_original_combined_anchors_reproduced": true
+}

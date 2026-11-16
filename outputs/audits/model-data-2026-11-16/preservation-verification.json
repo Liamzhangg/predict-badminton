@@ -1,0 +1,11 @@
+{
+  "checked_files": 15243,
+  "changed": [],
+  "production_forecasts_bets_unchanged": true,
+  "core_tests": {
+    "command": ".venv/bin/python -m unittest discover -s tests -q",
+    "passed": 296,
+    "exit_code": 0
+  },
+  "git_diff_check": "clean"
+}

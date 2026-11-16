@@ -1,0 +1,21 @@
+{
+  "verified_at_utc": "2026-11-16T14:56:17.473335+00:00",
+  "pre_existing_files_unchanged": 15173,
+  "only_existing_file_change": "Append-only EXPERIMENTS.md update",
+  "original_document_preserved": true,
+  "production_default_and_saved_predictions_unchanged": true,
+  "all_saved_bets_and_settlements_unchanged": 84,
+  "profits_json_sha256": "4040c102b19a3c37992c94eda60ab620ca800bbdb2296496bdfbfc1457954245",
+  "profits_md_sha256": "2f3c34574eba9271e751b8f6607c2f0e9d3ab3e2228e5a6ece50205556eac64f",
+  "core_tests_passed": 284,
+  "production_comparison_tests_passed": 6,
+  "paired_check_tests_passed": 10,
+  "country_context_tests_passed": 10,
+  "original_annual_anchors_reproduced": true,
+  "paired_cluster_evidence_reconciles": true,
+  "actual_production_booster_reproduced_exactly": true,
+  "primary_scores_and_gates_unchanged_by_artifact_followup": true,
+  "historical_promotion_gate_passed": true,
+  "prospective_forward_gate_available": false,
+  "new_model_bundles_exported": 0
+}

@@ -1,6 +1,6 @@
 # predict-badminton
 
-BWF match-win probabilities using **LightGBM + score-sensitive Elo + player-based TrueSkill**. Covers men's/women's singles, men's/women's doubles, and mixed doubles.
+BWF match-win probabilities using **LightGBM + score-sensitive Elo + player-based TrueSkill + country Elo, identity and counts**. Covers men's/women's singles, men's/women's doubles, and mixed doubles.
 
 <table align="center">
   <tr>
@@ -9,13 +9,21 @@ BWF match-win probabilities using **LightGBM + score-sensitive Elo + player-base
     <th>Brier Score</th>
   </tr>
   <tr>
-    <td align="center"><strong>76.22%</strong></td>
-    <td align="center"><strong>0.4802</strong></td>
-    <td align="center"><strong>0.1593</strong></td>
+    <td align="center"><strong>77.74%</strong></td>
+    <td align="center"><strong>0.4550</strong></td>
+    <td align="center"><strong>0.1501</strong></td>
   </tr>
 </table>
 
-Retrospective 2026 holdout: **43,580 matches** across all five disciplines. Lower log loss and Brier score are better.
+Retrospective 2026 quarterly replay: **44,179 matches**, averaged across five seeds, across all five disciplines. Lower log loss and Brier score are better. These are historical model-selection results, not a fresh forward test or a profitability guarantee. See [experiment evidence](EXPERIMENTS.md).
+
+## Forecast Default
+
+New forecasts select the separate country-feature bundle through local `outputs/forecast_bundle.json`. The previous observed-timing model remains intact as a backup. Ratings and recent form refresh from completed local results before each new forecast; existing predictions and paper bets are never recalculated. Country fixtures require `team1_country` and `team2_country` columns, with empty values allowed for unknown countries. See [forecast and rollback instructions](data/README.md#new-forecasts).
+
+## Publication Privacy
+
+Betting records remain local-only. Only source and aggregate research are published.
 
 ## Elo Leaderboards
 
@@ -58,12 +66,13 @@ These are **model ratings, not official BWF rankings or win probabilities**. Jun
 
 ## Model
 
-Built from **302,332 matches spanning 2018-2026**, the model estimates win probabilities for all five badminton disciplines.
+Refitted on **302,941 matches spanning 2018-2026**, the default model estimates win probabilities for all five badminton disciplines.
 
 **LightGBM** combines **score-sensitive Elo** and **player-based TrueSkill** with:
 
 - **Player strength:** individual ratings, doubles partnerships, and past match scores.
 - **Match history:** recent form, head-to-head results, and rest days.
 - **Tournament context:** event type, tournament level, round, and seeding.
+- **Country context:** per-discipline country Elo, country identity, and historical intercountry match counts. Home advantage and travel distance are not included.
 
 Historical evaluation follows chronological order, with result-availability checks designed to reduce data leakage.

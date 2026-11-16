@@ -1,0 +1,77 @@
+{
+  "production_refit": {
+    "rows": 302941,
+    "as_of": "2026-11-16T18:17:18",
+    "through": "2026-11-15T16:06:00.961766",
+    "best_iteration": 500
+  },
+  "recent_events": {
+    "kumamoto-masters-japan-2026": {
+      "raw_rows": 172,
+      "eligible_training_rows": 171,
+      "raw_completed_non_walkover_winner_ids_missing_from_cohort": [],
+      "finals": [
+        {
+          "match_id": 1565920,
+          "discipline": "XD",
+          "available_at": "2026-11-15 16:05:56.740139"
+        },
+        {
+          "match_id": 1565805,
+          "discipline": "MS",
+          "available_at": "2026-11-15 16:05:56.740139"
+        },
+        {
+          "match_id": 1565905,
+          "discipline": "MD",
+          "available_at": "2026-11-15 16:05:56.740139"
+        },
+        {
+          "match_id": 1565813,
+          "discipline": "WD",
+          "available_at": "2026-11-15 16:05:56.740139"
+        },
+        {
+          "match_id": 1565851,
+          "discipline": "WS",
+          "available_at": "2026-11-15 16:05:56.740139"
+        }
+      ]
+    },
+    "victor-kaohsiung-masters-2026": {
+      "raw_rows": 238,
+      "eligible_training_rows": 237,
+      "raw_completed_non_walkover_winner_ids_missing_from_cohort": [],
+      "finals": [
+        {
+          "match_id": 1565515,
+          "discipline": "XD",
+          "available_at": "2026-11-15 16:06:00.961766"
+        },
+        {
+          "match_id": 1565683,
+          "discipline": "WS",
+          "available_at": "2026-11-15 16:06:00.961766"
+        },
+        {
+          "match_id": 1565601,
+          "discipline": "MS",
+          "available_at": "2026-11-15 16:06:00.961766"
+        },
+        {
+          "match_id": 1565580,
+          "discipline": "WD",
+          "available_at": "2026-11-15 16:06:00.961766"
+        },
+        {
+          "match_id": 1565636,
+          "discipline": "MD",
+          "available_at": "2026-11-15 16:06:00.961766"
+        }
+      ]
+    }
+  },
+  "hong_kong_target_count": 79,
+  "hong_kong_targets_already_in_training": [],
+  "note": "Local source/cohort completeness only; not an independent new crawl of official results."
+}

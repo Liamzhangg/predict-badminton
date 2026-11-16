@@ -1,0 +1,96 @@
+{
+  "locked_at_utc": "2026-11-16T06:36:47.644769+00:00",
+  "cutoff": "2026-11-15T05:54:42.807512+00:00",
+  "seeds": [
+    42,
+    7,
+    2026,
+    13,
+    99
+  ],
+  "variants": {
+    "country_only": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "country_rating_t1",
+      "country_rating_t2",
+      "country_rating_diff",
+      "country_log_n_t1",
+      "country_log_n_t2",
+      "country_log_n_diff",
+      "country_id_t1",
+      "country_id_t2"
+    ],
+    "home_distance": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "home_t1",
+      "home_t2",
+      "home_diff",
+      "country_rating_t1",
+      "country_rating_t2",
+      "country_rating_diff",
+      "country_log_n_t1",
+      "country_log_n_t2",
+      "country_log_n_diff",
+      "country_id_t1",
+      "country_id_t2",
+      "home_log_km_t1",
+      "home_log_km_t2",
+      "home_log_km_diff"
+    ]
+  },
+  "comparison": "country Elo + represented-country identity + log international-history counts, versus exactly that bundle with home indicators and home-country log-distance",
+  "primary": "Pooled quarterly-retraining 2026 accuracy; identical matches in both candidates. Raw two-order probability policy, same as current round forecasts.",
+  "annual": "Earlier-year refits scored on 2024, 2025, 2026; first two pooled as validation, 2026 reused benchmark.",
+  "rolling": "Retrain at January/April/July/October 2026 boundaries, using only earlier prediction times and labels available strictly before boundary. Score each next quarter; Q1 reuses identical January-trained annual predictions.",
+  "training": "Same fixed LightGBM defaults, availability-purged inner early stopping, refit available training rows. Country categories fit separately on each fitting/training split; unseen categories missing. Base/country history is updated only from results available before each target prediction.",
+  "statistics": "5000 paired tournament-edition/year bootstrap draws. Crossed intervals additionally resample the five seeds, sharing tournament draws. Matches are not multiplied by seed count. ECE uses fixed 10 uniform bins and is descriptive only.",
+  "gates_fixed_before_scoring": {
+    "validation_accuracy_delta": ">=0",
+    "validation_log_loss_delta": "<=0",
+    "annual_2026_accuracy_delta": ">=0",
+    "rolling_accuracy_crossed_ci95_lower": ">0",
+    "rolling_log_loss_crossed_ci95_upper": "<=0",
+    "rolling_brier_mean_delta": "<=0",
+    "prospective_forward": "Required but not currently available; no candidate can be declared production-ready from these reused outcomes alone."
+  },
+  "evaluation_status": "Reused retrospective benchmark, including rolling replay. New seeds are robustness checks, not new test data. No tuning, model export, production switch, or saved-bet/prediction changes.",
+  "base_bundle": "outputs/runs/2026-11-12-observed-timing-v2-054212Z",
+  "base_policy": {
+    "version": 3,
+    "disciplines": [
+      "MS",
+      "WS",
+      "MD",
+      "WD",
+      "XD"
+    ],
+    "elo": {
+      "default_elo": 1500.0,
+      "k_base": 32.0,
+      "pair_lambda": 20.0,
+      "alpha_player": 0.8,
+      "score_margin_weight": 0.5,
+      "score_margin_reference": 0.2
+    },
+    "glicko": null,
+    "trueskill": {
+      "parameters": {
+        "mu": 25.0,
+        "sigma": 8.333333333333334,
+        "beta": 4.166666666666667,
+        "tau": 0.08333333333333333
+      },
+      "entity": "player",
+      "library": "trueskill==0.4.5",
+      "draw_probability": 0.0,
+      "backend": null,
+      "calendar_inactivity": false
+    },
+    "result_availability": "observed_results_with_conservative_history_v2"
+  },
+  "research_helper_sha256": "6e9382e4ca9c282df5dd8ee1c102d2d4abd709666fb9132898145f54eef5b99b"
+}

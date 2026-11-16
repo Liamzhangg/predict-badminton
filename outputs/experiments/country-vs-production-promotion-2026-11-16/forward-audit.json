@@ -1,0 +1,29 @@
+{
+  "locked_at_utc": "2026-11-16T07:04:46.855261+00:00",
+  "latest_local_result_observation": "2026-11-15T16:06:00.961766Z",
+  "prior_bundles_matching_exact_candidate_schemas": {
+    "production_recipe": [
+      "outputs/artifacts/feature_list.json",
+      "outputs/archives/cleanup-2026-11-12/smoke-model/feature_list.json",
+      "outputs/experiment_reports/order-symmetry-promotion-2026-11-10/smoke/feature_list.json",
+      "outputs/experiment_reports/availability-promotion-2026-11-11/smoke-tuned/feature_list.json",
+      "outputs/runs/2026-11-12-observed-timing-v2-054212Z/feature_list.json",
+      "outputs/runs/2026-11-11-kumamoto-r16-observed/feature_list.json",
+      "outputs/runs/2026-11-11-pre-availability/feature_list.json",
+      "outputs/runs/2026-11-11-availability-safe/feature_list.json",
+      "outputs/runs/2026-11-12-official-world-tour-categories/feature_list.json",
+      "outputs/runs/2026-11-09-player-trueskill/feature_list.json"
+    ],
+    "country_candidate": []
+  },
+  "existing_timestamped_forecast_records": [
+    {
+      "file": "outputs/experiments/japan-kaohsiung-finals-2026-11-14/forecast.json",
+      "generated_at_utc": "2026-11-14T19:28:01.728272+00:00",
+      "model_directory": "outputs/runs/2026-11-12-observed-timing-v2-054212Z"
+    }
+  ],
+  "prospective_forward_gate_passed": false,
+  "reason": "No verified pre-result predictions for these two exact candidates. Completed local results and all replay scores are retrospective; future unseen matches are required.",
+  "scope": "Local repository audit only; no result fetching or edits to existing forecasts."
+}

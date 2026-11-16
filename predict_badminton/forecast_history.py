@@ -55,7 +55,8 @@ def refresh_history(
     if any(target_match_ids.intersection(m.get("source_match_ids", [str(m["match_id"])])) for m in eligible):
         raise ValueError("A completed target match is already known; it cannot be forecast as upcoming")
     fresh = FeatureBuilder(player_names=names, result_availability_policy=OBSERVED_AVAILABILITY_POLICY,
-                           category_catalog=history.category_catalog)
+                           category_catalog=history.category_catalog,
+                           country_context=history.country_context.empty_copy() if history.country_context is not None else None)
     fresh.elo = EloEngine(**history.model_policy["elo"])
     fresh.trueskill = TrueSkillEngine(**history.trueskill.parameters)
     if fresh.model_policy != history.model_policy:

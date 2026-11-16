@@ -1,0 +1,138 @@
+{
+  "started_at_utc": "2026-11-16T06:00:24.133459+00:00",
+  "frozen_cutoff": "2026-11-15T05:54:42.807512+00:00",
+  "seeds": [
+    42,
+    7,
+    2026
+  ],
+  "variants": {
+    "baseline": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2"
+    ],
+    "counts_only": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "country_log_n_t1",
+      "country_log_n_t2",
+      "country_log_n_diff"
+    ],
+    "elo_only": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "country_rating_t1",
+      "country_rating_t2",
+      "country_rating_diff"
+    ],
+    "identity_only": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "country_id_t1",
+      "country_id_t2"
+    ],
+    "elo_identity": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "country_rating_t1",
+      "country_rating_t2",
+      "country_rating_diff",
+      "country_id_t1",
+      "country_id_t2"
+    ],
+    "original_combined": [
+      "host_known",
+      "country_known_t1",
+      "country_known_t2",
+      "country_rating_t1",
+      "country_rating_t2",
+      "country_rating_diff",
+      "country_log_n_t1",
+      "country_log_n_t2",
+      "country_log_n_diff",
+      "country_id_t1",
+      "country_id_t2"
+    ]
+  },
+  "contrasts": {
+    "elo_alone": [
+      "baseline",
+      "elo_only"
+    ],
+    "identity_alone": [
+      "baseline",
+      "identity_only"
+    ],
+    "counts_alone": [
+      "baseline",
+      "counts_only"
+    ],
+    "identity_beyond_elo": [
+      "elo_only",
+      "elo_identity"
+    ],
+    "elo_beyond_identity": [
+      "identity_only",
+      "elo_identity"
+    ],
+    "counts_beyond_both": [
+      "elo_identity",
+      "original_combined"
+    ],
+    "original_combined_vs_baseline": [
+      "baseline",
+      "original_combined"
+    ]
+  },
+  "primary": [
+    "identity_beyond_elo",
+    "elo_beyond_identity"
+  ],
+  "rating": "Country Elo only: side ratings and difference, no counts/identity. Same uniform K=20, initial 1500, per-discipline, past-available international results only, as previous study.",
+  "identity": "Represented-country categorical labels only, shared vocabulary across sides fit on each training split; unseen test categories become missing. No ratings or counts in identity_only.",
+  "counts": "Separate log1p counts of earlier available international matches, both sides and difference. Counts-only and counts-beyond-both prevent attributing activity effects to Elo or identity.",
+  "fixed_context": "Same location-coverage flags in every variant. Home indicators and distance excluded throughout. Original combined column order preserved for exact reproducibility.",
+  "timing": "Observed-v2 replay, available_at strictly before target time; train labels available before year boundary; availability-purged internal early stopping then earlier-year refit; fixed LightGBM defaults, two-order probabilities.",
+  "evaluation": "Pooled 2024-2025 validation and reused retrospective 2026 benchmark; no fresh independent holdout, tuning, model promotion or saved forecast/bet updates. Three seeds are not independent test sets.",
+  "base_bundle": "outputs/runs/2026-11-12-observed-timing-v2-054212Z",
+  "base_policy": {
+    "version": 3,
+    "disciplines": [
+      "MS",
+      "WS",
+      "MD",
+      "WD",
+      "XD"
+    ],
+    "elo": {
+      "default_elo": 1500.0,
+      "k_base": 32.0,
+      "pair_lambda": 20.0,
+      "alpha_player": 0.8,
+      "score_margin_weight": 0.5,
+      "score_margin_reference": 0.2
+    },
+    "glicko": null,
+    "trueskill": {
+      "parameters": {
+        "mu": 25.0,
+        "sigma": 8.333333333333334,
+        "beta": 4.166666666666667,
+        "tau": 0.08333333333333333
+      },
+      "entity": "player",
+      "library": "trueskill==0.4.5",
+      "draw_probability": 0.0,
+      "backend": null,
+      "calendar_inactivity": false
+    },
+    "result_availability": "observed_results_with_conservative_history_v2"
+  },
+  "research_helper": "outputs/experiments/home-distance-controls-2026-11-15/study.py",
+  "research_helper_sha256": "6e9382e4ca9c282df5dd8ee1c102d2d4abd709666fb9132898145f54eef5b99b"
+}

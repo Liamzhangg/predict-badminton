@@ -1,0 +1,115 @@
+{
+  "evaluation_type": "Retrospective post-training slice for actual saved production weights; not prospective candidate forecasts",
+  "snapshot_cutoff": "2026-11-12T05:42:12",
+  "production_training_rows": 302429,
+  "reconstructed_training_rows": 302429,
+  "post_snapshot_matches": 249,
+  "prediction_policy": "raw two-order average, features refreshed strictly before each target",
+  "saved_receipts_used": false,
+  "drops": {
+    "walkover": 8577,
+    "bad_winner": 6355,
+    "no_player_ids": 5795,
+    "para_match": 29757,
+    "no_time": 1199,
+    "duplicate_fixture": 652,
+    "unobserved_or_conflicting_result_version": 512,
+    "duplicate_source_alias": 208
+  },
+  "saved_receipt_training_digest": "bfc5dba4589d1cb347a6431f9c48ccd07b04a0cf98e6197995d7fed250e8256e",
+  "matches_primary_replay_prefix": true,
+  "identical_booster_dump": true,
+  "mirror_maximum_probability_difference": 0.0,
+  "production_metrics": {
+    "n": 249,
+    "log_loss": 0.4833882738759338,
+    "brier_score": 0.16105312317390946,
+    "roc_auc": 0.8428940568475453,
+    "accuracy": 0.7469879518072289,
+    "ece": 0.022960868758184465
+  },
+  "status": "verified_retrospective_comparison",
+  "candidate_metrics": {
+    "n": 249,
+    "log_loss": 0.4775358277388684,
+    "brier_score": 0.15878964458649522,
+    "roc_auc": 0.8469638242894056,
+    "accuracy": 0.7469879518072289,
+    "ece": 0.038004744726270065
+  },
+  "paired": {
+    "n": 249,
+    "seeds": [
+      42
+    ],
+    "clusters": 3,
+    "replicates": 5000,
+    "unit": "Unique match; seed-average paired differences, not stacked seed observations",
+    "accuracy": {
+      "mean": 0.0,
+      "seed_values": {
+        "42": 0.0
+      },
+      "cluster_ci95": [
+        -0.016666666666666666,
+        0.006802721088435374
+      ],
+      "crossed_seed_cluster_ci95": [
+        -0.016666666666666666,
+        0.006802721088435374
+      ]
+    },
+    "log_loss": {
+      "mean": -0.005852446137065357,
+      "seed_values": {
+        "42": -0.00585244613706536
+      },
+      "cluster_ci95": [
+        -0.013615317752803094,
+        0.013082117414884544
+      ],
+      "crossed_seed_cluster_ci95": [
+        -0.013615317752803094,
+        0.013082117414884544
+      ]
+    },
+    "brier_score": {
+      "mean": -0.002263478587414232,
+      "seed_values": {
+        "42": -0.002263478587414232
+      },
+      "cluster_ci95": [
+        -0.004565788302817474,
+        0.004969261038056299
+      ],
+      "crossed_seed_cluster_ci95": [
+        -0.004565788302817474,
+        0.004969261038056299
+      ]
+    }
+  },
+  "original_tree_count": 500,
+  "note": "Both fits use the original production training snapshot and parameters. This small, already-seen later slice is diagnostic, not a fresh independent gate.",
+  "historical_observation_snapshot_used": true,
+  "receipt_source": "Historical observation database strictly before original production snapshot",
+  "initial_saved_receipt_reconstruction": {
+    "evaluation_type": "Retrospective post-training slice for actual saved production weights; not prospective candidate forecasts",
+    "snapshot_cutoff": "2026-11-12T05:42:12",
+    "production_training_rows": 302429,
+    "reconstructed_training_rows": 302645,
+    "post_snapshot_matches": 249,
+    "prediction_policy": "raw two-order average, features refreshed strictly before each target",
+    "saved_receipts_used": true,
+    "drops": {
+      "walkover": 8577,
+      "bad_winner": 6355,
+      "no_player_ids": 5795,
+      "para_match": 29757,
+      "no_time": 1199,
+      "duplicate_fixture": 652,
+      "duplicate_source_alias": 208
+    },
+    "status": "not_verified",
+    "reason": "Training row count differs or no post-snapshot matches"
+  }
+}

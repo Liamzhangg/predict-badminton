@@ -1,0 +1,8 @@
+{
+  "locked_at_utc": "2026-11-16T07:13:57.443298+00:00",
+  "reason": "Original saved receipt roster does not list later-ingested older matches, so it cannot by itself restore the old raw-file inventory.",
+  "repair": "Use the existing historical observation database strictly before the original production snapshot. Later-known IDs are unobserved at that snapshot and excluded, without using winners to select records.",
+  "verification": "Require original training-row count and numerical/booster reproduction of the actual saved model before candidate scoring. Same 500-tree model parameters and seed as production. Only strictly post-snapshot targets are evaluated.",
+  "primary_gate": "Unchanged; this small retrospective diagnostic is not the primary replay or fresh forward validation.",
+  "snapshot_cutoff": "2026-11-12T05:42:12"
+}

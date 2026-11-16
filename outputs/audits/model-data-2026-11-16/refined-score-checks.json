@@ -1,0 +1,395 @@
+{
+  "counts": {
+    "normal_status_valid_sequence_agrees_with_winner": 290654,
+    "non_normal_score_status_source_rows": 2452,
+    "normal_status_missing_or_nonstandard_21point_sequence": 10660,
+    "normal_status_extra_game_after_2_0": 27,
+    "normal_status_valid_sequence_winner_conflict": 7,
+    "normal_status_incomplete_best_of_three": 1
+  },
+  "examples": {
+    "normal_status_extra_game_after_2_0": [
+      {
+        "path": "data/raw/bwf_matches/2019-carebaco-junior-international.json",
+        "id": 1179177,
+        "score": [
+          [
+            16,
+            21
+          ],
+          [
+            14,
+            21
+          ],
+          [
+            20,
+            22
+          ]
+        ],
+        "winner": 2,
+        "canonical_match_id": 1179177,
+        "canonical_winner": 2,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/5th-iran-junior-international-series-2024.json",
+        "id": 1351813,
+        "score": [
+          [
+            18,
+            21
+          ],
+          [
+            17,
+            21
+          ],
+          [
+            21,
+            15
+          ]
+        ],
+        "winner": 2,
+        "canonical_match_id": 1351813,
+        "canonical_winner": 2,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/algeria-international-2018.json",
+        "id": 523268,
+        "score": [
+          [
+            19,
+            21
+          ],
+          [
+            21,
+            23
+          ],
+          [
+            19,
+            21
+          ]
+        ],
+        "winner": 2,
+        "canonical_match_id": 523268,
+        "canonical_winner": 2,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/all-africa-men-s-and-women-s-team-championships-2018.json",
+        "id": 524573,
+        "score": [
+          [
+            24,
+            22
+          ],
+          [
+            21,
+            14
+          ],
+          [
+            21,
+            15
+          ]
+        ],
+        "winner": 1,
+        "canonical_match_id": 524573,
+        "canonical_winner": 1,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/all-africa-mixed-team-championships-2025.json",
+        "id": 1418783,
+        "score": [
+          [
+            21,
+            15
+          ],
+          [
+            21,
+            9
+          ],
+          [
+            21,
+            15
+          ]
+        ],
+        "winner": 1,
+        "canonical_match_id": 1418783,
+        "canonical_winner": 1,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/all-africa-mixed-team-championships-2025.json",
+        "id": 1418830,
+        "score": [
+          [
+            19,
+            21
+          ],
+          [
+            17,
+            21
+          ],
+          [
+            16,
+            21
+          ]
+        ],
+        "winner": 2,
+        "canonical_match_id": 1418830,
+        "canonical_winner": 2,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/austrian-u17-open-2025.json",
+        "id": 1430568,
+        "score": [
+          [
+            21,
+            15
+          ],
+          [
+            21,
+            11
+          ],
+          [
+            21,
+            11
+          ]
+        ],
+        "winner": 1,
+        "canonical_match_id": 1430568,
+        "canonical_winner": 1,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/ciputra-hanoi-yonex-sunrise-vietnam-international-challenge-2026.json",
+        "id": 1509400,
+        "score": [
+          [
+            21,
+            23
+          ],
+          [
+            13,
+            21
+          ],
+          [
+            19,
+            21
+          ]
+        ],
+        "winner": 2,
+        "canonical_match_id": 1509400,
+        "canonical_winner": 2,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/elpozo-bwf-world-senior-badminton-championships-2021.json",
+        "id": 1253263,
+        "score": [
+          [
+            21,
+            14
+          ],
+          [
+            21,
+            11
+          ],
+          [
+            21,
+            11
+          ]
+        ],
+        "winner": 1,
+        "canonical_match_id": 1253263,
+        "canonical_winner": 1,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/elpozo-bwf-world-senior-badminton-championships-2021.json",
+        "id": 1253267,
+        "score": [
+          [
+            21,
+            12
+          ],
+          [
+            21,
+            12
+          ],
+          [
+            21,
+            12
+          ]
+        ],
+        "winner": 1,
+        "canonical_match_id": 1253267,
+        "canonical_winner": 1,
+        "canonical_score_margin": null
+      }
+    ],
+    "normal_status_valid_sequence_winner_conflict": [
+      {
+        "path": "data/raw/bwf_matches/badminton-asia-south-asia-regional-championships-2026-individual.json",
+        "id": 1512847,
+        "score": [
+          [
+            21,
+            19
+          ],
+          [
+            14,
+            21
+          ],
+          [
+            21,
+            1
+          ]
+        ],
+        "winner": 2,
+        "canonical_match_id": 1512847,
+        "canonical_winner": 2,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/fz-forza-alpes-international-u19-2023.json",
+        "id": 1304511,
+        "score": [
+          [
+            21,
+            19
+          ],
+          [
+            21,
+            12
+          ]
+        ],
+        "winner": 2,
+        "canonical_match_id": 1304511,
+        "canonical_winner": 2,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/fz-forza-alpes-international-u19-2023.json",
+        "id": 1304513,
+        "score": [
+          [
+            15,
+            21
+          ],
+          [
+            11,
+            21
+          ]
+        ],
+        "winner": 1,
+        "canonical_match_id": 1304513,
+        "canonical_winner": 1,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/iceland-international-2019.json",
+        "id": 1145836,
+        "score": [
+          [
+            9,
+            21
+          ],
+          [
+            10,
+            21
+          ]
+        ],
+        "winner": 1,
+        "canonical_match_id": 1145836,
+        "canonical_winner": 1,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/tem-slovenia-junior-international-2019.json",
+        "id": 1186963,
+        "score": [
+          [
+            20,
+            22
+          ],
+          [
+            21,
+            19
+          ],
+          [
+            19,
+            21
+          ]
+        ],
+        "winner": 1,
+        "canonical_match_id": 1186963,
+        "canonical_winner": 1,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/tem-slovenia-junior-international-2020.json",
+        "id": 1225763,
+        "score": [
+          [
+            21,
+            18
+          ],
+          [
+            13,
+            21
+          ],
+          [
+            20,
+            22
+          ]
+        ],
+        "winner": 1,
+        "canonical_match_id": 1225763,
+        "canonical_winner": 1,
+        "canonical_score_margin": null
+      },
+      {
+        "path": "data/raw/bwf_matches/yonex-lithuanian-junior-2018.json",
+        "id": 1086596,
+        "score": [
+          [
+            21,
+            13
+          ],
+          [
+            21,
+            17
+          ]
+        ],
+        "winner": 2,
+        "canonical_match_id": 1086596,
+        "canonical_winner": 2,
+        "canonical_score_margin": null
+      }
+    ],
+    "normal_status_incomplete_best_of_three": [
+      {
+        "path": "data/raw/bwf_matches/zambia-international-2024.json",
+        "id": 1397794,
+        "score": [
+          [
+            2,
+            21
+          ],
+          [
+            21,
+            14
+          ]
+        ],
+        "winner": 1,
+        "canonical_match_id": 1397794,
+        "canonical_winner": 1,
+        "canonical_score_margin": null
+      }
+    ]
+  },
+  "note": "Source-copy counts, not unique canonical fixtures. Nonstandard sequences and retirements do not establish wrong winner labels."
+}

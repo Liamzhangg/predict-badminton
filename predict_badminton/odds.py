@@ -6,7 +6,6 @@ from datetime import UTC, datetime
 
 import pandas as pd
 
-from predict_badminton.config import DISCIPLINES
 from predict_badminton.forecast_history import history_sha256, refresh_history
 from predict_badminton.probabilities import PREDICTION_POLICY, predict_probabilities
 
@@ -94,7 +93,7 @@ def round_predictions(snapshot: dict, bundle: tuple, *, round_name: str, refresh
         cutoff = history.history_cutoff
     rows = [history.preview(match) for match in matches]
     frame = pd.DataFrame(rows)[history.feature_columns]
-    frame["discipline"] = pd.Categorical(frame["discipline"], categories=DISCIPLINES + ["OTHER"])
+    history.encode_categories(frame)
     probabilities = predict_probabilities(model, frame)
     if refresh and as_of is None and any(m["match_time"] <= datetime.now(UTC).replace(tzinfo=None) for m in matches):
         raise ValueError("A fixture started while refreshing history; no live forecast is available")

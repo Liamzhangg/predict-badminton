@@ -128,3 +128,11 @@ TRUESKILL_FEATURE_COLS: list[str] = [
     for side in ("t1", "t2", "diff")
 ]
 FEATURE_COLS: list[str] = LEGACY_FEATURE_COLS + TRUESKILL_FEATURE_COLS
+
+COUNTRY_CONTEXT_COLS: list[str] = [
+    "host_known", "country_known_t1", "country_known_t2",
+    "country_rating_t1", "country_rating_t2", "country_rating_diff",
+    "country_log_n_t1", "country_log_n_t2", "country_log_n_diff",
+    "country_id_t1", "country_id_t2",
+]
+COUNTRY_FEATURE_COLS: list[str] = FEATURE_COLS + COUNTRY_CONTEXT_COLS

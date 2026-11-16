@@ -4,7 +4,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from predict_badminton.config import FEATURE_COLS, GLICKO_MODEL_FEATURE_COLS, LEGACY_FEATURE_COLS
+from predict_badminton.config import COUNTRY_FEATURE_COLS, FEATURE_COLS, GLICKO_MODEL_FEATURE_COLS, LEGACY_FEATURE_COLS
 
 PREDICTION_POLICY = "two_order_average_v1"
 
@@ -16,6 +16,8 @@ _PAIRS = [
     ("form5_cnt_t1", "form5_cnt_t2"), ("form10_cnt_t1", "form10_cnt_t2"),
     ("rest_days_t1", "rest_days_t2"), ("h2h_wins_t1", "h2h_wins_t2"),
     ("team1_seeded", "team2_seeded"),
+    ("country_known_t1", "country_known_t2"), ("country_rating_t1", "country_rating_t2"),
+    ("country_log_n_t1", "country_log_n_t2"), ("country_id_t1", "country_id_t2"),
     *[(f"{engine}_{quantity}_t1", f"{engine}_{quantity}_t2")
       for engine, quantities in (("glicko", ("rating", "rd", "volatility")),
                                  ("trueskill", ("mu", "sigma"))) for quantity in quantities],
@@ -23,18 +25,18 @@ _PAIRS = [
 _DIFFERENCES = ["elo_diff_disc", "elo_diff_global", "pair_component_diff",
                 "form5_wr_diff", "form10_wr_diff", "seed_diff",
                 "glicko_rating_diff", "glicko_rd_diff", "glicko_volatility_diff",
-                "trueskill_mu_diff", "trueskill_sigma_diff"]
+                "trueskill_mu_diff", "trueskill_sigma_diff", "country_rating_diff", "country_log_n_diff"]
 _UNCHANGED = ["elo_reliability", "pair_reliability", "h2h_total", "tournament_tier",
-              "round_importance", "same_country", "discipline"]
+              "round_importance", "same_country", "discipline", "host_known"]
 
 
 def swap_features(frame: pd.DataFrame) -> pd.DataFrame:
     """Reverse the opponents, preserving context and categorical types."""
-    if list(frame.columns) not in (FEATURE_COLS, GLICKO_MODEL_FEATURE_COLS, LEGACY_FEATURE_COLS):
+    if list(frame.columns) not in (COUNTRY_FEATURE_COLS, FEATURE_COLS, GLICKO_MODEL_FEATURE_COLS, LEGACY_FEATURE_COLS):
         raise ValueError("Unsupported or reordered model feature schema")
     pairs = [(first, second) for first, second in _PAIRS if first in frame]
     differences = [name for name in _DIFFERENCES if name in frame]
-    covered = [name for pair in pairs for name in pair] + differences + _UNCHANGED + ["h2h_wr_t1"]
+    covered = [name for pair in pairs for name in pair] + differences + [name for name in _UNCHANGED if name in frame] + ["h2h_wr_t1"]
     if len(covered) != len(set(covered)) or set(covered) != set(frame.columns):
         raise ValueError("Model feature schema lacks a complete opponent-swap policy")
     swapped = frame.copy()

@@ -1,0 +1,21 @@
+{
+  "complete": true,
+  "promoted_at_utc": "2026-11-16T18:22:45.344644+00:00",
+  "selected_directory": "outputs/runs/2026-11-16-country-context-181718Z",
+  "backup_directory": "outputs/runs/2026-11-12-observed-timing-v2-054212Z",
+  "core_tests_passed": 296,
+  "default_predict_cli_verified": true,
+  "default_round_cli_verified": true,
+  "protected_files_checked": 15138,
+  "intentional_changes": [
+    "data/README.md",
+    "outputs/forecast_bundle.json"
+  ],
+  "all_preexisting_models_predictions_odds_and_bets_unchanged": true,
+  "selected_model_sha256": "119369c3b2c82f34f59238293af5c739ece494e3a0c044e67226819ef67214fa",
+  "selected_state_sha256": "4e6f7ead9f039765a1a7c2902651d983fbcebbeb7bcd9a89338c2387055808d7",
+  "backup_model_sha256": "1ac05853bf7efc9a192dce703305c8445f7a64468b0732c9964019d3ba4ca594",
+  "backup_state_sha256": "f59f94efb9fd035d7b89f49eb797ef64c72a0cbca838d6d1bdfa6c8c030c48e6",
+  "profits_json_sha256": "4040c102b19a3c37992c94eda60ab620ca800bbdb2296496bdfbfc1457954245",
+  "profits_md_sha256": "2f3c34574eba9271e751b8f6607c2f0e9d3ab3e2228e5a6ece50205556eac64f"
+}

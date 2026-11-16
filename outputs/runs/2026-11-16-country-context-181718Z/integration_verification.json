@@ -1,0 +1,57 @@
+{
+  "complete": true,
+  "checked_at_utc": "2026-11-16T18:21:59.076326+00:00",
+  "protected_data_output_files_checked": 15138,
+  "intentional_changes": [
+    "data/README.md"
+  ],
+  "original_models_predictions_odds_and_bets_unchanged": true,
+  "new_bundle_all_disciplines_and_unknown_countries": true,
+  "backup_bundle_loadable": true,
+  "temporary_round_workflow_with_live_refresh": true,
+  "synthetic_outputs_removed": true,
+  "core_tests_passed": 296,
+  "default_pointer_changed": false,
+  "synthetic_smoke_probabilities_not_forecasts": {
+    "2026-11-12-observed-timing-v2-054212Z": [
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5
+    ],
+    "2026-11-16-country-context-181718Z": [
+      0.41072448575924386,
+      0.761372067409573,
+      0.266290170254592,
+      0.37793652992619703,
+      0.7668544589372442,
+      0.2585687257265219,
+      0.3710080769602803,
+      0.7546323131930593,
+      0.2747854325798945,
+      0.3494030636130846,
+      0.7369115121516631,
+      0.27261648735574606,
+      0.3714514918312465,
+      0.7617778559731087,
+      0.2776248187716679
+    ]
+  },
+  "critical_sha256": {
+    "outputs/profits.json": "4040c102b19a3c37992c94eda60ab620ca800bbdb2296496bdfbfc1457954245",
+    "outputs/profits.md": "2f3c34574eba9271e751b8f6607c2f0e9d3ab3e2228e5a6ece50205556eac64f",
+    "outputs/runs/2026-11-12-observed-timing-v2-054212Z/lgbm_model.pkl": "1ac05853bf7efc9a192dce703305c8445f7a64468b0732c9964019d3ba4ca594",
+    "outputs/runs/2026-11-12-observed-timing-v2-054212Z/feature_state.pkl": "f59f94efb9fd035d7b89f49eb797ef64c72a0cbca838d6d1bdfa6c8c030c48e6"
+  }
+}
