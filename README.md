@@ -23,7 +23,9 @@ New forecasts select `outputs/runs/2026-11-16-receipt-quality-cleaned` through `
 
 ## Publication Privacy
 
-Betting records remain local-only. Only source and aggregate research are published.
+Betting slips, sportsbook odds, individual forecasts and the accounting ledger are private, local-only files. Model code and aggregate research reports are published. See the [model and data audit](outputs/audits/model-data-2026-11-16/report.md) and [publication policy](PUBLICATION.md).
+
+Raw result data, response caches and trained model binaries also remain local; cloning the repository alone does not supply a trained prediction environment.
 
 ## Elo Leaderboards
 

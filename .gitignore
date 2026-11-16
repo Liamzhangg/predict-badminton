@@ -23,7 +23,6 @@ build/
 !data/templates/upcoming_fixtures_template.csv
 !data/draws/*.json
 !data/leaderboards/elo_leaderboard_*.csv
-!data/odds/**/*.csv
 !data/catalogs/*.csv
 !data/quarantine/bwf_matches/records.csv
 data/raw/**/*.json
@@ -39,6 +38,13 @@ data/manifests/*.sqlite3*
 !data/manifests/.gitkeep
 models/
 outputs/
+
+# Private betting records and history backups must never be published.
+.private/
+data/odds/
+outputs/rounds/
+outputs/profits.*
+tests/test_betting_slip.py
 
 # OS
 .DS_Store

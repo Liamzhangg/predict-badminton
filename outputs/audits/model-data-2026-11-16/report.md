@@ -102,7 +102,7 @@ The reconstructed training cohort includes 171 eligible Kumamoto 2026 results an
 
 The frozen Hong Kong forecast selects this country bundle, refreshes eligible history at its own cutoff, and has 79 target IDs. None appears among training source IDs. These saved targets are suitable for prospective tracking only while their original probabilities and selection rules remain frozen.
 
-Evidence: [recent events and target overlap](recent-events-and-targets.json#L1), private local records.
+Evidence: [recent events and target overlap](recent-events-and-targets.json#L1). Individual forecast metadata remains local-only.
 
 ## Recommended Next Actions
 
@@ -125,4 +125,4 @@ PYTHONPATH=. .venv/bin/python outputs/audits/model-data-2026-11-16/primary_subgr
 
 The diagnostic scripts write only within this audit directory. The primary script checks the original protected-file snapshot and fails if protected files differ. A later legitimate production or data update will therefore require a separately dated audit rather than overwriting the original preservation baseline.
 
-Publication note: raw sources, model binaries and the full protected-file inventory remain local. The published preservation verification records the completed audit-time check; only aggregate diagnostics and source code are published; individual predictions stay local.
+Publication note: raw sources, model binaries, private betting records, individual predictions and the full protected-file inventory remain local. The published preservation verification records the completed audit-time check; only aggregate diagnostics and source code are published.
