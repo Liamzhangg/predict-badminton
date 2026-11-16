@@ -1,0 +1,11 @@
+{
+  "candidate_directory": "outputs/runs/2026-11-16-receipt-quality-cleaned",
+  "model_sha256": "4c75695a51ae3bb5aa5489d23b151b5a9759f4466857e77143048e9705e3138a",
+  "state_sha256": "d4fe1505cd3379a0f5f94c7a0a3d367a3645335228cb181bf44ea1855711b9df",
+  "roundtrip_load": true,
+  "frozen_bet_edits": false,
+  "shadow_fixtures": 79,
+  "max_shadow_change_pp": 6.035310996376553,
+  "median_shadow_change_pp": 1.1533913124785855,
+  "production_pointer_changed": false
+}

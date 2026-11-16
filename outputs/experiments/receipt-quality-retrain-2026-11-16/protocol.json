@@ -1,0 +1,17 @@
+{
+  "purpose": "Compare receipt and seven-record quarantine fixes with the active 55-feature country production recipe without promotion or changing Hong Kong bets.",
+  "reference_commit": "6c8c20885e8a141ae7ce7484b04f9fc6345c86d7",
+  "as_of_utc": "2026-11-16T18:17:18+00:00",
+  "seeds": [42, 7, 2026, 13, 99],
+  "variants": ["current_recipe", "cleaned_recipe"],
+  "primary": "Paired 2026 quarterly historical replay, refitting at January/April/July/October boundaries using only earlier prediction times and labels available strictly before each boundary.",
+  "secondary": "Annual 2026 replay reuses each January fit. Report senior World Tour, World Tour R32, junior-tagged and discipline subgroups descriptively.",
+  "training": "Same production LightGBM parameters and feature schema. Availability-purged chronological internal early stopping, then refit all eligible training rows with selected iterations. Training-only country vocabularies. No new tuning or feature search.",
+  "evaluation_population": "Identical non-quarantined 2026 fixtures in both variants, with identical frozen labels, prediction times and result-availability times. A quarantined result is never an evaluation target in either variant.",
+  "metrics": ["accuracy", "log_loss", "brier_score", "ece"],
+  "uncertainty": "5000 paired tournament-edition/year bootstrap resamples crossed with five seed resamples. Seeds do not multiply match counts. Subgroup intervals are exploratory, not multiplicity adjusted.",
+  "final_candidate": "Separate all-clean-data seed-42 refit using the production 500-tree parameters at the same data cutoff. Never score either all-data artifact on its own historical training rows.",
+  "hong_kong": "Original forecasts, odds, reports, pending bets and accounting remain byte-for-byte frozen. Optional new shadow-probability comparison is stored only in this experiment directory and does not select or record bets.",
+  "limitations": "All historical years have been reused during model development. These are matched retrospective diagnostics, not independent forward validation or a profitability test. Actual post-training accuracy is unavailable until future outcomes occur.",
+  "production_pointer_change": false
+}

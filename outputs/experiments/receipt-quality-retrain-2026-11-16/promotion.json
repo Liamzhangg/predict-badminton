@@ -1,0 +1,33 @@
+{
+  "promoted_at_utc": "2026-11-16T22:22:33.263655+00:00",
+  "authorization": "Explicit user request after reviewing the cleaned-model comparison",
+  "default_directory": "outputs/runs/2026-11-16-receipt-quality-cleaned",
+  "previous_directory": "outputs/runs/2026-11-16-country-context-181718Z",
+  "default_pointer": "outputs/forecast_bundle.json",
+  "rollback_pointer": "outputs/forecast_bundle.previous.json",
+  "older_observed_backup_unchanged": true,
+  "model_sha256": "4c75695a51ae3bb5aa5489d23b151b5a9759f4466857e77143048e9705e3138a",
+  "state_sha256": "d4fe1505cd3379a0f5f94c7a0a3d367a3645335228cb181bf44ea1855711b9df",
+  "training_rows": 302934,
+  "features": 55,
+  "default_bundle_loader_verified": true,
+  "synthetic_cli_predictions": 6,
+  "synthetic_predictions_removed": true,
+  "default_cli_used_cleaned_model": true,
+  "fresh_history_verified": true,
+  "all_disciplines_and_unknown_countries_verified": true,
+  "frozen_files_checked": 37,
+  "frozen_files_changed": [],
+  "hong_kong_forecasts_odds_and_bets_unchanged": true,
+  "existing_model_binaries_unchanged": true,
+  "hong_kong_forecast_sha256": "701eb2e926dc593af0fb0b9d85703494fcfdccf1ebb517174fcbdb972319f8c6",
+  "ledger_sha256": "a468aea607f7f406a0537577a20b1c44e4de1ad4bcd8e3e1b6d2db9f5ce47c24",
+  "comparison_stage_default_unchanged": true,
+  "promotion_is_separate_approved_action": true,
+  "historical_replay": {
+    "n": 44188,
+    "current_control_accuracy": 0.7773920521408527,
+    "cleaned_accuracy": 0.7772743731329773,
+    "kind": "reused historical recipe replay, not all-data artifact evaluation or proof of a performance gain"
+  }
+}

@@ -90,6 +90,30 @@ class PredictionArgsTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     forecast_bundle_directory()
 
+    def test_cleaned_default_changes_new_cli_selection_without_touching_frozen_records(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "outputs").mkdir()
+            previous = {"directory": "outputs/runs/previous-country"}
+            cleaned = {"directory": "outputs/runs/receipt-quality-cleaned"}
+            pointer = root / "outputs/forecast_bundle.json"
+            pointer.write_text(json.dumps(previous))
+            frozen = root / "outputs/hong-kong-forecast.json"
+            frozen.write_text(json.dumps({"model_directory": previous["directory"], "probability": "0.6123456789"}))
+            ledger = root / "outputs/profits.json"
+            ledger.write_text('{"bets": [{"stake": "10.00", "model_probability": "0.6123456789"}]}')
+            original = {path: path.read_bytes() for path in (frozen, ledger)}
+            (root / "outputs/forecast_bundle.previous.json").write_text(json.dumps(previous))
+            pointer.write_text(json.dumps(cleaned))
+            with patch("predict_badminton.config.REPO_ROOT", root), patch("sys.argv", ["predict.py", "--fixtures-csv", "future.csv"]):
+                args = parse_args()
+                self.assertEqual(args.model_path, (root / cleaned["directory"] / "lgbm_model.pkl").resolve())
+                self.assertEqual(args.state_path, (root / cleaned["directory"] / "feature_state.pkl").resolve())
+                self.assertEqual(args.probabilities, "raw")
+                self.assertFalse(args.frozen_history)
+            self.assertEqual(json.loads((root / "outputs/forecast_bundle.previous.json").read_text()), previous)
+            self.assertTrue(all(path.read_bytes() == content for path, content in original.items()))
+
     def test_cli_refreshes_by_default_and_never_overwrites_existing_predictions(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

@@ -9,17 +9,17 @@ BWF match-win probabilities using **LightGBM + score-sensitive Elo + player-base
     <th>Brier Score</th>
   </tr>
   <tr>
-    <td align="center"><strong>77.74%</strong></td>
-    <td align="center"><strong>0.4550</strong></td>
-    <td align="center"><strong>0.1501</strong></td>
+    <td align="center"><strong>77.73%</strong></td>
+    <td align="center"><strong>0.4554</strong></td>
+    <td align="center"><strong>0.1503</strong></td>
   </tr>
 </table>
 
-Retrospective 2026 quarterly replay: **44,179 matches**, averaged across five seeds, across all five disciplines. Lower log loss and Brier score are better. These are historical model-selection results, not a fresh forward test or a profitability guarantee. See [experiment evidence](EXPERIMENTS.md).
+Cleaned-recipe retrospective 2026 quarterly replay: **44,188 matches**, averaged across five seeds, across all five disciplines. Lower log loss and Brier score are better. The matched pre-cleanup recipe scored 77.739% versus 77.727% cleaned, with no demonstrated performance gain. This is a data-quality promotion, not a fresh forward test or a profitability guarantee. See the [comparison report](outputs/experiments/receipt-quality-retrain-2026-11-16/report.md) and [experiment evidence](EXPERIMENTS.md).
 
 ## Forecast Default
 
-New forecasts select the separate country-feature bundle through local `outputs/forecast_bundle.json`. The previous observed-timing model remains intact as a backup. Ratings and recent form refresh from completed local results before each new forecast; existing predictions and paper bets are never recalculated. Country fixtures require `team1_country` and `team2_country` columns, with empty values allowed for unknown countries. See [forecast and rollback instructions](data/README.md#new-forecasts).
+New forecasts select `outputs/runs/2026-11-16-receipt-quality-cleaned` through `outputs/forecast_bundle.json`. The 55-feature cleaned country model uses verified final-result receipts and excludes the seven quarantined winner/score contradictions. The previous country bundle remains intact as the immediate rollback target in `outputs/forecast_bundle.previous.json`; the older observed-timing backup is also retained. Ratings and recent form refresh from completed local results before each new forecast; existing predictions and paper bets are never recalculated. Country fixtures require `team1_country` and `team2_country` columns, with empty values allowed for unknown countries. See [forecast and rollback instructions](data/README.md#new-forecasts).
 
 ## Publication Privacy
 
@@ -66,7 +66,7 @@ These are **model ratings, not official BWF rankings or win probabilities**. Jun
 
 ## Model
 
-Refitted on **302,941 matches spanning 2018-2026**, the default model estimates win probabilities for all five badminton disciplines.
+Refitted on **302,934 cleaned matches spanning 2018-2026**, the default model estimates win probabilities for all five badminton disciplines.
 
 **LightGBM** combines **score-sensitive Elo** and **player-based TrueSkill** with:
 

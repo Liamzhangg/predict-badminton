@@ -14,7 +14,7 @@ Compact research record: one row per tested setting. Accuracy is higher-is-bette
 
 New forecasts use LightGBM with score-sensitive player/global/hybrid-pair Elo, player-based TrueSkill, experience/reliability counts, 5/10-match win rates, rest days, H2H wins/count/win rate, tournament tier, round, seeds, same-country flag and discipline, plus country Elo, country identity, intercountry counts and three coverage indicators. Both opponent orders are averaged. H2H has no manual extra weight. No home advantage, travel distance, calendar decay, workload additions, Glicko or calendar-inactivity TrueSkill growth is active.
 
-The selected forecast bundle is `outputs/runs/2026-11-16-country-context-181718Z`; it refreshes observed eligible history separately. `outputs/runs/2026-11-12-observed-timing-v2-054212Z` remains the backup, and `outputs/artifacts` remains the untouched older bundle. The promotion is documented below. The [model and data audit](outputs/audits/model-data-2026-11-16/report.md) explains why reused pooled scores do not establish superiority on future senior World Tour markets.
+The selected forecast bundle is `outputs/runs/2026-11-16-receipt-quality-cleaned`; it refreshes observed eligible history separately and excludes the seven quarantined records. `outputs/forecast_bundle.previous.json` retains the previous country bundle for rollback. The older observed-timing bundle and `outputs/artifacts` are untouched. The promotions are documented below. The [model and data audit](outputs/audits/model-data-2026-11-16/report.md) explains why reused pooled scores do not establish superiority on future senior World Tour markets.
 
 ## Elo inactivity decay
 
@@ -590,3 +590,28 @@ The new all-data refit uses **302,941 eligible matches**, a fixed `2026-11-16T18
 The previous `outputs/runs/2026-11-12-observed-timing-v2-054212Z` model and all its artifacts remain unchanged as the backup; `outputs/forecast_bundle.backup.json` preserves its pointer. The older `outputs/artifacts/` bundle also remains untouched. New forecasts rebuild player/country ratings, counts, recent form and H2H from results available strictly before their frozen cutoff. Historical predictions, quoted odds and all private betting records are not regenerated or re-scored. Old calibrators are not attached to the new feature schema.
 
 Verification: **296 core tests pass**, including new state serialization, strict result release, country-category encoding, opponent-order symmetry, country-history correction/retraction, raw-only bundle loading and legacy compatibility checks. The new run also stores exact feature-parity and integration-check reports. A synthetic end-to-end round forecast uses the real local history refresh without recording bets; temporary synthetic forecast files are removed. Pre-existing data/output files are hash-checked, allowing only the forecast pointer and this task's documentation update to change.
+
+## Receipt Completion and Quarantine Refit (2026-11-16)
+
+New receipts now require and fingerprint explicit final status. Legacy completion proofs are appended only when exact cached response bytes match their original recorded SHA-256 and the normalized result is final. All 609 observed matches retain their original availability times; all original database rows remain intact. The seven audited winner/score contradictions are quarantined by both match ID and fixture signature, without editing raw files or guessing corrected winners. Explicit non-final results and duplicate quarantine aliases cannot enter training/history.
+
+Matched comparison: the active 55-feature country recipe with its pre-fix data versus the same recipe with cleaned data. Five seeds (42/7/2026/13/99); January/April/July/October retraining, availability-purged internal early stopping, frozen training-only country vocabularies and raw two-order averaging. No new tuning. Both variants score the same 44,188 non-quarantined 2026 fixtures; the bad 2026 target is excluded from both sides.
+
+| Quarterly Replay | Matches | Current Accuracy / Loss | Cleaned Accuracy / Loss |
+| --- | ---: | ---: | ---: |
+| All 2026 | 44,188 | 77.739% / 0.455025 | 77.727% / 0.455410 |
+| Senior World Tour | 4,559 | 72.779% / 0.526686 | 72.814% / 0.526814 |
+| World Tour R32 | 2,106 | 74.340% / 0.502224 | 74.311% / 0.503142 |
+| Junior tagged | 18,023 | 78.047% / 0.455776 | 78.011% / 0.456358 |
+
+Pooled cleaned-minus-current accuracy is **-0.0118 percentage points**, crossed seed/tournament 95% interval **[-0.1086, +0.0755]**. Log-loss change is +0.000384, interval [-0.000027, +0.000829]; Brier change is +0.000129, interval [-0.000025, +0.000292]. All include zero. Secondary annual accuracy is 77.665% current versus 77.624% cleaned. The defects are fixed, but this reused historical comparison does not establish an accuracy or probability-quality gain, prospective superiority or profit.
+
+A separate 500-tree seed-42 candidate was saved at `outputs/runs/2026-11-16-receipt-quality-cleaned`, refit on **302,934** clean matches at the same `2026-11-16T18:17:18Z` data cutoff as production. Neither all-data artifact is scored on its own historical training rows. At the comparison stage, production weights/state/default pointer and all 16 original Hong Kong run files, original odds and paper-bet accounting remained byte-for-byte unchanged. A new 79-fixture shadow-probability file is stored separately and does not reselect or record bets. The candidate was **not promoted during the comparison**; the later approved promotion is recorded below.
+
+Verification: **312 tests pass**. All 15,206 pre-existing data/output files are checked, allowing only the evidence-backed database migration and data instructions to change; all raw result files and original database rows are preserved. Full [comparison and remediation report](outputs/experiments/receipt-quality-retrain-2026-11-16/report.md), locked protocol, per-fit checkpoints, cohort evidence, migration backup and candidate verification are under the new experiment directory. Large data/model artifacts remain local.
+
+## Cleaned Default Promotion (2026-11-16)
+
+Following explicit user approval, `outputs/forecast_bundle.json` now selects `outputs/runs/2026-11-16-receipt-quality-cleaned` for new forecasts. This is the already verified 302,934-row, 55-feature, seed-42 500-tree refit; no new training, tuning or feature selection is performed during promotion. Historical evidence remains the matched 77.739% current-control versus 77.727% cleaned quarterly replay, not proof of a gain or prospective profitability.
+
+`outputs/forecast_bundle.previous.json` preserves the previous country bundle. The older observed-v2 backup pointer and all existing model binaries remain unchanged. All 16 original Hong Kong files, their supplied odds, and the structured/rendered paper-bet ledger remain byte-for-byte frozen. The private betting records are not regenerated or reselected. Promotion verification, selector provenance and synthetic default-forecast checks are recorded separately from the earlier comparison-stage reports.

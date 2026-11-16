@@ -1,0 +1,12 @@
+{
+  "seed": 13,
+  "variant": "cleaned_recipe",
+  "training_boundary": "2026-01-01T00:00:00",
+  "train_n": 258731,
+  "trees": 429,
+  "target_n": 44188,
+  "fit_max_prediction_time": "2025-08-25 19:10:00",
+  "fit_max_available_at": "2025-08-26 00:00:00",
+  "stop_min_prediction_time": "2025-08-26 07:55:00",
+  "seconds": 9.05873933294788
+}

@@ -1,0 +1,8 @@
+{
+  "backup": "outputs/experiments/receipt-quality-retrain-2026-11-16/observations-before.sqlite3",
+  "added_completion_receipts": 2284,
+  "verified_match_ids": 609,
+  "original_availability_times_preserved": true,
+  "original_response_rows_preserved": true,
+  "database_sha256_after": "87c1524035afb9dbd67a5382ce8f47b78ffac6194196b2d39420b1f5c1198308"
+}

@@ -1,0 +1,35 @@
+{
+  "complete": true,
+  "protected_preexisting_files_checked": 15206,
+  "intentional_changes": [
+    "data/README.md",
+    "data/manifests/bwf_result_observations.sqlite3"
+  ],
+  "hong_kong_files_byte_frozen": 16,
+  "original_ledger_and_report_byte_frozen": true,
+  "all_original_raw_results_unchanged": true,
+  "production_model_state_and_pointer_unchanged": true,
+  "original_database_rows": {
+    "responses": {
+      "before": 65,
+      "after": 65,
+      "all_original_rows_unchanged": true
+    },
+    "result_versions": {
+      "before": 609,
+      "after": 1218,
+      "all_original_rows_unchanged": true
+    },
+    "response_results": {
+      "before": 2284,
+      "after": 4568,
+      "all_original_rows_unchanged": true
+    }
+  },
+  "original_observed_result_times_preserved": 609,
+  "candidate_rows": 302934,
+  "candidate_features": 55,
+  "candidate_loadable": true,
+  "test_suite_passed": 312,
+  "prospective_accuracy_available": false
+}

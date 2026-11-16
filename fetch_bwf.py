@@ -26,7 +26,7 @@ from predict_badminton.data_sources.bwf import (
     upsert_manifest_rows,
     validate_raw_dir,
 )
-from predict_badminton.data_sources.observations import OBSERVATIONS_PATH, observation_status
+from predict_badminton.data_sources.observations import OBSERVATIONS_PATH, observation_status, verify_legacy_receipts
 
 logging.basicConfig(
     level=logging.INFO,
@@ -82,6 +82,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     observations = subparsers.add_parser("observations", help="show completed-result receipt and invalidation counts")
     observations.add_argument("--db", type=Path, default=OBSERVATIONS_PATH)
+    observations.add_argument("--verify-cached-completions", action="store_true",
+                              help="append legacy completion proofs from exact matching cached responses")
+    observations.add_argument("--cache-dir", type=Path, default=SOURCE_CACHE_DIR)
 
     return parser
 
@@ -177,7 +180,14 @@ def main() -> int:
         if args.command == "validate":
             return cmd_validate(args)
         if args.command == "observations":
-            print(json.dumps(observation_status(args.db), indent=2))
+            verification = None
+            if args.verify_cached_completions:
+                paths = (p for p in sorted(args.cache_dir.rglob("*")) if p.is_file() and p.suffix in {".json", ".html"})
+                verification = verify_legacy_receipts(paths, path=args.db)
+            status = observation_status(args.db)
+            if verification is not None:
+                status["completion_verification"] = verification
+            print(json.dumps(status, indent=2))
             return 0
         if args.command == "list-blocked":
             return cmd_list_blocked(args)

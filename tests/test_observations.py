@@ -22,7 +22,7 @@ from predict_badminton.data_sources.observations import observation_status, reco
 def completed_match() -> dict:
     return {
         "id": "m1", "tournamentCode": "100", "tournamentName": "Example Open",
-        "eventName": "MS", "roundName": "R32", "winner": 1, "duration": 45,
+        "eventName": "MS", "roundName": "R32", "winner": 1, "duration": 45, "matchStatus": "F",
         "matchTimeUtc": "2026-11-11 09:00:00", "scoreStatus": 0,
         "team1": {"countryCode": "CAN", "players": [{"id": "p1", "nameDisplay": "A"}]},
         "team2": {"countryCode": "USA", "players": [{"id": "p2", "nameDisplay": "B"}]},

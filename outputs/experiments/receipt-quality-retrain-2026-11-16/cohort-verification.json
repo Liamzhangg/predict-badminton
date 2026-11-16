@@ -1,0 +1,26 @@
+{
+  "reference_rows": 302941,
+  "cleaned_rows": 302934,
+  "drops": {
+    "walkover": 8577,
+    "bad_winner": 6538,
+    "no_player_ids": 5795,
+    "para_match": 29757,
+    "no_time": 1199,
+    "duplicate_fixture": 652,
+    "quarantined_result": 7,
+    "duplicate_source_alias": 208
+  },
+  "removed_match_ids": [
+    "1086596",
+    "1145836",
+    "1186963",
+    "1225763",
+    "1304511",
+    "1304513",
+    "1512847"
+  ],
+  "retained_labels_times_and_score_margins_identical": true,
+  "receipt_snapshot": "Explicit final status required and fingerprinted; legacy receipts require exact cached-response proof",
+  "quarantine_sha256": "06e3246105892838c18db653760469cefc065d79b46cd3b58f2ecb576c836e81"
+}

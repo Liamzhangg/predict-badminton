@@ -1,6 +1,8 @@
 """Fresh result receipts, explicit invalidations, and availability snapshots."""
 from __future__ import annotations
 
+from collections.abc import Iterable
+from contextlib import closing
 from datetime import UTC, datetime
 import hashlib
 from itertools import groupby
@@ -19,7 +21,7 @@ _RESULT_FIELDS = (
     "tournamentCode", "tournamentName", "eventName", "roundName", "locationName",
     "matchTimeUtc", "matchTime", "timePrecision", "duration", "winner", "scoreStatus",
     "scoreStatusValue", "team1seed", "team2seed", "isTeamMatch", "teamTieId",
-    "matchOrder", "matchTypeNo",
+    "matchOrder", "matchTypeNo", "matchStatus",
 )
 
 
@@ -34,11 +36,14 @@ def _invalidation_reason(match: dict[str, Any]) -> str | None:
         return status
     if not isinstance(match.get("winner"), bool) and match.get("winner") in (0, "0"):
         return "winner_reset"
+    if match.get("matchStatus") in ("L", "N"):
+        return "match_not_final"
     return None
 
 
 def _snapshot(match: dict[str, Any]) -> dict[str, Any] | None:
-    if isinstance(match.get("winner"), bool) or match.get("winner") not in (1, 2):
+    if (match.get("matchStatus") != "F" or isinstance(match.get("winner"), bool)
+            or match.get("winner") not in (1, 2)):
         return None
     if match.get("id") is None or not str(match["id"]).strip() or is_para_match(match):
         return None
@@ -134,13 +139,70 @@ def record_results(
     return len(versions), added
 
 
-def result_version(match: dict[str, Any]) -> tuple[str, str] | None:
-    """Return the exact normalized version hash and its canonical JSON snapshot."""
-    snapshot = _snapshot(match)
-    if snapshot is None:
-        return None
+def _encoded_version(snapshot: dict[str, Any]) -> tuple[str, str]:
     payload = json.dumps(snapshot, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False)
     return hashlib.sha256(payload.encode()).hexdigest(), payload
+
+
+def result_version(match: dict[str, Any]) -> tuple[str, str] | None:
+    """Fingerprint an explicitly final result, including its completion status."""
+    snapshot = _snapshot(match)
+    return _encoded_version(snapshot) if snapshot is not None else None
+
+
+def verify_legacy_receipts(source_paths: Iterable[Path], *, path: Path = OBSERVATIONS_PATH) -> dict[str, Any]:
+    """Append completion proofs only from bytes matching an original response hash."""
+    from predict_badminton.data_sources.bwf import normalize_json_data
+
+    if not path.is_file():
+        raise ValueError("Result observations database is missing")
+    verified = []
+    with closing(sqlite3.connect(path)) as connection, connection:
+        rows = connection.execute("""SELECT rr.response_id,rr.match_id,rr.result_sha256,
+            r.observed_at,r.response_sha256,v.result_json FROM response_results rr
+            JOIN responses r USING(response_id) JOIN result_versions v USING(match_id,result_sha256)""").fetchall()
+        legacy = {}
+        for response_id, mid, fingerprint, stamp, digest, payload in rows:
+            if json.loads(payload).get("matchStatus") != "F":
+                legacy.setdefault(digest, {})[(response_id, mid, fingerprint)] = stamp
+        seen = set()
+        added = 0
+        for source_path in source_paths:
+            body = source_path.read_bytes()
+            digest = hashlib.sha256(body).hexdigest()
+            if digest not in legacy or digest in seen:
+                continue
+            seen.add(digest)
+            rounds, _ = normalize_json_data(json.loads(body), "verified-receipt")
+            blocked = {str(match["id"]).strip() for group in rounds for match in group
+                       if match.get("id") is not None and match.get("matchStatus") != "F"}
+            completed = {}
+            for group in rounds:
+                for match in group:
+                    if str(match.get("id")).strip() in blocked:
+                        continue
+                    version = result_version(match)
+                    if version is not None:
+                        snapshot = json.loads(version[1])
+                        old_hash = _encoded_version({k: v for k, v in snapshot.items() if k != "matchStatus"})[0]
+                        completed[(str(match["id"]).strip(), old_hash)] = version
+            for (response_id, mid, old_hash), stamp in legacy[digest].items():
+                if (mid, old_hash) not in completed:
+                    continue
+                fingerprint, payload = completed[(mid, old_hash)]
+                connection.execute("INSERT OR IGNORE INTO result_versions VALUES (?,?,?,?)",
+                                   (mid, fingerprint, stamp, payload))
+                connection.execute("UPDATE result_versions SET first_seen_at=MIN(first_seen_at,?) WHERE match_id=? AND result_sha256=?",
+                                   (stamp, mid, fingerprint))
+                inserted = connection.execute("INSERT OR IGNORE INTO response_results VALUES (?,?,?)",
+                                              (response_id, mid, fingerprint)).rowcount
+                added += inserted
+                if inserted:
+                    verified.append({"response_id": response_id, "match_id": mid, "observed_at": stamp,
+                                     "response_sha256": digest, "legacy_sha256": old_hash,
+                                     "completed_sha256": fingerprint, "source_path": str(source_path)})
+    return {"added_completion_receipts": added, "verified": verified,
+            "unmatched_response_hashes": sorted(set(legacy) - seen)}
 
 
 def observations_before(cutoff: datetime, path: Path = OBSERVATIONS_PATH) -> dict[str, dict[str, Any] | None]:
@@ -154,12 +216,13 @@ def observations_before(cutoff: datetime, path: Path = OBSERVATIONS_PATH) -> dic
     try:
         connection.execute("BEGIN")
         known = {mid: None for (mid,) in connection.execute("SELECT DISTINCT match_id FROM result_versions")}
-        query = """SELECT rr.match_id,r.observed_at,rr.result_sha256,r.source_url,r.response_sha256,r.response_id
+        query = """SELECT rr.match_id,r.observed_at,rr.result_sha256,r.source_url,r.response_sha256,r.response_id,v.result_json
             FROM response_results rr JOIN responses r USING(response_id)
+            JOIN result_versions v USING(match_id,result_sha256)
             WHERE r.observed_at < ?"""
         parameters = [stamp]
         if connection.execute("SELECT 1 FROM sqlite_master WHERE name='result_invalidations' AND type='table'").fetchone():
-            query += """ UNION ALL SELECT ri.match_id,r.observed_at,NULL,r.source_url,r.response_sha256,r.response_id
+            query += """ UNION ALL SELECT ri.match_id,r.observed_at,NULL,r.source_url,r.response_sha256,r.response_id,NULL
                 FROM result_invalidations ri JOIN responses r USING(response_id) WHERE r.observed_at < ?"""
             parameters.append(stamp)
         rows = connection.execute(query + " ORDER BY 1,2,6", parameters).fetchall()
@@ -167,16 +230,26 @@ def observations_before(cutoff: datetime, path: Path = OBSERVATIONS_PATH) -> dic
         connection.close()
     for (mid, observed), receipt_rows in groupby(rows, key=lambda row: row[:2]):
         receipts = list(receipt_rows)
-        fingerprints = {row[2] for row in receipts}
-        if len(fingerprints) != 1 or None in fingerprints:
+        # A completion proof covers only its original response, not a later legacy correction.
+        completed, unverified, covered = [], set(), set()
+        for row in receipts:
+            snapshot = json.loads(row[6]) if row[6] is not None else {}
+            if snapshot.get("matchStatus") == "F":
+                completed.append(row)
+                old_hash = _encoded_version({k: v for k, v in snapshot.items() if k != "matchStatus"})[0]
+                covered.add((row[5], old_hash))
+            else:
+                unverified.add((row[5], row[2]))
+        fingerprints = {row[2] for row in completed}
+        if len(fingerprints) != 1 or unverified - covered:
             known[mid] = None
             continue
-        fingerprint = receipts[0][2]
+        fingerprint = completed[0][2]
         previous = known[mid]
         if previous is None or previous["result_sha256"] != fingerprint:
             known[mid] = {"result_sha256": fingerprint,
                           "available_at": datetime.fromisoformat(observed).astimezone(UTC).replace(tzinfo=None),
-                          "source_url": receipts[0][3], "response_sha256": receipts[0][4]}
+                          "source_url": completed[0][3], "response_sha256": completed[0][4]}
     return known
 
 

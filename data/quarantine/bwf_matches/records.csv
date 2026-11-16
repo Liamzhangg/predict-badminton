@@ -1,0 +1,8 @@
+match_id,fixture_id,reason,audit_date,source_file,declared_winner,score
+1512847,1d80175cd8ba248d4d90d6ee02ac5a4ea18d576bddbfc447ecb413b5a4aacb23,winner_score_conflict_pending_source_verification,2026-11-16,data/raw/bwf_matches/badminton-asia-south-asia-regional-championships-2026-individual.json,2,"[[21,19],[14,21],[21,1]]"
+1304511,dca5d5b6684cff071df45553a03e41783323e0d37d11fd92bc56965fd5b28b8f,winner_score_conflict_pending_source_verification,2026-11-16,data/raw/bwf_matches/fz-forza-alpes-international-u19-2023.json,2,"[[21,19],[21,12]]"
+1304513,71269576e090306d2aac442d9d12661f5534a6842170cc16be361c5e615bf372,winner_score_conflict_pending_source_verification,2026-11-16,data/raw/bwf_matches/fz-forza-alpes-international-u19-2023.json,1,"[[15,21],[11,21]]"
+1145836,3abfe4615d205d1f18366233f5ca7e94b493f003db7b06bb9265e2170ee9e4b4,winner_score_conflict_pending_source_verification,2026-11-16,data/raw/bwf_matches/iceland-international-2019.json,1,"[[9,21],[10,21]]"
+1186963,ec0887f0ab1149022ac6ba035f9ee54524d83bfa4b2b08992500f7bbe114cf85,winner_score_conflict_pending_source_verification,2026-11-16,data/raw/bwf_matches/tem-slovenia-junior-international-2019.json,1,"[[20,22],[21,19],[19,21]]"
+1225763,b5a35a7a68fcdda268b1cb28a8f83e370e5c5ce45e4c1d78e9e2e09182a38f8b,winner_score_conflict_pending_source_verification,2026-11-16,data/raw/bwf_matches/tem-slovenia-junior-international-2020.json,1,"[[21,18],[13,21],[20,22]]"
+1086596,38601e9e05c988f881c05f2078f1ce0d649d5b202fe9f9504ddf9fbddd52c9d8,winner_score_conflict_pending_source_verification,2026-11-16,data/raw/bwf_matches/yonex-lithuanian-junior-2018.json,2,"[[21,13],[21,17]]"

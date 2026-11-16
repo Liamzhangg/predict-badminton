@@ -8,10 +8,12 @@ Drop policy (tracked in counts dict returned by load_all_matches):
   - official walkover status: no played match for training or Elo
   - no parseable match time: cannot order chronologically
   - empty player IDs for either team: cannot compute Elo
+  - explicitly non-final results or quarantined winner/score contradictions
 """
 from __future__ import annotations
 
 import hashlib
+import csv
 import json
 import logging
 import re
@@ -21,6 +23,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from predict_badminton.config import REPO_ROOT
 from predict_badminton.match_rules import point_margin, unplayed_status
 from predict_badminton.temporal import match_timing
 from predict_badminton.tournament_catalog import TournamentCatalog, official_tier
@@ -143,6 +146,15 @@ def _iter_matches(data: Any) -> Iterator[dict[str, Any]]:
                 yield match
 
 
+def _quarantined_results() -> frozenset[str]:
+    path = REPO_ROOT / "data/quarantine/bwf_matches/records.csv"
+    with path.open(newline="", encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+    if any(not row.get("match_id") or not re.fullmatch(r"[0-9a-f]{64}", row.get("fixture_id", "")) for row in rows):
+        raise ValueError("Invalid quarantined-result catalog")
+    return frozenset(key for row in rows for key in ("id:" + row["match_id"], "fixture:" + row["fixture_id"]))
+
+
 def parse_file(
     filepath: Path,
     drop_counts: dict[str, int],
@@ -151,13 +163,15 @@ def parse_file(
     include_para: bool = False,
     observed_results: dict[str, dict[str, Any] | None] | None = None,
     category_catalog: TournamentCatalog | None = None,
+    quarantined_results: frozenset[str] | None = None,
 ) -> list[dict[str, Any]]:
     """Parse one JSON file; return list of normalised match dicts.
 
     If name_map is provided it is updated in-place with {player_id: display_name}.
-    Observation rejections stay marked until load_all_matches resolves fixture aliases.
+    Result rejections stay marked until load_all_matches resolves fixture aliases.
     """
     records: list[dict[str, Any]] = []
+    quarantined = _quarantined_results() if quarantined_results is None else quarantined_results
     try:
         with open(filepath, encoding="utf-8") as fh:
             data = json.load(fh)
@@ -205,8 +219,8 @@ def parse_file(
             coarse=(len(raw_time.strip()) == 10 or mt.time() == datetime.min.time()
                     or match.get("timePrecision") == "date"),
         )
-        observation_error = None
-        if tracked:
+        observation_error = "unfinished_result" if match.get("matchStatus") not in (None, "", "F") else None
+        if tracked and observation_error is None:
             from predict_badminton.data_sources.observations import result_version
 
             receipt = observed_results[match_id]
@@ -218,6 +232,12 @@ def parse_file(
             else:
                 timing.update(available_at=receipt["available_at"], availability_source="observed_completed_result")
         teams = tuple(sorted((tuple(sorted(ids1)), tuple(sorted(ids2)))))
+        fixture_key = (str(match.get("tournamentCode") or t_name).strip().casefold(),
+                       match.get("matchTime") or raw_time, match.get("eventName"),
+                       match.get("roundName"), teams, match.get("matchOrder"), match.get("matchTypeNo"))
+        fixture_id = hashlib.sha256(json.dumps(fixture_key).encode()).hexdigest()
+        if "id:" + match_id in quarantined or "fixture:" + fixture_id in quarantined:
+            observation_error = "quarantined_result"
 
         records.append(
             {
@@ -247,11 +267,7 @@ def parse_file(
                 **timing,
                 "_observation_error": observation_error,
                 "_has_utc_time": bool(match.get("matchTimeUtc")),
-                "_fixture_key": (
-                    str(match.get("tournamentCode") or t_name).strip().casefold(),
-                    match.get("matchTime") or raw_time, match.get("eventName"),
-                    match.get("roundName"), teams, match.get("matchOrder"), match.get("matchTypeNo"),
-                ),
+                "_fixture_key": fixture_key,
             }
         )
     return records
@@ -362,6 +378,7 @@ def load_all_matches(
     all_records: list[dict[str, Any]] = []
     drop_counts: dict[str, int] = {}
     name_map: dict[str, str] = {}
+    quarantined = _quarantined_results()
 
     for fp in files:
         records = parse_file(
@@ -371,6 +388,7 @@ def load_all_matches(
             include_para=include_para,
             observed_results=observed_results,
             category_catalog=category_catalog,
+            quarantined_results=quarantined,
         )
         all_records.extend(records)
 

@@ -25,6 +25,7 @@ build/
 !data/leaderboards/elo_leaderboard_*.csv
 !data/odds/**/*.csv
 !data/catalogs/*.csv
+!data/quarantine/bwf_matches/records.csv
 data/raw/**/*.json
 !data/raw/bwf_matches/.gitkeep
 data/processed/**
